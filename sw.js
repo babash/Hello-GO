@@ -1,6 +1,6 @@
 // Hello GO : le service worker garde l'application sur l'appareil, pour qu'elle s'ouvre sans réseau.
 // Changer VERSION à chaque publication : l'ancien cache est alors remplacé.
-const VERSION = 'hello-go-1.1.0';
+const VERSION = 'hello-go-1.2.0';
 const FICHIERS = ['./', 'index.html', 'css/app.css', 'css/polices.css', 'js/donnees.js', 'js/decouvertes.js', 'js/analyse.js', 'js/app.js',
   'vendor/sortable.min.js', 'icone.svg', 'manifest.webmanifest'];
 self.addEventListener('install', (ev) => { ev.waitUntil(caches.open(VERSION).then((c) => c.addAll(FICHIERS)).then(() => self.skipWaiting())); });
