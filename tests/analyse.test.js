@@ -112,3 +112,11 @@ assert.ok(A.surprises({ nsi: ['ia'] }, r2).some((x) => /sécurité/.test(x))); a
 const d4 = dossier(); d4.decouverte = { reactions: re }; assert.ok(A.majHautsFaits(d4).some((h) => h.id === 'cartes'));
 assert.ok(/Découvrir/.test(A.prochaineAction(dossier()).bouton));
 console.log('découvrir : ' + C.length + ' cartes, essais passés');
+
+// import : les nouveaux champs sont contrôlés
+const bon = { v: 1, questions: [], quiz: { reponses: { gouts: ['musique'], spe: 'maths', dansspe: ['probas'] }, fait: true }, decouverte: { reactions: { 4: 1, 86: -1 } }, vus: { suite: 1 } };
+assert.strictEqual(A.dossierValide(bon), true);
+assert.strictEqual(A.dossierValide(Object.assign({}, bon, { decouverte: { reactions: { '"><img>': 1 } } })), false);
+assert.strictEqual(A.dossierValide(Object.assign({}, bon, { decouverte: { reactions: { 4: '<b>' } } })), false);
+assert.strictEqual(A.dossierValide(Object.assign({}, bon, { quiz: { reponses: { gouts: [{}] } } })), false);
+console.log('import : nouveaux champs contrôlés');
