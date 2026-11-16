@@ -35,12 +35,28 @@ assert.strictEqual(A.motComplet({ mot: 'a', defSource: 'b', defMoi: 'c' }), true
 assert.ok(A.coachMot({ mot: 'Biais', defSource: 'Erreur systématique et manque d’objectivité d’un algorithme', sourceTexte: 's', defMoi: 'Erreur systématique, manque d’objectivité d’un algorithme', analogie: 'a' }).some((x) => /ressemble trop/.test(x)));
 
 // questionnaire
-let s = A.suggestions({ i: ['musique'], n: ['ia'], a: 'avenir', s: 'maths' });
-assert.strictEqual(s.length, 5); assert.ok(/musicale/.test(s[0].sujet.t), s[0].sujet.t); assert.ok(s[0].raisons.includes('Musique'));
+const ids = { i: Object.keys(D.TAGS.i), n: Object.keys(D.TAGS.n), a: ['recit', 'comment', 'debat', 'avenir'], s: D.QUIZ.find((x) => x.id === 'spe').choix.map((x) => x[0]) };
+let s = A.suggestions({ gouts: ['musique'], nsi: ['ia'], angle: 'avenir', spe: 'maths' });
+assert.strictEqual(s.length, 5); assert.ok(/musicale/.test(s[0].sujet.t), s[0].sujet.t); assert.ok(s[0].raisons.includes('Écouter ou faire de la musique'));
 assert.strictEqual(A.suggestions({}).length, 0);
 D.SUJETS.forEach((x) => { assert.ok(x.t && x.th && x.i.length && x.n.length && x.a.length, x.t); });
-const ids = {}; D.QUIZ.forEach((qz) => { ids[qz.id] = qz.choix.map((x) => x[0]); });
 D.SUJETS.forEach((x) => { x.i.forEach((v) => assert.ok(ids.i.includes(v), x.t + ' ' + v)); x.n.forEach((v) => assert.ok(ids.n.includes(v), x.t + ' ' + v)); x.a.forEach((v) => assert.ok(ids.a.includes(v), v)); x.s.forEach((v) => assert.ok(ids.s.includes(v), v)); });
+// chaque réponse du questionnaire a un identifiant unique, des étiquettes connues et des mots qui trouvent au moins un sujet
+const vusId = new Set(); let nReponses = 0;
+D.QUIZ.forEach((q) => { const listes = q.choixSelon ? Object.values(q.choixSelon) : [A.choixDe(q, {})];
+  if (q.choixSelon) Object.keys(q.choixSelon).forEach((k) => assert.ok(ids.s.includes(k), k));
+  listes.forEach((l) => l.forEach((c) => { nReponses++; const cle = q.id + ':' + c[0]; assert.ok(!vusId.has(cle), cle); vusId.add(cle);
+    c[2].i.forEach((v) => assert.ok(ids.i.includes(v), cle + v)); c[2].n.forEach((v) => assert.ok(ids.n.includes(v), cle + v));
+    if (c[2].k) assert.ok(D.SUJETS.some((x) => new RegExp(c[2].k, 'i').test(x.t)), 'aucun sujet pour ' + cle + ' /' + c[2].k + '/'); })); });
+assert.ok(nReponses >= 90, nReponses);
+// chaque réponse qui porte des étiquettes mène à des sujets ; les sous-réponses d'une spécialité en changent le résultat
+D.QUIZ.forEach((q) => { if (q.id === 'spe' || q.id === 'angle') return; const tous = q.choixSelon ? Object.entries(q.choixSelon) : [['', A.choixDe(q, {})]];
+  tous.forEach(([spe, l]) => l.forEach((c) => { if (!c[2].i.length && !c[2].n.length) return; const r = { spe }; r[q.id] = [c[0]]; assert.ok(A.suggestions(r, 5).length >= 3, q.id + ':' + c[0]); })); });
+assert.notDeepStrictEqual(A.suggestions({ spe: 'maths', dansspe: ['arith'] }, 3).map((x) => x.sujet.t), A.suggestions({ spe: 'maths', dansspe: ['geom'] }, 3).map((x) => x.sujet.t));
+assert.ok(/fractales/i.test(A.suggestions({ spe: 'maths', dansspe: ['geom'] }, 1)[0].sujet.t));
+assert.ok(/dessin animé/.test(A.suggestions({ gouts: ['anime'] }, 1)[0].sujet.t));
+const th = {}; A.suggestions({ gouts: ['rs', 'actu', 'justice'], coeur: ['prive', 'vrai'] }, 5).forEach((x) => { th[x.sujet.th] = (th[x.sujet.th] || 0) + 1; }); assert.ok(Object.values(th).every((v) => v <= 2), 'variété des thèmes');
+assert.strictEqual(A.profil({ spe: 'ses', dansspe: ['arith'] }).nombre, 1, 'une sous-réponse d’une autre spécialité ne compte pas');
 
 // prochaine action et phase
 assert.ok(/Découvrir/.test(A.prochaineAction(dossier()).bouton));
@@ -92,7 +108,7 @@ while (A.prochaineCarte(re)) re[A.prochaineCarte(re).num] = 1; assert.strictEqua
 assert.strictEqual(A.suggestions({}, 5, {}).length, 0);
 const r2 = {}; C.filter((c) => c.n.includes('secu')).forEach((c) => { r2[c.num] = 1; });
 assert.ok(A.suggestions({}, 5, r2).every((x) => x.sujet.n.includes('secu') || x.score > 0)); assert.ok(A.suggestions({}, 5, r2)[0].sujet.n.includes('secu'));
-assert.ok(A.surprises({ n: ['ia'] }, r2).some((x) => /sécurité/.test(x))); assert.ok(!A.surprises({ n: ['secu'], i: ['societe', 'histoire', 'argent', 'sciences', 'sante'] }, r2).some((x) => /sécurité/.test(x)));
+assert.ok(A.surprises({ nsi: ['ia'] }, r2).some((x) => /sécurité/.test(x))); assert.ok(!A.surprises({ nsi: ['secret'] }, r2).some((x) => /sécurité/.test(x)));
 const d4 = dossier(); d4.decouverte = { reactions: re }; assert.ok(A.majHautsFaits(d4).some((h) => h.id === 'cartes'));
 assert.ok(/Découvrir/.test(A.prochaineAction(dossier()).bouton));
 console.log('découvrir : ' + C.length + ' cartes, essais passés');

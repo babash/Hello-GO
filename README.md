@@ -14,7 +14,7 @@ Hello GO fait partie des [Ressources NSI et SNT](https://babash.github.io/Babash
 
 ## Ce que font les élèves
 
-1. **Explorer** : 35 cartes tirées de la [Timeline de l'histoire de l'informatique](https://babash.github.io/TimelineNSI/) à découvrir une par une (« Ça m'intrigue » ou « Pas pour moi »), qui font ressortir des goûts auxquels l'élève n'avait pas pensé ; un questionnaire de 4 questions ; 5 sujets proposés, avec la raison ; une banque de 46 sujets, par thème du programme ; des pistes, avec leurs idées et leurs questions possibles.
+1. **Explorer** : 35 cartes tirées de la [Timeline de l'histoire de l'informatique](https://babash.github.io/TimelineNSI/) à découvrir une par une (« Ça m'intrigue » ou « Pas pour moi »), qui font ressortir des goûts auxquels l'élève n'avait pas pensé ; un questionnaire riche (goûts par domaine, ce qui tient à cœur, ce qu'on préfère dans sa deuxième spécialité, la NSI, l'après-bac) ; 5 sujets proposés, avec la raison ; une banque de 61 sujets, par thème du programme ; des pistes, avec leurs idées et leurs questions possibles.
 2. **Construire** : un plan fait de points de 1 à 3 lignes, à ajouter, à réordonner (en glissant, ou avec les flèches) et à relier à des mots et à des sources.
 3. **Définir** : chaque mot important a deux définitions, celle d'une source et celle de l'élève, et une image pour le membre du jury non spécialiste.
 4. **Préparer l'échange** : les questions que le jury pourrait poser, dont certaines proposées d'après le plan.

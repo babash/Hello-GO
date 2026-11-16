@@ -30,9 +30,10 @@ def parcours(nav, largeur, hauteur, sombre):
     assert p.locator('.decouverte').count() == 0 and p.locator('[data-a=suite-cartes]').count() == 1; assert p.locator('.sujet').count() >= 5; large('1c-bilan')
     p.click('[data-a=suite-cartes]'); assert 'Carte 11 sur' in p.inner_text('.decouverte')
     p.goto(URL + '#/explorer/quiz'); p.wait_for_selector('.puce')
-    p.locator('label.puce', has_text='Musique').click(); p.locator('label.puce', has_text='intelligence artificielle').click()
-    p.locator('label.puce', has_text='Imaginer').click(); p.locator('label.puce', has_text='Mathématiques').click()
-    p.click('[data-a=quiz-fini]'); assert p.locator('#resultats .sujet').count() == 5; assert 'musicale' in p.locator('#resultats .sujet').first.inner_text(); large('2-quiz')
+    p.locator('label.puce', has_text='faire de la musique').click(); p.locator('label.puce', has_text='Mathématiques').click(); p.wait_for_selector('[name=quiz-dansspe]')
+    assert p.locator('label.puce', has_text='Suites et récurrence').count() == 1; p.locator('label.puce', has_text='Probabilités').click()
+    p.locator('label.puce', has_text='Imaginer').click(); assert p.locator('label.puce', has_text='faire de la musique').locator('input').is_checked()
+    p.click('[data-a=quiz-fini]'); assert p.locator('#resultats .sujet').count() == 5; assert 'usi' in p.locator('#resultats').inner_text(); large('2-quiz')
     p.locator('#resultats [data-a=garder]').first.click()
     p.goto(URL + '#/explorer/sujets'); p.fill('#recherche', 'tor'); assert p.locator('.sujet:visible').count() >= 1; large('3-sujets')
     p.goto(URL + '#/explorer/pistes'); assert p.locator('.piste').count() == 1

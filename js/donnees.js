@@ -15,19 +15,57 @@
     ['presse', 'Article de presse'], ['vulgarisee', 'Vulgarisation (vidéo, podcast, blog reconnu)'], ['encyclopedie', 'Encyclopédie (Wikipédia…)'], ['autre', 'Autre'],
   ];
 
+  // Les étiquettes communes aux sujets, aux cartes et au questionnaire.
+  const TAGS = {
+    i: { jeux: 'les jeux', musique: 'la musique', sport: 'le sport', cinema: 'le cinéma et les séries', reseaux: 'les réseaux sociaux', art: 'l’art et la création',
+      sante: 'la santé', climat: 'l’environnement', societe: 'la société', argent: 'l’argent et l’économie', histoire: 'l’histoire', sciences: 'les sciences', transports: 'les transports et la ville' },
+    n: { prog: 'programmer', donnees: 'les données', web: 'Internet et les réseaux', secu: 'la sécurité et les codes secrets', ia: 'l’intelligence artificielle', hist: 'l’histoire de l’informatique', materiel: 'les machines et le matériel' },
+  };
+  // Une réponse : [identifiant, texte, { i: [...], n: [...], k: 'mots cherchés dans les titres des sujets' }]
+  const c = (id, texte, i, n, k) => [id, texte, { i: i || [], n: n || [], k: k || '' }];
   const QUIZ = [
-    { id: 'i', titre: 'Ce qui te plaît en dehors des cours', aide: 'Plusieurs choix possibles.', multi: true, choix: [
-      ['jeux', 'Jeux vidéo'], ['musique', 'Musique'], ['sport', 'Sport'], ['cinema', 'Cinéma, séries, animation'], ['reseaux', 'Réseaux sociaux'],
-      ['art', 'Dessin et art'], ['sante', 'Santé'], ['climat', 'Environnement et climat'], ['societe', 'Société et politique'],
-      ['argent', 'Argent et économie'], ['histoire', 'Histoire'], ['sciences', 'Sciences et maths'], ['transports', 'Transports et ville'] ] },
-    { id: 's', titre: 'Ta deuxième spécialité', aide: 'Pour une question transversale.', multi: false, choix: [
-      ['maths', 'Mathématiques'], ['pc', 'Physique-chimie'], ['svt', 'SVT'], ['ses', 'SES'], ['hggsp', 'HGGSP'], ['hlp', 'HLP'], ['llce', 'Langues (LLCER)'], ['arts', 'Arts'], ['autre', 'Une autre'] ] },
-    { id: 'n', titre: 'Ce qui t’attire en NSI', aide: 'Plusieurs choix possibles.', multi: true, choix: [
-      ['prog', 'Programmer'], ['donnees', 'Les données'], ['web', 'Internet et les réseaux'], ['secu', 'La sécurité et les codes secrets'],
-      ['ia', 'L’intelligence artificielle'], ['hist', 'L’histoire de l’informatique'], ['materiel', 'Les machines et le matériel'] ] },
-    { id: 'a', titre: 'L’angle qui te parle', aide: 'Un seul choix.', multi: false, choix: [
-      ['recit', 'Raconter une histoire (une personne, une invention)'], ['comment', 'Expliquer comment ça marche'],
-      ['debat', 'Débattre d’un problème de société'], ['avenir', 'Imaginer l’avenir'] ] },
+    { id: 'gouts', titre: 'Ce qui te plaît en dehors des cours', aide: 'Coche tout ce qui te parle, même un peu.', multi: true, groupes: [
+      ['Arts et culture', [c('dessin', 'Dessin, peinture, graphisme', ['art'], [], 'art |dessin'), c('musique', 'Écouter ou faire de la musique', ['musique'], [], 'music'), c('films', 'Films et séries', ['cinema'], [], 'image|cinéma'),
+        c('anime', 'Animation, mangas, BD', ['cinema', 'art'], [], 'dessin animé'), c('photo', 'Photo et vidéo', ['art', 'reseaux'], [], 'image'), c('lire', 'Lire, écrire des histoires', ['art', 'histoire'], ['ia']), c('mode', 'Mode et style', ['art', 'reseaux']), c('scene', 'Danse, théâtre, scène', ['art'])]],
+      ['Jeux et sport', [c('jv', 'Jeux vidéo', ['jeux'], ['ia', 'prog'], 'jeu'), c('esport', 'E-sport et streaming', ['jeux', 'reseaux']), c('foot', 'Football et sports d’équipe', ['sport'], ['donnees'], 'match'),
+        c('sportseul', 'Course, natation, sports de combat…', ['sport', 'sante']), c('plateau', 'Échecs, cartes, jeux de société', ['jeux', 'sciences'], ['ia', 'prog'], 'jeu|hanoï')]],
+      ['Société', [c('actu', 'Suivre l’actualité', ['societe'], [], 'politique|infox|journalisme'), c('justice', 'La justice et les droits', ['societe'], ['donnees'], 'biais|surveillance|vie privée'),
+        c('egalite', 'L’égalité entre filles et garçons', ['societe', 'histoire'], ['hist'], 'femmes|lovelace'), c('planete', 'La planète et le climat', ['climat'], [], 'carbone|climat'),
+        c('soin', 'La santé, prendre soin des autres', ['sante'], [], 'médecine'), c('business', 'L’argent, le commerce, entreprendre', ['argent'], [], 'blockchain|million')]],
+      ['Sciences et techniques', [c('enigmes', 'Les énigmes et la logique', ['sciences'], ['prog', 'secu'], 'hanoï|np|récursivité'), c('espace', 'L’espace et l’astronomie', ['sciences', 'transports']), c('vivant', 'Le vivant et la nature', ['sciences', 'sante'], [], 'vivant|nature'),
+        c('bricoler', 'Bricoler, démonter, réparer', ['sciences'], ['materiel']), c('vehicules', 'Voitures, bateaux, avions', ['transports'], ['materiel'], 'voiture|métro'), c('robots', 'Les robots', ['sciences'], ['materiel', 'ia'], 'machine')]],
+      ['Le numérique au quotidien', [c('rs', 'Les réseaux sociaux', ['reseaux'], ['donnees'], 'réseaux sociaux'), c('contenu', 'Créer du contenu (vidéos, montages)', ['reseaux', 'art'], [], 'deepfake'), c('tel', 'Mon téléphone et mes applis', ['reseaux'], ['materiel']),
+        c('ianum', 'Utiliser des IA', [], ['ia'], 'intelligen'), c('protec', 'Protéger mes comptes et ma vie privée', ['reseaux'], ['secu'], 'protéger|chiffrer|vie privée')]],
+      ['Histoire et monde', [c('hist', 'L’histoire', ['histoire'], ['hist'], 'histoire|guerre'), c('langues', 'Les langues et les voyages', ['histoire', 'societe'], ['web']), c('ile', 'La vie de mon île et de ma région', ['societe', 'transports'], ['web'], 'fracture|smart')]] ] },
+    { id: 'coeur', titre: 'Ce qui te tient à cœur', aide: 'Ce qui te révolte, ou ce que tu voudrais défendre.', multi: true, choix: [
+      c('juste', 'Que personne ne soit traité injustement', ['societe'], ['ia', 'donnees'], 'biais|fracture'), c('prive', 'Que ma vie privée reste privée', ['societe', 'reseaux'], ['secu', 'donnees'], 'vie privée|surveillance|données'),
+      c('vrai', 'Démêler le vrai du faux', ['societe', 'reseaux'], ['ia'], 'infox|deepfake|preuve'), c('libre', 'Partager le savoir librement', ['societe'], ['hist', 'web'], 'libre|wikip'),
+      c('terre', 'Protéger la planète', ['climat'], ['materiel'], 'carbone|climat'), c('creer', 'Créer, inventer du nouveau', ['art'], ['prog', 'ia'], 'art|composition'),
+      c('comprendre', 'Comprendre comment les choses marchent', ['sciences'], ['materiel', 'prog'], 'comment'), c('proteger', 'Protéger les gens des attaques', ['societe'], ['secu'], 'sûre|sécuriser|cyber')] },
+    { id: 'spe', titre: 'Ta deuxième spécialité', aide: 'Pour une question transversale, qui relie tes deux spécialités.', multi: false, choix: [
+      c('maths', 'Mathématiques'), c('pc', 'Physique-chimie'), c('svt', 'SVT'), c('ses', 'SES'), c('hggsp', 'HGGSP'), c('hlp', 'HLP'), c('llce', 'Langues (LLCER, AMC)'), c('arts', 'Arts'),
+      c('si', 'Sciences de l’ingénieur'), c('eppcs', 'Éducation physique, pratiques et culture sportives'), c('autre', 'Une autre')] },
+    { id: 'dansspe', titre: 'Ce que tu préfères dans cette spécialité', aide: 'C’est là que se cachent les ponts avec la NSI.', multi: true, selon: 'spe', choixSelon: {
+      maths: [c('probas', 'Probabilités et statistiques', ['sciences'], ['donnees', 'ia']), c('arith', 'Arithmétique, nombres premiers', ['sciences'], ['secu'], 'chiffrer|sécuriser'), c('suites', 'Suites et récurrence', ['sciences'], ['prog'], 'récur'), c('geom', 'Géométrie et courbes', ['art', 'sciences'], ['prog'], 'fractales'), c('logique', 'Logique et démonstration', ['sciences'], ['prog'], 'np')],
+      pc: [c('ondes', 'Ondes et signaux', ['sciences', 'musique'], ['web', 'materiel'], 'musique|communications'), c('elec', 'Électricité et circuits', ['sciences'], ['materiel'], 'infiniment petit|quantique'), c('meca', 'Mouvement et mécanique', ['transports', 'sciences'], ['prog'], 'voiture'), c('energie', 'Énergie', ['climat'], ['materiel'], 'carbone')],
+      svt: [c('genet', 'Génétique', ['sante', 'sciences'], ['donnees'], 'médecine'), c('cerveau', 'Cerveau et comportement', ['sante'], ['ia'], 'intelligente|vivant'), c('climatsvt', 'Climat et écosystèmes', ['climat'], ['donnees'], 'climat|carbone'), c('corps', 'Corps humain et santé', ['sante'], ['ia'], 'médecine')],
+      ses: [c('marches', 'Marchés, monnaie, entreprises', ['argent'], ['donnees', 'secu'], 'blockchain|entreprise'), c('inegalites', 'Inégalités et mobilité sociale', ['societe'], ['donnees'], 'fracture|biais'), c('vote', 'Vote et opinion publique', ['societe', 'reseaux'], ['donnees'], 'politique'), c('travail', 'Travail et emploi', ['societe', 'argent'], ['ia'], 'entreprise')],
+      hggsp: [c('puissances', 'Puissances et conflits', ['societe', 'histoire'], ['secu'], 'cyberguerre|guerre'), c('medias', 'S’informer : médias et opinion', ['societe', 'reseaux'], ['donnees'], 'infox|journalisme'), c('mers', 'Mers, frontières, câbles', ['transports', 'histoire'], ['web'], 'protocoles'), c('patrimoine', 'Histoire et mémoire', ['histoire'], ['hist'], 'turing|lovelace|histoire')],
+      hlp: [c('humain', 'L’humain et ses limites', ['societe', 'sciences'], ['ia'], 'machine intelligente|virtuelle'), c('parole', 'La parole et ses pouvoirs', ['societe'], ['ia'], 'infox|politique'), c('creation', 'Création et représentation', ['art'], ['ia'], 'art'), c('liberte', 'Liberté et responsabilité', ['societe'], ['donnees'], 'vie privée|surveillance|voiture autonome')],
+      llce: [c('culture', 'Cinéma, séries, musique d’ailleurs', ['cinema', 'musique'], ['donnees']), c('traduire', 'Traduire et faire traduire', ['societe'], ['ia'], 'intelligen'), c('monde', 'Le monde anglophone du numérique', ['histoire', 'argent'], ['hist', 'web'], 'web')],
+      arts: [c('image', 'L’image', ['art', 'cinema'], ['ia'], 'image|dessin animé'), c('son', 'Le son', ['musique', 'art'], ['donnees'], 'music'), c('artnum', 'L’art numérique', ['art'], ['prog'], 'art algorithmique|fractales')],
+      si: [c('robotsi', 'Robots et automatismes', ['sciences'], ['materiel', 'ia'], 'voiture autonome|machine'), c('capteurs', 'Capteurs et objets connectés', ['sciences', 'transports'], ['materiel', 'web'], 'smart'), c('concevoir', 'Concevoir et modéliser', ['sciences'], ['prog'], 'virtuelle')],
+      eppcs: [c('perf', 'Mesurer la performance', ['sport'], ['donnees'], 'match'), c('santesport', 'Sport et santé', ['sport', 'sante'], ['donnees', 'materiel']), c('spectacle', 'Le sport spectacle', ['sport', 'argent'], ['ia', 'donnees'], 'match')] } },
+    { id: 'nsi', titre: 'Ce qui t’attire en NSI', aide: 'Coche ce que tu as aimé faire ou découvrir.', multi: true, choix: [
+      c('coder', 'Écrire un programme qui marche', [], ['prog']), c('algo', 'Trouver un algorithme malin', ['sciences'], ['prog'], 'complexité|récursivité'), c('bdd', 'Les bases de données et SQL', [], ['donnees'], 'données'),
+      c('site', 'Faire un site web', [], ['web'], 'web'), c('reseau', 'Comprendre Internet et les réseaux', [], ['web'], 'protocoles|tor'), c('secret', 'La sécurité et les codes secrets', [], ['secu']),
+      c('ia', 'L’intelligence artificielle', [], ['ia']), c('passe', 'L’histoire et les personnages de l’informatique', ['histoire'], ['hist']), c('machine', 'Ce qu’il y a dans la machine', [], ['materiel']), c('linux', 'Le terminal et les systèmes', [], ['materiel', 'hist'], 'libre')] },
+    { id: 'angle', titre: 'L’angle qui te parle', aide: 'Un seul choix.', multi: false, choix: [
+      c('recit', 'Raconter une histoire (une personne, une invention)'), c('comment', 'Expliquer comment ça marche'), c('debat', 'Débattre d’un problème de société'), c('avenir', 'Imaginer l’avenir')] },
+    { id: 'apres', titre: 'Après le bac, tu te vois plutôt…', aide: 'Facultatif. Ton projet peut nourrir ta motivation devant le jury.', multi: true, choix: [
+      c('info', 'Dans l’informatique', [], ['prog']), c('medical', 'Dans la santé', ['sante']), c('droit', 'Dans le droit ou la politique', ['societe'], ['donnees']), c('commerce', 'Dans le commerce ou la gestion', ['argent']),
+      c('ingenieur', 'Dans l’ingénierie ou les sciences', ['sciences'], ['materiel']), c('prof', 'Dans l’enseignement', ['societe', 'histoire']), c('design', 'Dans l’art, le design, l’audiovisuel', ['art', 'cinema']),
+      c('sportif', 'Dans le sport', ['sport']), c('sais', 'Je ne sais pas encore')] },
   ];
 
   // t : titre ; th : thème du programme ; i : intérêts ; n : goûts en NSI ; a : angles ; s : spécialités pour une question transversale
@@ -77,6 +115,21 @@
     { t: 'Comment un automate cellulaire imite-t-il le vivant avec des règles simples ?', th: 'Algorithmique', i: ['sciences', 'jeux'], n: ['prog'], a: ['comment'], s: ['svt', 'maths'] },
     { t: 'Comment l’intelligence artificielle fait-elle vivre les personnages non-joueurs d’un jeu vidéo ?', th: 'Algorithmique', i: ['jeux'], n: ['ia', 'prog'], a: ['comment'], s: ['maths'] },
     { t: 'Les données peuvent-elles faire gagner un match ?', th: 'Données structurées', i: ['sport'], n: ['donnees', 'ia'], a: ['comment', 'debat'], s: ['maths', 'ses'] },
+    { t: 'L’intelligence artificielle va-t-elle transformer le travail en entreprise ?', th: 'Impact sociétal et éthique', i: ['argent', 'societe'], n: ['ia'], a: ['avenir', 'debat'], s: ['ses'] },
+    { t: 'Les centres de données : un numérique sobre est-il possible ?', th: 'Architectures, systèmes et réseaux', i: ['climat', 'argent'], n: ['materiel', 'web'], a: ['debat', 'avenir'], s: ['pc', 'svt', 'ses'] },
+    { t: 'L’intelligence artificielle consomme-t-elle trop d’énergie ?', th: 'Algorithmique', i: ['climat', 'societe'], n: ['ia', 'materiel'], a: ['debat'], s: ['pc', 'svt'] },
+    { t: 'Peut-on prévoir le climat avec des modèles informatiques ?', th: 'Langages et programmation', i: ['climat', 'sciences'], n: ['prog', 'donnees'], a: ['comment', 'avenir'], s: ['svt', 'maths', 'pc'] },
+    { t: 'Les statistiques peuvent-elles améliorer l’entraînement d’un·e sportif·ve ?', th: 'Données structurées', i: ['sport', 'sante'], n: ['donnees'], a: ['comment'], s: ['eppcs', 'maths', 'svt'] },
+    { t: 'L’arbitrage vidéo : la machine voit-elle mieux que l’arbitre ?', th: 'Interfaces et objets', i: ['sport'], n: ['ia', 'materiel'], a: ['debat', 'comment'], s: ['eppcs', 'pc'] },
+    { t: 'Le logiciel libre : pourquoi donner son code ?', th: 'Impact sociétal et éthique', i: ['societe', 'argent'], n: ['hist', 'prog'], a: ['debat', 'recit'], s: ['ses', 'hlp'] },
+    { t: 'Peut-on faire confiance à Wikipédia, une encyclopédie écrite par tout le monde ?', th: 'Impact sociétal et éthique', i: ['societe', 'histoire'], n: ['web'], a: ['debat'], s: ['hggsp', 'hlp'] },
+    { t: 'Les algorithmes de recommandation décident-ils de ce qu’on regarde et de ce qu’on écoute ?', th: 'Données structurées', i: ['reseaux', 'cinema', 'musique'], n: ['donnees', 'ia'], a: ['debat', 'comment'], s: ['ses', 'maths', 'llce'] },
+    { t: 'Comment un GPS trouve-t-il le chemin le plus court ?', th: 'Algorithmique', i: ['transports', 'jeux'], n: ['prog'], a: ['comment'], s: ['maths', 'si'] },
+    { t: 'Comment fait-on tenir une chanson ou une image dans un petit fichier ?', th: 'Données structurées', i: ['musique', 'art'], n: ['donnees'], a: ['comment'], s: ['maths', 'pc', 'arts'] },
+    { t: 'Les câbles sous-marins : par où passe vraiment Internet ?', th: 'Architectures, systèmes et réseaux', i: ['transports', 'histoire', 'societe'], n: ['web', 'materiel'], a: ['comment', 'debat'], s: ['hggsp', 'pc'] },
+    { t: 'Objets connectés et montres de sport : pratiques ou indiscrets ?', th: 'Interfaces et objets', i: ['sport', 'sante'], n: ['materiel', 'donnees'], a: ['debat'], s: ['eppcs', 'svt', 'si'] },
+    { t: 'Une IA peut-elle traduire sans comprendre ?', th: 'Algorithmique', i: ['societe', 'histoire'], n: ['ia'], a: ['comment', 'debat'], s: ['llce', 'hlp'] },
+    { t: 'Comment un virus informatique peut-il paralyser un hôpital ?', th: 'Architectures, systèmes et réseaux', i: ['sante', 'societe'], n: ['secu'], a: ['recit', 'comment'], s: ['svt'] },
     { t: 'La blockchain : comment faire confiance sans banque ?', th: 'Bases de données', i: ['argent'], n: ['secu', 'donnees'], a: ['comment', 'debat'], s: ['ses', 'maths'] },
   ];
 
@@ -189,7 +242,7 @@
     ],
   };
 
-  const api = { ETIQUETTES, TYPES_SOURCE, QUIZ, SUJETS, DEBUTS_QUESTION, A_SAVOIR, GRILLE, TERMES, EXEMPLE };
+  const api = { TAGS, ETIQUETTES, TYPES_SOURCE, QUIZ, SUJETS, DEBUTS_QUESTION, A_SAVOIR, GRILLE, TERMES, EXEMPLE };
   racine.HGDonnees = api;
   if (typeof module !== 'undefined') module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);

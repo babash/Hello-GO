@@ -161,10 +161,14 @@
   vues.quiz = () => {
     const r = d.quiz.reponses, sug = d.quiz.fait ? A.suggestions(r, 5, d.decouverte.reactions) : [];
     return ongletsExplorer('quiz') + `
-    <p class="chapo">4 questions pour te proposer des sujets. Tu peux changer tes réponses quand tu veux.</p>
-    ${D.QUIZ.map((q) => `<fieldset class="carte"><legend>${e(q.titre)}</legend><p class="note">${e(q.aide)}</p><div class="puces">${q.choix.map((c) => {
-      const coche = q.multi ? (r[q.id] || []).includes(c[0]) : r[q.id] === c[0];
-      return `<label class="puce"><input type="${q.multi ? 'checkbox' : 'radio'}" name="quiz-${q.id}" data-quiz="${q.id}" value="${c[0]}"${coche ? ' checked' : ''}><span>${e(c[1])}</span></label>`; }).join('')}</div></fieldset>`).join('')}
+    <p class="chapo">Plus tu coches, plus les propositions te ressemblent. Rien n’est définitif : tu peux revenir changer tes réponses.</p>
+    ${D.QUIZ.map((q) => { const liste = A.choixDe(q, r); if (q.selon && !liste.length) return '';
+      const puce = (c) => { const coche = q.multi ? (r[q.id] || []).includes(c[0]) : r[q.id] === c[0];
+        return `<label class="puce"><input type="${q.multi ? 'checkbox' : 'radio'}" name="quiz-${q.id}" data-quiz="${q.id}" value="${c[0]}"${coche ? ' checked' : ''}><span>${e(c[1])}</span></label>`; };
+      return `<fieldset class="carte"><legend>${e(q.titre)}</legend><p class="note">${e(q.aide)}</p>
+        ${q.groupes ? q.groupes.map((g) => `<h3>${e(g[0])}</h3><div class="puces">${g[1].map(puce).join('')}</div>`).join('') : `<div class="puces">${liste.map(puce).join('')}</div>`}</fieldset>`; }).join('')}
+    <section class="carte"><h2>Une actualité ou une question qui t’a marqué·e</h2><p class="note">Facultatif. Elle devient une piste.</p>
+      <input type="text" id="piste-libre" placeholder="Par exemple : une panne, une arnaque, une invention…" aria-label="Une actualité qui m’a marqué·e"><button data-a="piste-libre">Ajouter à mes pistes</button></section>
     <button class="principal" data-a="quiz-fini">Voir mes sujets</button>
     <div id="resultats">${d.quiz.fait ? `<h2>Des sujets pour toi</h2>${sug.length ? `<ul class="liste">${sug.map((x) => carteSujet(x.sujet, x.raisons)).join('')}</ul>` : '<p>Coche au moins une réponse pour avoir des propositions.</p>'}
       <p><a href="#/explorer/sujets">Voir tous les sujets</a></p>` : ''}</div>`;
@@ -431,6 +435,7 @@
     const t = ev.target;
     if (t.dataset.quiz) { const q = D.QUIZ.find((x) => x.id === t.dataset.quiz), r = d.quiz.reponses;
       if (q.multi) { r[q.id] = (r[q.id] || []).filter((v) => v !== t.value); if (t.checked) r[q.id].push(t.value); } else r[q.id] = t.value;
+      if (q.id === 'spe') { r.dansspe = []; enregistrer(true); rendre(); const s2 = $('[name="quiz-dansspe"]'); if (s2) s2.focus(); return; }
       enregistrer(); return; }
     if (t.dataset.grille) { const o = d.oraux.find((x) => x.id === t.dataset.grille); o.auto = o.auto || {}; o.auto[t.dataset.c] = +t.value; enregistrer(true); rendre(); return; }
     if (t.dataset.coche) { const c = cible(t.dataset.coche); c[0][c[1]] = t.checked; enregistrer(true); return; }

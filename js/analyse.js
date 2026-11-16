@@ -108,30 +108,53 @@
     reste.sort(function (a, b) { return poids(a) - poids(b) || ((a.num * 37) % 101) - ((b.num * 37) % 101); });
     return reste[0];
   }
-  // Ce qui intrigue l'élève sans qu'il ou elle l'ait coché dans « Mes goûts » : la surprise.
+  // Les réponses possibles d'une question (celles de « dansspe » dépendent de la spécialité choisie).
+  function choixDe(q, reponses) {
+    if (q.groupes) return q.groupes.reduce(function (l, g) { return l.concat(g[1]); }, []);
+    if (q.choixSelon) return q.choixSelon[(reponses || {})[q.selon]] || [];
+    return q.choix;
+  }
+  // Le profil que dessinent les réponses : des poids par étiquette, les mots cherchés, l'angle et la spécialité.
+  function profil(reponses) {
+    const r = reponses || {}, p = { i: {}, n: {}, raison: { i: {}, n: {} }, mots: [], angle: r.angle || '', spe: r.spe || '', nombre: 0 };
+    D.QUIZ.forEach(function (q) {
+      if (q.id === 'angle' || q.id === 'spe') { if (r[q.id]) p.nombre++; return; }
+      const coches = [].concat(r[q.id] || []);
+      choixDe(q, r).forEach(function (c) {
+        if (coches.indexOf(c[0]) < 0) return;
+        p.nombre++;
+        ['i', 'n'].forEach(function (k) { c[2][k].forEach(function (t) { p[k][t] = (p[k][t] || 0) + 1; if (!p.raison[k][t]) p.raison[k][t] = c[1]; }); });
+        if (c[2].k) p.mots.push({ re: new RegExp(c[2].k, 'i'), texte: c[1] });
+      });
+    });
+    return p;
+  }
+  // Ce qui intrigue l'élève dans les cartes sans qu'il ou elle l'ait coché dans « Mes goûts » : la surprise.
   function surprises(reponses, reactions) {
-    const g = gouts(reactions), r = reponses || {}, lib = {};
-    D.QUIZ.forEach(function (q) { q.choix.forEach(function (c) { lib[q.id + ':' + c[0]] = c[1]; }); });
-    const l = [];
-    ['n', 'i'].forEach(function (k) { Object.keys(g[k]).forEach(function (t) { if (g[k][t] >= 2 && (r[k] || []).indexOf(t) < 0 && lib[k + ':' + t]) l.push({ nom: lib[k + ':' + t], n: g[k][t] }); }); });
+    const g = gouts(reactions), p = profil(reponses), l = [];
+    ['n', 'i'].forEach(function (k) { Object.keys(g[k]).forEach(function (t) { if (g[k][t] >= 2 && !p[k][t]) l.push({ nom: D.TAGS[k][t], n: g[k][t] }); }); });
     return l.sort(function (a, b) { return b.n - a.n; }).slice(0, 3).map(function (x) { return x.nom; });
   }
 
+  // Les sujets qui collent le mieux aux réponses et aux cartes aimées, avec la raison.
   function suggestions(reponses, combien, reactions) {
-    const r = reponses || {}, lib = {}, g = gouts(reactions);
-    D.QUIZ.forEach(function (q) { q.choix.forEach(function (c) { lib[q.id + ':' + c[0]] = c[1]; }); });
+    const p = profil(reponses), g = gouts(reactions);
     const liste = D.SUJETS.map(function (s, rang) {
       let score = 0; const raisons = [];
-      (r.i || []).forEach(function (x) { if (s.i.indexOf(x) >= 0) { score += 3; raisons.push(lib['i:' + x]); } });
-      (r.n || []).forEach(function (x) { if (s.n.indexOf(x) >= 0) { score += 2; raisons.push(lib['n:' + x]); } });
-      if (r.a && s.a.indexOf(r.a) >= 0) score += 2;
-      if (r.s && s.s.indexOf(r.s) >= 0) { score += 2; raisons.push(lib['s:' + r.s]); }
-      s.i.forEach(function (x) { if (g.i[x]) { score += Math.min(g.i[x], 3); if (raisons.indexOf(lib['i:' + x]) < 0) raisons.push(lib['i:' + x]); } });
-      s.n.forEach(function (x) { if (g.n[x]) { score += Math.min(g.n[x], 3); if (raisons.indexOf(lib['n:' + x]) < 0) raisons.push(lib['n:' + x]); } });
-      return { sujet: s, score: score, raisons: raisons, rang: rang };
+      const plus = function (texte) { if (texte && raisons.indexOf(texte) < 0) raisons.push(texte); };
+      s.i.forEach(function (x) { if (p.i[x]) { score += 1 + Math.min(p.i[x], 3); plus(p.raison.i[x]); } if (g.i[x]) { score += Math.min(g.i[x], 3); } });
+      s.n.forEach(function (x) { if (p.n[x]) { score += 1 + Math.min(p.n[x], 3); plus(p.raison.n[x]); } if (g.n[x]) { score += Math.min(g.n[x], 3); } });
+      p.mots.forEach(function (m) { if (m.re.test(s.t)) { score += 4; plus(m.texte); } });
+      if (score > 0 && p.angle && s.a.indexOf(p.angle) >= 0) score += 2;
+      if (p.spe && s.s.indexOf(p.spe) >= 0) { score += 3; plus('ta spécialité'); }
+      if (!raisons.length && score > 0) plus('les cartes qui t’ont intrigué·e');
+      return { sujet: s, score: score, raisons: raisons.slice(0, 3), rang: rang };
     }).filter(function (x) { return x.score > 0; });
     liste.sort(function (a, b) { return b.score - a.score || a.rang - b.rang; });
-    return liste.slice(0, combien || 5);
+    // De la variété : pas plus de deux sujets du même thème dans la sélection.
+    const parTheme = {}, choisis = [];
+    liste.forEach(function (x) { if (choisis.length < (combien || 5) && (parTheme[x.sujet.th] || 0) < 2) { choisis.push(x); parTheme[x.sujet.th] = (parTheme[x.sujet.th] || 0) + 1; } });
+    return choisis;
   }
 
   function questionsProbables(q, dossier) {
@@ -158,7 +181,7 @@
     const qs = d.questions || [];
     const nCartes = Object.keys((d.decouverte || {}).reactions || {}).length;
     if (nCartes < 10 && !(d.pistes || []).length && !qs.length) return { texte: 'Découvre 10 histoires de l’informatique : dis ce qui t’intrigue, et trouve des idées de sujets.', bouton: 'Découvrir', vers: '#/explorer/decouvrir', duree: '5 min' };
-    if (!d.quiz || !d.quiz.fait) if (!(d.pistes || []).length && !qs.length) return { texte: 'Dis ce que tu aimes : 4 questions pour affiner tes sujets.', bouton: 'Faire le questionnaire', vers: '#/explorer/quiz', duree: '3 min' };
+    if (!d.quiz || !d.quiz.fait) if (!(d.pistes || []).length && !qs.length) return { texte: 'Dis ce que tu aimes, ce qui te tient à cœur et ce que tu préfères dans ta spécialité : tes sujets s’affinent.', bouton: 'Faire le questionnaire', vers: '#/explorer/quiz', duree: '3 min' };
     if (!qs.length) {
       const p = (d.pistes || [])[0];
       if (!p) return { texte: 'Choisis une piste parmi les sujets proposés.', bouton: 'Voir les sujets', vers: '#/explorer/sujets', duree: '5 min' };
@@ -279,7 +302,7 @@
       && sinon(n.compteurs, function (o) { return valeurs(o, entier); }) && sinon(n.vus, function (o) { return valeurs(o, entier); });
   }
 
-  const api = { gouts, prochaineCarte, surprises, CARTES, coach, coachMot, motComplet, coachSources, suggestions, questionsProbables, phase, prochaineAction, HAUTS_FAITS, majHautsFaits,
+  const api = { choixDe, profil, gouts, prochaineCarte, surprises, CARTES, coach, coachMot, motComplet, coachSources, suggestions, questionsProbables, phase, prochaineAction, HAUTS_FAITS, majHautsFaits,
     tousLesPoints, ressemblance, contient, aChiffre, reference, dossierValide, SEC_PAR_POINT };
   racine.HGAnalyse = api;
   if (typeof module !== 'undefined') module.exports = api;
