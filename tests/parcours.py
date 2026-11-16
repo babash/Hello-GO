@@ -24,7 +24,12 @@ def parcours(nav, largeur, hauteur, sombre):
         p.screenshot(path='%s/%s-%s.png' % (SORTIE, nom, etape), full_page=True)
     p.goto(URL); assert p.locator('#nav').is_hidden(); large('0-bienvenue')
     p.fill('#prenom', 'Essai'); p.click('[data-a=demarrer]'); assert 'Salut Essai' in p.inner_text('h1'); large('1-accueil')
-    p.click('.action a'); p.wait_for_selector('.puce'); assert '#/explorer/quiz' in p.url
+    p.click('.action a'); p.wait_for_selector('.decouverte'); assert '#/explorer/decouvrir' in p.url; large('1b-decouvrir')
+    for k in range(10):
+        assert ('Carte %d sur' % (k + 1)) in p.inner_text('.decouverte'); p.locator('[data-a=reagir][data-v="%d"]' % (1 if k % 2 == 0 else -1)).click()
+    assert p.locator('.decouverte').count() == 0 and p.locator('[data-a=suite-cartes]').count() == 1; assert p.locator('.sujet').count() >= 5; large('1c-bilan')
+    p.click('[data-a=suite-cartes]'); assert 'Carte 11 sur' in p.inner_text('.decouverte')
+    p.goto(URL + '#/explorer/quiz'); p.wait_for_selector('.puce')
     p.locator('label.puce', has_text='Musique').click(); p.locator('label.puce', has_text='intelligence artificielle').click()
     p.locator('label.puce', has_text='Imaginer').click(); p.locator('label.puce', has_text='Mathématiques').click()
     p.click('[data-a=quiz-fini]'); assert p.locator('#resultats .sujet').count() == 5; assert 'musicale' in p.locator('#resultats .sujet').first.inner_text(); large('2-quiz')

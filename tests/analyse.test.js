@@ -43,7 +43,7 @@ const ids = {}; D.QUIZ.forEach((qz) => { ids[qz.id] = qz.choix.map((x) => x[0]);
 D.SUJETS.forEach((x) => { x.i.forEach((v) => assert.ok(ids.i.includes(v), x.t + ' ' + v)); x.n.forEach((v) => assert.ok(ids.n.includes(v), x.t + ' ' + v)); x.a.forEach((v) => assert.ok(ids.a.includes(v), v)); x.s.forEach((v) => assert.ok(ids.s.includes(v), v)); });
 
 // prochaine action et phase
-assert.ok(/questionnaire/.test(A.prochaineAction(dossier()).bouton));
+assert.ok(/Découvrir/.test(A.prochaineAction(dossier()).bouton));
 assert.strictEqual(A.phase(dossier()), 0); assert.strictEqual(A.phase(d), 2);
 assert.ok(A.prochaineAction(d).vers);
 
@@ -82,3 +82,17 @@ const abime = (f) => { const x = JSON.parse(JSON.stringify(exporte)); f(x); retu
   (x) => { x.questions[0].parties[0].points[0].etiquette = 'inconnue'; }, (x) => { x.sources[0].type = 'x'; }, (x) => { x.quiz.reponses = null; }, (x) => { x.interets = [1]; },
 ].forEach((f, i) => assert.ok(!abime(f), 'dossier abîmé n° ' + i));
 console.log('analyse : tous les essais passent (' + A.HAUTS_FAITS.length + ' hauts faits, ' + D.SUJETS.length + ' sujets, ' + D.A_SAVOIR.length + ' à savoir)');
+
+// découvrir : cartes de la Timeline
+const C = A.CARTES; assert.ok(C.length >= 30);
+C.forEach((c) => { assert.ok(c.titre && c.texte && c.q && c.q.trim().endsWith('?'), c.titre); c.i.forEach((v) => assert.ok(ids.i.includes(v), c.titre + v)); c.n.forEach((v) => assert.ok(ids.n.includes(v), c.titre + v)); });
+let re = {}, vues = []; for (let k = 0; k < 7; k++) { const c = A.prochaineCarte(re); vues.push(c); re[c.num] = -1; }
+assert.ok(new Set(vues.flatMap((c) => c.n)).size >= 6, 'les 7 premières cartes couvrent au moins 6 domaines');
+while (A.prochaineCarte(re)) re[A.prochaineCarte(re).num] = 1; assert.strictEqual(Object.keys(re).length, C.length);
+assert.strictEqual(A.suggestions({}, 5, {}).length, 0);
+const r2 = {}; C.filter((c) => c.n.includes('secu')).forEach((c) => { r2[c.num] = 1; });
+assert.ok(A.suggestions({}, 5, r2).every((x) => x.sujet.n.includes('secu') || x.score > 0)); assert.ok(A.suggestions({}, 5, r2)[0].sujet.n.includes('secu'));
+assert.ok(A.surprises({ n: ['ia'] }, r2).some((x) => /sécurité/.test(x))); assert.ok(!A.surprises({ n: ['secu'], i: ['societe', 'histoire', 'argent', 'sciences', 'sante'] }, r2).some((x) => /sécurité/.test(x)));
+const d4 = dossier(); d4.decouverte = { reactions: re }; assert.ok(A.majHautsFaits(d4).some((h) => h.id === 'cartes'));
+assert.ok(/Découvrir/.test(A.prochaineAction(dossier()).bouton));
+console.log('découvrir : ' + C.length + ' cartes, essais passés');

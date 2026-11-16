@@ -160,3 +160,7 @@ dialog::backdrop { background: rgba(0, 0, 0, .55); } dialog h2 { margin-top: 0; 
 }
 @media (max-width: 420px) { .grille3 { grid-template-columns: 1fr; } .grille2 { grid-template-columns: 1fr; } body { font-size: 16px; } }
 @media print { .nav, .haut, .pied, #toasts, button { display: none !important; } body { padding: 0; background: #fff; color: #000; } }
+
+.decouverte h2 { font-size: 1.35rem; } .decouverte h2 .note { font-family: var(--texte); font-weight: 400; }
+.question-carte { background: var(--accent-fond); border-radius: 10px; padding: 10px 12px; font-weight: 700; }
+.deux { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0 6px; } .deux button { min-height: 52px; }

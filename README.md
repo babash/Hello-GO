@@ -14,7 +14,7 @@ Hello GO fait partie des [Ressources NSI et SNT](https://babash.github.io/Babash
 
 ## Ce que font les élèves
 
-1. **Explorer** : un questionnaire de 4 questions propose 5 sujets et dit pourquoi ; une banque de 46 sujets, rangés par thème ; des pistes, avec leurs idées et leurs questions possibles.
+1. **Explorer** : 35 cartes tirées de la [Timeline de l'histoire de l'informatique](https://babash.github.io/TimelineNSI/) à découvrir une par une (« Ça m'intrigue » ou « Pas pour moi »), qui font ressortir des goûts auxquels l'élève n'avait pas pensé ; un questionnaire de 4 questions ; 5 sujets proposés, avec la raison ; une banque de 46 sujets, par thème du programme ; des pistes, avec leurs idées et leurs questions possibles.
 2. **Construire** : un plan fait de points de 1 à 3 lignes, à ajouter, à réordonner (en glissant, ou avec les flèches) et à relier à des mots et à des sources.
 3. **Définir** : chaque mot important a deux définitions, celle d'une source et celle de l'élève, et une image pour le membre du jury non spécialiste.
 4. **Préparer l'échange** : les questions que le jury pourrait poser, dont certaines proposées d'après le plan.
@@ -27,7 +27,7 @@ Hello GO fait partie des [Ressources NSI et SNT](https://babash.github.io/Babash
 - **Un « à savoir » chaque jour** : une règle de l'épreuve ou un conseil, selon l'avancement.
 - **Un coach** dans le plan : nombre de points et durée estimée, équilibre des parties, chiffre sans source, mot technique à définir, définition recopiée.
 - **Un exemple** complet (les biais algorithmiques) et des fiches de méthode.
-- **31 hauts faits**, qui récompensent les bonnes habitudes, pas la quantité.
+- **34 hauts faits**, qui récompensent les bonnes habitudes, pas la quantité.
 
 ## Où en est le projet
 
@@ -55,6 +55,7 @@ python3 tests/robustesse.py    # deux onglets, fichiers abîmés ou piégés, cl
 ## Sources
 
 - Les règles de l'épreuve : note de service du 10 septembre 2026, Bulletin officiel spécial n° 4 du 17 septembre 2026, et la foire aux questions d'Éduscol (septembre 2026).
+- Les cartes à découvrir : « Timeline – Histoire de l'informatique » (TimelineNSI), Babash - NSI Tani Malandi, CC BY-SA 4.0 ; `outils/generer_decouvertes.py` les reprend.
 - Les sujets : exemples du ministère de l'Éducation nationale et sujets du dossier « Grand oral » de l'enseignant.
 
 ## Contact

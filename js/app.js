@@ -12,7 +12,7 @@
   // ---------- Le dossier ----------
   function dossierNeuf() {
     return { v: 1, profil: { prenom: '', vu: false }, quiz: { reponses: {}, fait: false }, interets: ['', '', ''], ponts: [''], pistes: [], questions: [],
-      mots: [], sources: [], oraux: [{ id: uid(), nom: 'Oral blanc 1', auto: {} }, { id: uid(), nom: 'Oral blanc 2', auto: {} }], hf: {}, compteurs: {}, vus: {} };
+      decouverte: { reactions: {} }, mots: [], sources: [], oraux: [{ id: uid(), nom: 'Oral blanc 1', auto: {} }, { id: uid(), nom: 'Oral blanc 2', auto: {} }], hf: {}, compteurs: {}, vus: {} };
   }
   function charger() {
     let t = null;
@@ -83,7 +83,7 @@
       <p class="logo-grand">Hello <b>GO</b></p>
       <h1>Prépare ton Grand oral de NSI, pas à pas</h1>
       <ol class="etapes">
-        <li><b>Explore</b> : trouve un sujet qui te plaît, puis ta question.</li>
+        <li><b>Explore</b> : découvre des histoires de l’informatique, trouve un sujet qui te plaît, puis ta question.</li>
         <li><b>Construis</b> ton plan point par point, avec tes mots et tes sources.</li>
         <li><b>Prépare</b> l’échange avec le jury et tes oraux blancs.</li>
       </ol>
@@ -100,7 +100,7 @@
     const savoir = liste[jour % liste.length];
     const nPoints = d.questions.reduce((t, q) => t + A.tousLesPoints(q).length, 0);
     const nHf = Object.keys(d.hf).length;
-    const debut = [['Faire le questionnaire', d.quiz.fait, '#/explorer/quiz'], ['Garder une piste', d.pistes.length > 0 || d.questions.length > 0, '#/explorer/sujets'],
+    const debut = [['Découvrir 10 cartes', Object.keys(d.decouverte.reactions).length >= 10, '#/explorer/decouvrir'], ['Dire ce que j’aime', d.quiz.fait, '#/explorer/quiz'], ['Garder une piste', d.pistes.length > 0 || d.questions.length > 0, '#/explorer/sujets'],
       ['Choisir ma question', d.questions.length > 0, '#/explorer/pistes'], ['Écrire 5 points', nPoints >= 5, '#/questions'],
       ['Définir 3 mots', d.mots.filter(A.motComplet).length >= 3, '#/mots'], ['Ajouter 2 sources', d.sources.length >= 2, '#/sources']];
     return `
@@ -125,7 +125,7 @@
   };
 
   function ongletsExplorer(actif) {
-    return `<h1>Explorer</h1><nav class="onglets" aria-label="Explorer">${[['quiz', 'Questionnaire'], ['sujets', 'Sujets'], ['pistes', 'Mes pistes' + (d.pistes.length ? ' (' + d.pistes.length + ')' : '')]]
+    return `<h1>Explorer</h1><nav class="onglets" aria-label="Explorer">${[['decouvrir', 'Découvrir'], ['quiz', 'Mes goûts'], ['sujets', 'Sujets'], ['pistes', 'Mes pistes' + (d.pistes.length ? ' (' + d.pistes.length + ')' : '')]]
       .map((o) => `<a href="#/explorer/${o[0]}"${o[0] === actif ? ' aria-current="page"' : ''}>${o[1]}</a>`).join('')}</nav>`;
   }
   function carteSujet(s, raisons) {
@@ -134,8 +134,32 @@
       ${raisons && raisons.length ? `<p class="note">Parce que tu as choisi : ${e([...new Set(raisons)].join(', '))}.</p>` : ''}
       ${deja ? '<p class="fait-texte">Dans tes pistes</p>' : `<button data-a="garder" data-t="${e(s.t)}">Garder comme piste</button>`}</li>`;
   }
+  vues.decouvrir = () => {
+    const re = d.decouverte.reactions, n = Object.keys(re).length, total = A.CARTES.length, c = A.prochaineCarte(re);
+    const aimees = A.CARTES.filter((x) => re[x.num] === 1), bilan = n >= 10 && (n % 10 === 0 || !c) && !d.vus.suite;
+    const sug = A.suggestions(d.quiz.reponses, 5, re), surp = A.surprises(d.quiz.reponses, re);
+    const resultats = n ? `<h2>Ce qui t’intrigue</h2>
+      ${aimees.length ? `<ul class="liste">${aimees.map((x) => { const deja = d.pistes.some((p) => p.titre === x.q);
+        return `<li class="carte sujet"><p class="sur-titre">${e(x.titre)} · ${e(x.date)}</p><p class="gros">${e(x.q)}</p>${deja ? '<p class="fait-texte">Dans tes pistes</p>' : `<button data-a="garder" data-t="${e(x.q)}">Garder comme piste</button>`}</li>`; }).join('')}</ul>` : '<p class="vide">Aucune carte pour le moment : continue, il y en a pour tous les goûts.</p>'}
+      ${surp.length ? `<section class="carte savoir"><p class="sur-titre">Ta surprise</p><p class="gros">Tu ne l’avais pas coché dans tes goûts, mais ça t’intrigue : ${e(surp.join(', '))}.</p></section>` : ''}
+      ${sug.length ? `<h2>Des sujets qui pourraient te plaire</h2><ul class="liste">${sug.map((x) => carteSujet(x.sujet, x.raisons)).join('')}</ul>` : ''}` : '';
+    return ongletsExplorer('decouvrir') + `
+    <p class="chapo">Des histoires vraies de l’informatique. Pour chacune, dis simplement si elle t’intrigue : tu découvriras peut-être un sujet auquel tu n’avais pas pensé.</p>
+    ${c && !bilan ? `<section class="carte decouverte" aria-live="polite">
+      <p class="sur-titre">Carte ${n + 1} sur ${total} · ${e(c.cat)}</p>
+      <h2>${e(c.titre)} <span class="note">${e(c.date)}</span></h2>
+      <p class="gros">${e(c.texte)}</p>
+      <p>${e(c.note)}</p>
+      <p class="question-carte">${e(c.q)}</p>
+      <div class="deux"><button data-a="reagir" data-n="${c.num}" data-v="-1">Pas pour moi</button><button class="principal" data-a="reagir" data-n="${c.num}" data-v="1">Ça m’intrigue</button></div>
+      <p class="note"><a href="https://babash.github.io/TimelineNSI/" target="_blank" rel="noopener">Voir toutes les cartes sur la Timeline</a></p>
+    </section>` : `<section class="carte action"><p class="gros">${c ? 'Tu as vu ' + n + ' cartes sur ' + total + '. Regarde ce qui ressort, ou continue.' : 'Tu as vu toutes les cartes.'}</p>
+      ${c ? '<button class="principal" data-a="suite-cartes">Voir 10 autres cartes</button>' : ''} <a class="bouton" href="#/explorer/quiz">Dire ce que j’aime</a></section>`}
+    ${resultats}
+    ${n ? '<p class="bas"><button class="discret" data-a="recommencer-cartes">Revoir toutes les cartes depuis le début</button></p>' : ''}`;
+  };
   vues.quiz = () => {
-    const r = d.quiz.reponses, sug = d.quiz.fait ? A.suggestions(r, 5) : [];
+    const r = d.quiz.reponses, sug = d.quiz.fait ? A.suggestions(r, 5, d.decouverte.reactions) : [];
     return ongletsExplorer('quiz') + `
     <p class="chapo">4 questions pour te proposer des sujets. Tu peux changer tes réponses quand tu veux.</p>
     ${D.QUIZ.map((q) => `<fieldset class="carte"><legend>${e(q.titre)}</legend><p class="note">${e(q.aide)}</p><div class="puces">${q.choix.map((c) => {
@@ -159,7 +183,7 @@
       <div class="grille3">${d.interets.map((v, i) => champ('interets.' + i, v, 'placeholder="Un centre d’intérêt" aria-label="Centre d’intérêt ' + (i + 1) + '"')).join('')}</div>
       ${d.ponts.map((v, i) => champ('ponts.' + i, v, 'placeholder="Un pont : ce que j’aime + une notion = une question" aria-label="Pont ' + (i + 1) + '"')).join('')}
       <button class="discret" data-a="plus-pont">+ Un autre pont</button></section>
-    ${d.pistes.length ? '' : `<p class="vide">Tu n’as pas encore de piste. <a href="#/explorer/quiz">Fais le questionnaire</a> ou <a href="#/explorer/sujets">parcours les sujets</a>.</p>`}
+    ${d.pistes.length ? '' : `<p class="vide">Tu n’as pas encore de piste. <a href="#/explorer/decouvrir">Découvre des cartes</a> ou <a href="#/explorer/sujets">parcours les sujets</a>.</p>`}
     ${d.pistes.map((p) => `<section class="carte piste">
       ${champ('piste.' + p.id + '.titre', p.titre, 'class="titre" aria-label="Titre de la piste"')}
       <label>Pourquoi ce sujet m’intéresse ${zoneTexte('piste.' + p.id + '.pourquoi', p.pourquoi, 'placeholder="Sois convaincant·e : c’est aussi ta réponse au jury."')}</label>
@@ -182,7 +206,7 @@
       <span class="badge ${q.statut}">${STATUTS[q.statut]}</span><p class="gros">${e(q.titre || 'Question sans titre')}</p>
       <p class="note">${pluriel(n, 'point')} · environ ${Math.round(n * A.SEC_PAR_POINT / 60)} min · ${pluriel((q.echange || []).length, 'question')} pour l’échange</p></a>`; }).join('')}
     ${d.questions.length < 2 ? `<section class="carte"><h2>${d.questions.length ? 'Une deuxième question' : 'Ma question'}</h2>
-      <p>Tu as déjà ta question ? Écris-la ici. Sinon, <a href="#/explorer/quiz">commence par Explorer</a>.</p>
+      <p>Tu as déjà ta question ? Écris-la ici. Sinon, <a href="#/explorer/decouvrir">commence par Explorer</a>.</p>
       <input type="text" id="question-libre" placeholder="Ma question, avec un point d’interrogation" aria-label="Ma question"><button data-a="question-libre">Commencer le plan</button></section>` : ''}`;
 
   function zoneCoach(q) { return conseils(A.coach(q, d)); }
@@ -329,7 +353,7 @@
     <p class="note">Hello GO, version ${window.HG_VERSION}.</p>`;
 
   // ---------- Le routeur ----------
-  const NAV = [['#/', 'Accueil', 'M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z'], ['#/explorer/quiz', 'Explorer', 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm3.5 6.5-2 5-5 2 2-5z'],
+  const NAV = [['#/', 'Accueil', 'M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z'], ['#/explorer/decouvrir', 'Explorer', 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm3.5 6.5-2 5-5 2 2-5z'],
     ['#/questions', 'Questions', 'M4 5h16M4 10h16M4 15h10M4 20h7'], ['#/mots', 'Mots', 'M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3zM5 17a3 3 0 0 1 3-3h11'],
     ['#/sources', 'Sources', 'M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1'], ['#/plus', 'Plus', 'M5 12h.01M12 12h.01M19 12h.01']];
   function route() {
@@ -337,7 +361,7 @@
     if (!d.profil.vu) return ['bienvenue', '', vues.bienvenue()];
     switch (h[0]) {
       case '': return ['accueil', '#/', vues.accueil()];
-      case 'explorer': return [h[1] || 'quiz', '#/explorer/quiz', (vues[h[1]] && ['quiz', 'sujets', 'pistes'].includes(h[1]) ? vues[h[1]] : vues.quiz)()];
+      case 'explorer': return [h[1] || 'decouvrir', '#/explorer/decouvrir', (vues[h[1]] && ['decouvrir', 'quiz', 'sujets', 'pistes'].includes(h[1]) ? vues[h[1]] : vues.decouvrir)()];
       case 'questions': return ['questions', '#/questions', vues.questions()];
       case 'question': return ['question', '#/questions', vues.question(h[1], h[2])];
       case 'mots': return ['mots', '#/mots', vues.mots()];
@@ -438,6 +462,9 @@
   const actions = {
     demarrer() { d.profil.prenom = ($('#prenom').value || '').trim().slice(0, 24); d.profil.vu = true; enregistrer(true); location.hash = '#/'; rendre(false); },
     'autre-savoir'() { d.vus.decalage = (d.vus.decalage || 0) + 1; enregistrer(); rendre(); },
+    reagir(b) { d.decouverte.reactions[b.dataset.n] = +b.dataset.v; delete d.vus.suite; enregistrer(true); rendre(false); const t = $('.decouverte h2, .action .gros'); if (t) t.scrollIntoView({ block: 'center' }); },
+    'suite-cartes'() { d.vus.suite = 1; enregistrer(); rendre(false); },
+    'recommencer-cartes'() { avecAnnulation('Tes avis sur les cartes sont effacés.', () => { d.decouverte.reactions = {}; delete d.vus.suite; }); },
     'quiz-fini'() { d.quiz.fait = true; enregistrer(true); rendre(); const r = $('#resultats'); if (r) r.scrollIntoView({ behavior: 'smooth' }); },
     garder(b) { d.pistes.push({ id: uid(), titre: b.dataset.t, pourquoi: '', idees: [''], candidates: [''] }); enregistrer(true); rendre(); toast('Ajouté à tes pistes.', '#/explorer/pistes', 'Ouvrir'); },
     'piste-libre'() { const v = $('#piste-libre').value.trim(); if (!v) return toast('Écris d’abord ton idée.'); d.pistes.push({ id: uid(), titre: v, pourquoi: '', idees: [''], candidates: [''] }); enregistrer(true); location.hash = '#/explorer/pistes'; },

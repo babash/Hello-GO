@@ -3,6 +3,7 @@
 (function (racine) {
   'use strict';
   const D = racine.HGDonnees || require('./donnees.js');
+  const CARTES = racine.HGDecouvertes || require('./decouvertes.js');
 
   const SEC_PAR_POINT = 15; // 30 à 50 points pour 10 minutes (dossier de l'enseignant) : 12 à 20 s par point
 
@@ -91,8 +92,33 @@
   }
 
   // Le questionnaire : les 5 sujets qui collent le mieux aux réponses, avec la raison.
-  function suggestions(reponses, combien) {
-    const r = reponses || {}, lib = {};
+  // Les goûts que montrent les cartes « Ça m'intrigue » : { i: { tag: nombre }, n: { tag: nombre } }
+  function gouts(reactions) {
+    const g = { i: {}, n: {} };
+    CARTES.forEach(function (c) { if ((reactions || {})[c.num] === 1) { c.i.forEach(function (t) { g.i[t] = (g.i[t] || 0) + 1; }); c.n.forEach(function (t) { g.n[t] = (g.n[t] || 0) + 1; }); } });
+    return g;
+  }
+  // La prochaine carte : jamais vue, et du domaine le moins montré jusqu'ici, pour faire découvrir autre chose.
+  function prochaineCarte(reactions) {
+    const r = reactions || {}, vus = {};
+    CARTES.forEach(function (c) { if (r[c.num]) c.n.forEach(function (t) { vus[t] = (vus[t] || 0) + 1; }); });
+    const reste = CARTES.filter(function (c) { return !r[c.num]; });
+    if (!reste.length) return null;
+    const poids = function (c) { return Math.min.apply(null, c.n.map(function (t) { return vus[t] || 0; })); };
+    reste.sort(function (a, b) { return poids(a) - poids(b) || ((a.num * 37) % 101) - ((b.num * 37) % 101); });
+    return reste[0];
+  }
+  // Ce qui intrigue l'élève sans qu'il ou elle l'ait coché dans « Mes goûts » : la surprise.
+  function surprises(reponses, reactions) {
+    const g = gouts(reactions), r = reponses || {}, lib = {};
+    D.QUIZ.forEach(function (q) { q.choix.forEach(function (c) { lib[q.id + ':' + c[0]] = c[1]; }); });
+    const l = [];
+    ['n', 'i'].forEach(function (k) { Object.keys(g[k]).forEach(function (t) { if (g[k][t] >= 2 && (r[k] || []).indexOf(t) < 0 && lib[k + ':' + t]) l.push({ nom: lib[k + ':' + t], n: g[k][t] }); }); });
+    return l.sort(function (a, b) { return b.n - a.n; }).slice(0, 3).map(function (x) { return x.nom; });
+  }
+
+  function suggestions(reponses, combien, reactions) {
+    const r = reponses || {}, lib = {}, g = gouts(reactions);
     D.QUIZ.forEach(function (q) { q.choix.forEach(function (c) { lib[q.id + ':' + c[0]] = c[1]; }); });
     const liste = D.SUJETS.map(function (s, rang) {
       let score = 0; const raisons = [];
@@ -100,6 +126,8 @@
       (r.n || []).forEach(function (x) { if (s.n.indexOf(x) >= 0) { score += 2; raisons.push(lib['n:' + x]); } });
       if (r.a && s.a.indexOf(r.a) >= 0) score += 2;
       if (r.s && s.s.indexOf(r.s) >= 0) { score += 2; raisons.push(lib['s:' + r.s]); }
+      s.i.forEach(function (x) { if (g.i[x]) { score += Math.min(g.i[x], 3); if (raisons.indexOf(lib['i:' + x]) < 0) raisons.push(lib['i:' + x]); } });
+      s.n.forEach(function (x) { if (g.n[x]) { score += Math.min(g.n[x], 3); if (raisons.indexOf(lib['n:' + x]) < 0) raisons.push(lib['n:' + x]); } });
       return { sujet: s, score: score, raisons: raisons, rang: rang };
     }).filter(function (x) { return x.score > 0; });
     liste.sort(function (a, b) { return b.score - a.score || a.rang - b.rang; });
@@ -128,7 +156,9 @@
   // La prochaine action : une seule, choisie d'après l'état du dossier.
   function prochaineAction(d) {
     const qs = d.questions || [];
-    if (!d.quiz || !d.quiz.fait) if (!(d.pistes || []).length && !qs.length) return { texte: 'Trouve ta piste : 4 questions pour te proposer des sujets.', bouton: 'Faire le questionnaire', vers: '#/explorer/quiz', duree: '3 min' };
+    const nCartes = Object.keys((d.decouverte || {}).reactions || {}).length;
+    if (nCartes < 10 && !(d.pistes || []).length && !qs.length) return { texte: 'Découvre 10 histoires de l’informatique : dis ce qui t’intrigue, et trouve des idées de sujets.', bouton: 'Découvrir', vers: '#/explorer/decouvrir', duree: '5 min' };
+    if (!d.quiz || !d.quiz.fait) if (!(d.pistes || []).length && !qs.length) return { texte: 'Dis ce que tu aimes : 4 questions pour affiner tes sujets.', bouton: 'Faire le questionnaire', vers: '#/explorer/quiz', duree: '3 min' };
     if (!qs.length) {
       const p = (d.pistes || [])[0];
       if (!p) return { texte: 'Choisis une piste parmi les sujets proposés.', bouton: 'Voir les sujets', vers: '#/explorer/sujets', duree: '5 min' };
@@ -153,6 +183,9 @@
   function unPlan(d, f) { return (d.questions || []).some(f); }
   function aEtiquette(q, e) { return tousLesPoints(q).some(function (p) { return p.etiquette === e; }); }
   const HAUTS_FAITS = [
+    { id: 'cartes10', g: 'Explorer', titre: 'Un petit pas pour toi', cond: 'Donner ton avis sur 10 cartes de « Découvrir ».', pourquoi: 'On ne peut pas aimer ce qu’on n’a jamais croisé.', test: function (d) { return Object.keys((d.decouverte || {}).reactions || {}).length >= 10; } },
+    { id: 'cartes', g: 'Explorer', titre: 'Attrapez-les toutes !', cond: 'Donner ton avis sur toutes les cartes de « Découvrir ».', pourquoi: 'Tu as fait le tour : tu choisis ton sujet en connaissant le terrain.', test: function (d) { return Object.keys((d.decouverte || {}).reactions || {}).length >= CARTES.length; } },
+    { id: 'surprise', g: 'Explorer', cache: true, indice: 'Laisse-toi surprendre par une carte que tu n’attendais pas.', titre: 'Plot twist', cond: 'Être intrigué·e par un domaine que tu n’avais pas coché dans tes goûts.', pourquoi: 'Les meilleurs sujets sont souvent ceux qu’on n’attendait pas.', test: function (d) { return !!(d.quiz && d.quiz.fait) && surprises(d.quiz.reponses, (d.decouverte || {}).reactions).length > 0; } },
     { id: 'quiz', g: 'Explorer', titre: 'Curiosité activée', cond: 'Finir le questionnaire.', pourquoi: 'On parle mieux de ce qu’on aime.', test: function (d) { return !!(d.quiz && d.quiz.fait); } },
     { id: 'pistes3', g: 'Explorer', titre: 'Trois fers au feu', cond: 'Garder 3 pistes.', pourquoi: 'Ne choisis pas trop vite : compare.', test: function (d) { return (d.pistes || []).length >= 3; } },
     { id: 'multivers', g: 'Explorer', titre: 'Multivers', cond: 'Écrire 3 questions possibles pour une même piste.', pourquoi: 'Un même sujet a plusieurs angles : explore-les, comme dans un multivers.', test: function (d) { return (d.pistes || []).some(function (p) { return (p.candidates || []).length >= 3; }); } },
@@ -232,19 +265,21 @@
     const criteres = D.GRILLE.map(function (c) { return c.id; });
     const grille = function (a) { return objet(a) && Object.keys(a).every(function (k) { return criteres.indexOf(k) >= 0 && [1, 2, 3, 4].indexOf(a[k]) >= 0; }); };
     const oral = function (o) { return objet(o) && id(o.id) && textes(o, ['nom', 'date', 'objectifs']) && sinon(o.video, oui) && sinon(o.auto, grille); };
-    const reponses = function (r) { return objet(r) && sinon(r.i, function (l) { return liste(l, texte); }) && sinon(r.n, function (l) { return liste(l, texte); }) && texte(r.a) && texte(r.s); };
     const valeurs = function (o, f) { return objet(o) && Object.keys(o).every(function (k) { return f(o[k]); }); };
+    const reponses = function (r) { return valeurs(r, function (v) { return typeof v === 'string' || liste(v, function (x) { return typeof x === 'string'; }); }); };
+    const reactions = function (r) { return objet(r) && Object.keys(r).every(function (k) { return /^[0-9]{1,3}$/.test(k) && (r[k] === 1 || r[k] === -1); }); };
     return objet(n) && n.v === 1 && liste(n.questions, question)
       && sinon(n.profil, function (p) { return objet(p) && texte(p.prenom) && sinon(p.vu, oui); })
       && sinon(n.quiz, function (q) { return objet(q) && reponses(q.reponses) && sinon(q.fait, oui); })
       && sinon(n.interets, function (l) { return liste(l, texte); }) && sinon(n.ponts, function (l) { return liste(l, texte); })
       && sinon(n.pistes, function (l) { return liste(l, piste); }) && sinon(n.mots, function (l) { return liste(l, mot); })
       && sinon(n.sources, function (l) { return liste(l, source); }) && sinon(n.oraux, function (l) { return liste(l, oral); })
+      && sinon(n.decouverte, function (o) { return objet(o) && reactions(o.reactions); })
       && sinon(n.hf, function (o) { return valeurs(o, function (v) { return typeof v === 'string'; }); })
       && sinon(n.compteurs, function (o) { return valeurs(o, entier); }) && sinon(n.vus, function (o) { return valeurs(o, entier); });
   }
 
-  const api = { coach, coachMot, motComplet, coachSources, suggestions, questionsProbables, phase, prochaineAction, HAUTS_FAITS, majHautsFaits,
+  const api = { gouts, prochaineCarte, surprises, CARTES, coach, coachMot, motComplet, coachSources, suggestions, questionsProbables, phase, prochaineAction, HAUTS_FAITS, majHautsFaits,
     tousLesPoints, ressemblance, contient, aChiffre, reference, dossierValide, SEC_PAR_POINT };
   racine.HGAnalyse = api;
   if (typeof module !== 'undefined') module.exports = api;
