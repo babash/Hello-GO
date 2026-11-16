@@ -14,9 +14,9 @@ Hello GO fait partie des [Ressources NSI et SNT](https://babash.github.io/Babash
 
 ## Ce que font les élèves
 
-1. **Explorer** : un questionnaire de 4 questions propose 5 sujets et dit pourquoi ; une banque de 46 sujets, par thème du programme ; des pistes, avec leurs idées et leurs questions possibles.
+1. **Explorer** : un questionnaire de 4 questions propose 5 sujets et dit pourquoi ; une banque de 46 sujets, rangés par thème ; des pistes, avec leurs idées et leurs questions possibles.
 2. **Construire** : un plan fait de points de 1 à 3 lignes, à ajouter, à réordonner (en glissant, ou avec les flèches) et à relier à des mots et à des sources.
-3. **Définir** : chaque mot important a deux définitions, celle d'une source et celle de l'élève, et une image pour le juré non spécialiste.
+3. **Définir** : chaque mot important a deux définitions, celle d'une source et celle de l'élève, et une image pour le membre du jury non spécialiste.
 4. **Préparer l'échange** : les questions que le jury pourrait poser, dont certaines proposées d'après le plan.
 5. **S'évaluer** après chaque oral blanc, sur les 5 critères de la grille nationale.
 6. **Télécharger son dossier en PDF** : le plan, puis le lexique, puis les sources.
@@ -47,8 +47,9 @@ Cette première version garde tout **sur l'appareil de l'élève** : aucun compt
 ## Pour vérifier
 
 ```
-node tests/analyse.test.js     # les analyses (coach, questionnaire, hauts faits)
+node tests/analyse.test.js     # les analyses (coach, questionnaire, hauts faits, fichiers importés)
 python3 tests/parcours.py      # le parcours complet dans un navigateur, à 4 largeurs d'écran
+python3 tests/robustesse.py    # deux onglets, fichiers abîmés ou piégés, clavier, longues adresses à 320 px
 ```
 
 ## Sources

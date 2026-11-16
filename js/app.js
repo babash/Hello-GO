@@ -7,6 +7,7 @@
   const e = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
   const pluriel = (n, mot) => n + ' ' + mot + (n > 1 ? 's' : '');
+  const nomDeFichier = (s) => String(s).toLowerCase().normalize('NFD').replace(/\p{M}/gu, '').replace(/[^a-z0-9]+/g, '-'); // « Zoé » donne « zoe »
 
   // ---------- Le dossier ----------
   function dossierNeuf() {
@@ -14,20 +15,33 @@
       mots: [], sources: [], oraux: [{ id: uid(), nom: 'Oral blanc 1', auto: {} }, { id: uid(), nom: 'Oral blanc 2', auto: {} }], hf: {}, compteurs: {}, vus: {} };
   }
   function charger() {
-    try { const t = localStorage.getItem(CLE); if (t) { const d = JSON.parse(t); if (d && d.v === 1) return Object.assign(dossierNeuf(), d); } } catch (x) { /* dossier illisible : on repart d'un dossier neuf */ }
+    let t = null;
+    try { t = localStorage.getItem(CLE); if (t) { const d = JSON.parse(t); if (d && d.v === 1) return Object.assign(dossierNeuf(), d); } } catch (x) { /* dossier illisible */ }
+    // Un dossier illisible (ou d'une autre version) n'est jamais écrasé sans copie : il reste sous une autre clé.
+    try { if (t) localStorage.setItem(CLE + ':illisible', t); } catch (x) { /* pas de place pour la copie */ }
     return dossierNeuf();
   }
-  let d = charger(), minuterie = null, memoireOk = true, annulation = null;
+  let d = charger(), minuterie = null, memoireOk = true, enAttente = false;
   function ecrire() {
+    clearTimeout(minuterie); enAttente = false;
     try { localStorage.setItem(CLE, JSON.stringify(d)); memoireOk = true; } catch (x) { memoireOk = false; toast('Impossible d’enregistrer sur cet appareil. Télécharge ton dossier dans « Plus », puis « Réglages ».'); }
   }
   function enregistrer(tout_de_suite) {
     clearTimeout(minuterie);
-    if (tout_de_suite) ecrire(); else minuterie = setTimeout(ecrire, 400);
+    if (tout_de_suite) ecrire(); else { enAttente = true; minuterie = setTimeout(ecrire, 400); }
     const nouveaux = A.majHautsFaits(d);
     if (nouveaux.length) { ecrire(); nouveaux.forEach((h) => toast('Haut fait débloqué : ' + h.titre, '#/hauts-faits', 'Voir')); }
   }
-  window.addEventListener('pagehide', ecrire);
+  // En quittant, on n'écrit que ce qui attend encore : un vieil onglet n'écrase jamais le travail fait dans un autre.
+  window.addEventListener('pagehide', () => { if (enAttente) ecrire(); });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && enAttente) ecrire(); });
+  // Un autre onglet a enregistré : on reprend son dossier.
+  window.addEventListener('storage', (ev) => {
+    if (ev.key !== null && ev.key !== CLE) return;
+    clearTimeout(minuterie); enAttente = false; d = charger();
+    const dlg = $('#dialogue'); if (dlg && dlg.open) dlg.close('annuler');
+    rendre();
+  });
 
   function nouvelleQuestion(titre, idees) {
     const q = { id: uid(), titre: titre || '', statut: 'brouillon', echange: [], parties: [
@@ -229,7 +243,7 @@
       <label>Définition d’une source ${zoneTexte('mots.' + m.id + '.defSource', m.defSource, 'placeholder="La définition exacte, recopiée"')}</label>
       <label>D’où vient-elle ? ${champ('mots.' + m.id + '.sourceTexte', m.sourceTexte, 'placeholder="Un dictionnaire, un cours, un site officiel…"')}</label>
       <label>Avec mes mots ${zoneTexte('mots.' + m.id + '.defMoi', m.defMoi, 'placeholder="Comme je l’expliquerais à un·e camarade"')}</label>
-      <label>Une image simple, pour le juré non spécialiste ${champ('mots.' + m.id + '.analogie', m.analogie, 'placeholder="C’est comme…"')}</label>
+      <label>Une image simple, pour le membre du jury non spécialiste ${champ('mots.' + m.id + '.analogie', m.analogie, 'placeholder="C’est comme…"')}</label>
       <div data-zone="mot" data-m="${m.id}">${zoneMot(m)}</div></section>`).join('')}
     <button class="ajouter" data-a="plus-mot">+ Ajouter un mot</button>`;
 
@@ -309,7 +323,7 @@
     <section class="carte"><h2>Mon prénom</h2>${champ('profil.prenom', d.profil.prenom, 'maxlength="24" aria-label="Mon prénom"')}</section>
     <section class="carte"><h2>Mon dossier</h2>
       <p>Ton dossier est gardé <b>sur cet appareil seulement</b>. Pour le sauvegarder ou le passer sur un autre appareil, télécharge-le, puis importe-le.</p>
-      <p><button data-a="exporter">Télécharger mon dossier</button> <label class="bouton">Importer un dossier<input type="file" id="import" accept="application/json,.json" hidden></label></p></section>
+      <p><button data-a="exporter">Télécharger mon dossier</button> <label class="bouton fichier">Importer un dossier<input type="file" id="import" accept="application/json,.json"></label></p></section>
     <section class="carte"><h2>Tout effacer</h2><p>Pour effacer ton dossier de cet appareil, écris EFFACER, puis valide. C’est définitif.</p>
       <input type="text" id="confirmer" aria-label="Écris EFFACER pour confirmer" autocomplete="off"><button class="danger" data-a="effacer">Effacer mon dossier</button></section>
     <p class="note">Hello GO, version ${window.HG_VERSION}.</p>`;
@@ -346,6 +360,9 @@
     if (garderDefilement !== false) window.scrollTo(0, y);
   }
   function ajuster(t) { t.style.height = 'auto'; t.style.height = (t.scrollHeight + 2) + 'px'; }
+  // Téléphone tourné, fenêtre réduite : les zones de texte reprennent leur hauteur (sinon la fin d'un point est cachée).
+  let retaille = null;
+  window.addEventListener('resize', () => { clearTimeout(retaille); retaille = setTimeout(() => document.querySelectorAll('#vue textarea').forEach(ajuster), 150); });
   function rafraichir() {
     document.querySelectorAll('[data-zone]').forEach((z) => {
       const m = z.dataset.m && d.mots.find((x) => x.id === z.dataset.m);
@@ -393,18 +410,23 @@
       enregistrer(); return; }
     if (t.dataset.grille) { const o = d.oraux.find((x) => x.id === t.dataset.grille); o.auto = o.auto || {}; o.auto[t.dataset.c] = +t.value; enregistrer(true); rendre(); return; }
     if (t.dataset.coche) { const c = cible(t.dataset.coche); c[0][c[1]] = t.checked; enregistrer(true); return; }
-    if (t.id === 'import' && t.files[0]) { t.files[0].text().then((txt) => { try { const n = JSON.parse(txt); if (!n || n.v !== 1 || !Array.isArray(n.questions)) throw new Error('format');
-      const avant = JSON.stringify(d); d = Object.assign(dossierNeuf(), n); d.profil.vu = true; enregistrer(true); location.hash = '#/'; rendre();
-      toast('Dossier importé.', null, 'Annuler', () => { d = JSON.parse(avant); enregistrer(true); rendre(); }); } catch (x) { toast('Ce fichier n’est pas un dossier Hello GO.'); } }); return; }
+    if (t.id === 'import' && t.files[0]) { t.files[0].text().then((txt) => {
+      // Rien ne change tant que le fichier n'est pas reconnu ; s'il ne s'affiche pas, l'ancien dossier revient.
+      let n = null; try { n = JSON.parse(txt); } catch (x) { /* fichier illisible */ }
+      if (!A.dossierValide(n)) return toast('Ce fichier n’est pas un dossier Hello GO.');
+      const avant = JSON.stringify(d);
+      try { d = Object.assign(dossierNeuf(), n); d.profil.vu = true; enregistrer(true); location.hash = '#/'; rendre(); }
+      catch (x) { d = JSON.parse(avant); enregistrer(true); rendre(); return toast('Ce fichier n’est pas un dossier Hello GO.'); }
+      toast('Dossier importé.', null, 'Annuler', () => { d = JSON.parse(avant); enregistrer(true); rendre(); }); }); return; }
     if (t.dataset.f) { enregistrer(true); rafraichir(); }
   });
   document.addEventListener('keydown', (ev) => {
     const t = ev.target;
-    if (t.classList && t.classList.contains('texte-pt') && ev.key === 'Enter' && !ev.shiftKey) {
+    if (t.classList && t.classList.contains('texte-pt') && ev.key === 'Enter' && !ev.shiftKey && !ev.isComposing) {
       ev.preventDefault(); const p = t.dataset.f.split('.'), q = laQuestion(p[1]);
       for (const partie of q.parties) { const i = partie.points.findIndex((x) => x.id === p[2]); if (i >= 0) { const n = point(); partie.points.splice(i + 1, 0, n); enregistrer(true); rendre(); focusPoint(n.id); break; } }
     }
-    konami(ev.key);
+    if (typeof ev.key === 'string') konami(ev.key); // la saisie automatique envoie des touches sans nom
   });
   function focusPoint(id) { const t = $('[data-id="' + id + '"] textarea'); if (t) t.focus(); }
   const SUITE = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a']; let rang = 0;
@@ -443,9 +465,10 @@
     'plus-oral'() { d.oraux.push({ id: uid(), nom: 'Vidéo d’entraînement', auto: {} }); enregistrer(true); rendre(); },
     'suppr-oral'(b) { avecAnnulation('Supprimé.', () => { d.oraux = d.oraux.filter((x) => x.id !== b.dataset.o); }); },
     lier(b) { ouvrirLiens(b.dataset.q, b.dataset.p, b.dataset.t); },
+    'fermer-dialogue'() { $('#dialogue').close('annuler'); },
     pdf(b) { faireLePdf(laQuestion(b.dataset.q), b); },
     exporter() { ecrire(); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(d, null, 1)], { type: 'application/json' }));
-      a.download = 'hello-go-' + (d.profil.prenom || 'dossier').toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + new Date().toISOString().slice(0, 10) + '.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); },
+      a.download = 'hello-go-' + nomDeFichier(d.profil.prenom || 'dossier') + '-' + new Date().toISOString().slice(0, 10) + '.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); },
     effacer() { if ($('#confirmer').value.trim() !== 'EFFACER') return toast('Écris EFFACER dans la case pour confirmer.'); d = dossierNeuf(); ecrire(); location.hash = '#/'; rendre(false); },
     logo() { const t = Date.now(); touches = t - dernier < 600 ? touches + 1 : 1; dernier = t; if (touches >= 7) { touches = 0; secret(); } },
   };
@@ -464,6 +487,8 @@
     d.questions.forEach((q) => A.tousLesPoints(q).forEach((p) => { p.mots = (p.mots || []).filter((i) => m.has(i)); p.sources = (p.sources || []).filter((i) => s.has(i)); }));
   }
   document.addEventListener('click', (ev) => {
+    // Le lien d'évitement mène au contenu de la page affichée, sans changer d'adresse (« #vue » n'est pas une page).
+    if (ev.target.closest('.evitement')) { ev.preventDefault(); $('#vue').focus(); return; }
     const b = ev.target.closest('[data-a]'); if (!b || b.disabled) return;
     const f = actions[b.dataset.a]; if (f) f(b);
   });
@@ -472,10 +497,10 @@
   // ---------- Relier un point à des mots ou à des sources ----------
   function ouvrirLiens(qid, pid, type) {
     const q = laQuestion(qid), p = lePoint(q, pid), dlg = $('#dialogue'), estMot = type === 'mots', liste = d[type];
-    dlg.innerHTML = `<form method="dialog"><h2>${estMot ? 'Les mots de ce point' : 'Les sources de ce point'}</h2>
+    dlg.innerHTML = `<form method="dialog"><h2 id="titre-dialogue">${estMot ? 'Les mots de ce point' : 'Les sources de ce point'}</h2>
       ${liste.length ? `<div class="choix">${liste.map((x) => `<label class="niveau"><input type="checkbox" value="${x.id}"${(p[type] || []).includes(x.id) ? ' checked' : ''}><span>${e((estMot ? x.mot : x.titre) || '(sans nom)')}</span></label>`).join('')}</div>` : `<p class="note">${estMot ? 'Tu n’as pas encore de mot.' : 'Tu n’as pas encore de source.'}</p>`}
       <label>${estMot ? 'Un nouveau mot' : 'Une nouvelle source (son titre)'}<input type="text" id="nouveau-lien" autocomplete="off"></label>
-      <p class="bas"><button value="annuler">Annuler</button><button class="principal" value="ok">Valider</button></p></form>`;
+      <p class="bas"><button type="button" data-a="fermer-dialogue">Annuler</button><button class="principal" value="ok">Valider</button></p></form>`;
     dlg.onclose = () => {
       if (dlg.returnValue !== 'ok') return;
       p[type] = [...dlg.querySelectorAll('input[type=checkbox]:checked')].map((c) => c.value);
@@ -484,6 +509,8 @@
         toast(estMot ? 'Mot ajouté : pense à le définir.' : 'Source ajoutée : pense à la compléter.', estMot ? '#/mots' : '#/sources', 'Ouvrir'); }
       enregistrer(true); rendre();
     };
+    // Entrée valide (Valider est le seul bouton d'envoi) ; Échap annule, même après une validation précédente.
+    dlg.returnValue = ''; dlg.setAttribute('aria-labelledby', 'titre-dialogue');
     dlg.showModal();
   }
 
@@ -521,14 +548,15 @@
   function faireLePdf(q, bouton) {
     bouton.disabled = true; const avant = bouton.textContent; bouton.textContent = 'Préparation…';
     const pret = window.pdfMake ? Promise.resolve() : charger_script('vendor/pdfmake.min.js').then(() => charger_script('vendor/vfs_fonts.js'));
-    pret.then(() => { window.pdfMake.createPdf(contenuPdf(q)).download('grand-oral-' + (q.titre || 'plan').toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g, '-').slice(0, 40) + '.pdf');
+    pret.then(() => { window.pdfMake.createPdf(contenuPdf(q)).download('grand-oral-' + nomDeFichier(q.titre || 'plan').slice(0, 40) + '.pdf');
       d.compteurs.pdf = (d.compteurs.pdf || 0) + 1; enregistrer(true); })
       .catch(() => toast('Le PDF n’a pas pu être préparé. Vérifie ta connexion, puis réessaie.'))
       .then(() => { bouton.disabled = false; bouton.textContent = avant; });
   }
 
   // ---------- Démarrage ----------
-  window.addEventListener('hashchange', () => rendre(false));
+  // Une nouvelle page commence en haut, et le focus va à son contenu (clavier, lecteurs d'écran).
+  window.addEventListener('hashchange', () => { rendre(false); window.scrollTo(0, 0); $('#vue').focus({ preventScroll: true }); });
   A.majHautsFaits(d); rendre(false);
   if (!memoireOk) toast('Ce navigateur ne garde pas ton dossier.');
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});

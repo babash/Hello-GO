@@ -165,10 +165,10 @@
         ['annonce', 'D’abord les causes (données, modèle), puis les solutions (technique, loi).']] },
       { titre: 'Axe 1 · Les causes profondes des biais', minutes: 3, points: [
         ['argument', 'Biais d’échantillonnage : un groupe peu présent dans les données, et l’IA se trompe sur lui.'],
-        ['exemple', 'Le husky reconnu grâce à la neige derrière lui : le modèle apprend le décor, pas l’animal.'],
+        ['exemple', 'Un husky pris pour un loup à cause de la neige derrière lui : le modèle a appris le décor, pas l’animal.'],
         ['argument', 'Biais historique : les données sont le miroir des discriminations passées.'],
         ['argument', 'Biais de modélisation : on choisit ce que l’IA doit maximiser.'],
-        ['exemple', 'Le robot Tay de Microsoft, devenu raciste en apprenant des utilisateurs extrêmes.'],
+        ['exemple', 'Le robot Tay de Microsoft, devenu raciste en apprenant des internautes extrêmes.'],
         ['transition', 'Les causes sont connues : que peut-on faire ?']] },
       { titre: 'Axe 2 · Les solutions : audits et réglementation', minutes: 3, points: [
         ['argument', 'Rééquilibrer les données avant l’apprentissage (sur-échantillonnage, sous-échantillonnage).'],

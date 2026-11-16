@@ -72,7 +72,7 @@
     if (!m.defSource || !m.defMoi) c.push('Il manque ' + (!m.defSource && !m.defMoi ? 'les deux définitions' : !m.defSource ? 'la définition d’une source' : 'la définition avec tes mots') + '.');
     if (m.defSource && !m.sourceTexte) c.push('D’où vient la première définition ? Écris sa source.');
     if (m.defSource && m.defMoi && ressemblance(m.defSource, m.defMoi) > 0.6) c.push('Ta définition « avec mes mots » ressemble trop à celle de la source : reformule-la.');
-    if (!m.analogie) c.push('Ajoute une image simple pour le juré non spécialiste.');
+    if (!m.analogie) c.push('Ajoute une image simple pour le membre du jury non spécialiste.');
     return c;
   }
   function motComplet(m) { return !!(m.mot && m.defSource && m.defMoi); }
@@ -171,7 +171,7 @@
     { id: 'q42', g: 'Le plan', cache: true, indice: 'Un nombre bien connu des geeks…', titre: '42', cond: 'Avoir exactement 42 points.', pourquoi: 'La réponse à la grande question sur la vie, l’univers et le reste… mais pas à ta problématique.', test: function (d) { return unPlan(d, function (q) { return tousLesPoints(q).length === 42; }); } },
 
     { id: 'dico', g: 'Les mots', titre: 'Dico vivant', cond: 'Avoir 5 mots avec leurs deux définitions.', pourquoi: 'Un mot bien défini, c’est une question du jury en moins.', test: function (d) { return (d.mots || []).filter(motComplet).length >= 5; } },
-    { id: 'groot', g: 'Les mots', titre: 'Je s’appelle Groot', cond: 'Écrire 5 analogies.', pourquoi: 'Dire beaucoup avec peu de mots : c’est ce qu’attend le juré non spécialiste.', test: function (d) { return (d.mots || []).filter(function (m) { return (m.analogie || '').trim().length > 5; }).length >= 5; } },
+    { id: 'groot', g: 'Les mots', titre: 'Je s’appelle Groot', cond: 'Écrire 5 analogies.', pourquoi: 'Dire beaucoup avec peu de mots : c’est ce qu’attend le membre du jury non spécialiste.', test: function (d) { return (d.mots || []).filter(function (m) { return (m.analogie || '').trim().length > 5; }).length >= 5; } },
     { id: 'zerocopie', g: 'Les mots', titre: 'Zéro copier-coller', cond: 'Avoir 8 mots complets, aucun recopié sur sa source.', pourquoi: 'Si tu sais le dire avec tes mots, tu l’as compris.', test: function (d) { const c = (d.mots || []).filter(motComplet); return c.length >= 8 && c.every(function (m) { return ressemblance(m.defSource, m.defMoi) <= 0.6; }); } },
     { id: 'recursif', g: 'Les mots', cache: true, indice: 'Pour comprendre cet indice, il faut d’abord comprendre cet indice.', titre: 'Récursif', cond: 'Utiliser un mot de ton lexique dans la définition d’un autre.', pourquoi: 'Pour comprendre ce haut fait, il faut d’abord comprendre ce haut fait.', test: function (d) { const l = d.mots || []; return l.some(function (a) { return l.some(function (b) { return a !== b && b.mot && b.mot.length > 2 && contient((a.defMoi || '') + ' ' + (a.defSource || ''), b.mot); }); }); } },
 
@@ -186,7 +186,7 @@
     { id: 'oral1', g: 'Les oraux', titre: 'Premier passage', cond: 'T’évaluer après un oral blanc.', pourquoi: 'On ne progresse à l’oral qu’en parlant.', test: function (d) { return (d.oraux || []).some(function (o) { return o.auto && Object.keys(o.auto).length >= 5; }); } },
     { id: 'progres', g: 'Les oraux', titre: 'Niveau supérieur', cond: 'Progresser sur un critère entre deux oraux.', pourquoi: 'Chaque passage te fait gagner de l’expérience.', test: function (d) { const o = (d.oraux || []).filter(function (x) { return x.auto && Object.keys(x.auto).length >= 5; }); return o.length >= 2 && Object.keys(o[0].auto).some(function (k) { return o[o.length - 1].auto[k] > o[0].auto[k]; }); } },
     { id: 'video', g: 'Les oraux', titre: 'Sur grand écran', cond: 'Noter qu’une vidéo est déposée sur Pronote.', pourquoi: 'Se revoir, c’est repérer ce qu’on ne sent pas en parlant.', test: function (d) { return (d.oraux || []).some(function (o) { return o.video; }); } },
-    { id: 'pdf', g: 'Les oraux', titre: 'Sauvegarde effectuée', cond: 'Télécharger ton dossier en PDF.', pourquoi: 'Un bon joueur sauvegarde avant le boss final.', test: function (d) { return ((d.compteurs || {}).pdf || 0) >= 1; } },
+    { id: 'pdf', g: 'Les oraux', titre: 'Sauvegarde effectuée', cond: 'Télécharger ton dossier en PDF.', pourquoi: 'On sauvegarde toujours avant le boss final.', test: function (d) { return ((d.compteurs || {}).pdf || 0) >= 1; } },
 
     { id: 'konami', g: 'Cachés', cache: true, indice: 'Haut, haut, bas, bas… (ou 7 touches sur le logo)', titre: 'Easter egg', cond: 'Trouver le passage secret.', pourquoi: 'La curiosité est une qualité de hacker.', test: function (d) { return ((d.compteurs || {}).secret || 0) >= 1; } },
     { id: 'canard', g: 'Cachés', cache: true, indice: 'Coin coin : lis la bonne fiche de méthode.', titre: 'Canard en plastique', cond: 'Lire la fiche « Expliquer à un non-spécialiste ».', pourquoi: 'Les programmeurs et programmeuses expliquent leur code à un canard pour trouver leurs erreurs.', test: function (d) { return ((d.compteurs || {}).canard || 0) >= 1; } },
@@ -210,8 +210,42 @@
     return morceaux.join(', ') + (s.lien ? (morceaux.length ? '. ' : '') + s.lien : '');
   }
 
+  // Un fichier importé n'est accepté que s'il a la forme d'un dossier Hello GO : des identifiants sûrs (ils vont dans les
+  // attributs de la page), des listes, des textes et des nombres. Une partie absente reprend sa valeur par défaut.
+  function dossierValide(n) {
+    const objet = function (x) { return x !== null && typeof x === 'object' && !Array.isArray(x); };
+    const texte = function (x) { return x === undefined || typeof x === 'string'; };
+    const textes = function (o, noms) { return noms.every(function (k) { return texte(o[k]); }); };
+    const id = function (x) { return typeof x === 'string' && /^[A-Za-z0-9_-]{1,40}$/.test(x); };
+    const liste = function (x, f) { return Array.isArray(x) && x.every(f); };
+    const sinon = function (x, f) { return x === undefined || f(x); };
+    const entier = function (x) { return Number.isInteger(x) && x >= 0; };
+    const oui = function (x) { return typeof x === 'boolean'; };
+    const parmi = function (l) { return function (x) { return x === undefined || l.some(function (e) { return e[0] === x; }); }; };
+    const point = function (p) { return objet(p) && id(p.id) && texte(p.texte) && parmi(D.ETIQUETTES)(p.etiquette) && sinon(p.mots, function (l) { return liste(l, id); }) && sinon(p.sources, function (l) { return liste(l, id); }); };
+    const partie = function (p) { return objet(p) && id(p.id) && texte(p.titre) && sinon(p.minutes, entier) && liste(p.points, point); };
+    const echange = function (x) { return objet(x) && id(x.id) && textes(x, ['question', 'reponse']); };
+    const question = function (q) { return objet(q) && id(q.id) && texte(q.titre) && ['brouillon', 'proposee', 'validee'].indexOf(q.statut) >= 0 && liste(q.echange, echange) && liste(q.parties, partie); };
+    const piste = function (p) { return objet(p) && id(p.id) && textes(p, ['titre', 'pourquoi']) && sinon(p.idees, function (l) { return liste(l, texte); }) && sinon(p.candidates, function (l) { return liste(l, texte); }); };
+    const mot = function (m) { return objet(m) && id(m.id) && textes(m, ['mot', 'defSource', 'sourceTexte', 'defMoi', 'analogie']); };
+    const source = function (s) { return objet(s) && id(s.id) && textes(s, ['titre', 'auteur', 'lien', 'date', 'retiens']) && parmi(D.TYPES_SOURCE)(s.type); };
+    const criteres = D.GRILLE.map(function (c) { return c.id; });
+    const grille = function (a) { return objet(a) && Object.keys(a).every(function (k) { return criteres.indexOf(k) >= 0 && [1, 2, 3, 4].indexOf(a[k]) >= 0; }); };
+    const oral = function (o) { return objet(o) && id(o.id) && textes(o, ['nom', 'date', 'objectifs']) && sinon(o.video, oui) && sinon(o.auto, grille); };
+    const reponses = function (r) { return objet(r) && sinon(r.i, function (l) { return liste(l, texte); }) && sinon(r.n, function (l) { return liste(l, texte); }) && texte(r.a) && texte(r.s); };
+    const valeurs = function (o, f) { return objet(o) && Object.keys(o).every(function (k) { return f(o[k]); }); };
+    return objet(n) && n.v === 1 && liste(n.questions, question)
+      && sinon(n.profil, function (p) { return objet(p) && texte(p.prenom) && sinon(p.vu, oui); })
+      && sinon(n.quiz, function (q) { return objet(q) && reponses(q.reponses) && sinon(q.fait, oui); })
+      && sinon(n.interets, function (l) { return liste(l, texte); }) && sinon(n.ponts, function (l) { return liste(l, texte); })
+      && sinon(n.pistes, function (l) { return liste(l, piste); }) && sinon(n.mots, function (l) { return liste(l, mot); })
+      && sinon(n.sources, function (l) { return liste(l, source); }) && sinon(n.oraux, function (l) { return liste(l, oral); })
+      && sinon(n.hf, function (o) { return valeurs(o, function (v) { return typeof v === 'string'; }); })
+      && sinon(n.compteurs, function (o) { return valeurs(o, entier); }) && sinon(n.vus, function (o) { return valeurs(o, entier); });
+  }
+
   const api = { coach, coachMot, motComplet, coachSources, suggestions, questionsProbables, phase, prochaineAction, HAUTS_FAITS, majHautsFaits,
-    tousLesPoints, ressemblance, contient, aChiffre, reference, SEC_PAR_POINT };
+    tousLesPoints, ressemblance, contient, aChiffre, reference, dossierValide, SEC_PAR_POINT };
   racine.HGAnalyse = api;
   if (typeof module !== 'undefined') module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);

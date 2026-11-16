@@ -1,4 +1,4 @@
-Court-circuit : les polices de css/polices.css
+Hello GO : les polices de css/polices.css
 
 Les polices intégrées dans css/polices.css (fichiers woff2 de fontsource 5.3.0, écrits en base64)
 sont sous SIL Open Font License 1.1 :

@@ -64,4 +64,21 @@ assert.strictEqual(A.reference({ auteur: 'A', titre: 'T', date: '2024', lien: 'h
 assert.ok(D.A_SAVOIR.length >= 40); [0, 1, 2].forEach((p) => assert.ok(D.A_SAVOIR.filter((x) => x.p === p).length >= 10));
 D.A_SAVOIR.forEach((x) => assert.ok(x.t.length <= 130, x.t));
 D.GRILLE.forEach((g2) => assert.strictEqual(g2.niveaux.length, 4));
+
+// le contrôle des fichiers importés : un dossier exporté passe ; un identifiant, un statut ou une note piégés, un type faux ne passent pas
+const exporte = { v: 1, profil: { prenom: 'Zoé', vu: true }, quiz: { reponses: { i: ['musique'], a: 'avenir' }, fait: true }, interets: ['a', '', ''], ponts: [''],
+  pistes: [{ id: 'k1', titre: 'T', pourquoi: '', idees: [''], candidates: [''] }], questions: [question()],
+  mots: [{ id: 'm1', mot: 'Biais', defSource: 'x', sourceTexte: '', defMoi: 'y', analogie: '' }],
+  sources: [{ id: 's1', titre: 'S', auteur: '', lien: '', type: 'experte', date: '', retiens: '' }],
+  oraux: [{ id: 'o1', nom: 'Oral blanc 1', auto: { oral: 3 }, video: true, date: '2027-01-15' }], hf: { hello: '2026-11-16' }, compteurs: { pdf: 1 }, vus: { decalage: 2 } };
+exporte.questions[0].parties[0].points.push(pt('Un point', 'accroche', ['s1']));
+assert.ok(A.dossierValide(exporte), 'un dossier exporté');
+assert.ok(A.dossierValide({ v: 1, questions: [] }), 'le minimum');
+assert.ok(!A.dossierValide(null) && !A.dossierValide([]) && !A.dossierValide('x'));
+const abime = (f) => { const x = JSON.parse(JSON.stringify(exporte)); f(x); return A.dossierValide(x); };
+[(x) => { x.v = 2; }, (x) => { delete x.questions; }, (x) => { x.questions[0].id = '"><img src=x onerror=alert(1)>'; }, (x) => { x.questions[0].statut = 'x" onmouseover="y'; },
+  (x) => { x.mots[0].id = 'a.b'; }, (x) => { x.questions[0].parties[0].points[0].mots = ['a/b']; }, (x) => { x.oraux[0].auto.oral = '<b>'; }, (x) => { x.oraux[0].auto.oral = 5; },
+  (x) => { x.oraux[0].auto.inconnu = 1; }, (x) => { x.vus.decalage = -3; }, (x) => { x.vus.decalage = 'x'; }, (x) => { x.hf = null; }, (x) => { x.mots = 'abc'; },
+  (x) => { x.questions[0].parties[0].points[0].etiquette = 'inconnue'; }, (x) => { x.sources[0].type = 'x'; }, (x) => { x.quiz.reponses = null; }, (x) => { x.interets = [1]; },
+].forEach((f, i) => assert.ok(!abime(f), 'dossier abîmé n° ' + i));
 console.log('analyse : tous les essais passent (' + A.HAUTS_FAITS.length + ' hauts faits, ' + D.SUJETS.length + ' sujets, ' + D.A_SAVOIR.length + ' à savoir)');
