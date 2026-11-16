@@ -65,9 +65,9 @@ comment on column grand_oral.mots.rang is 'La place du mot dans la liste, de 0 Ã
 comment on column grand_oral.mots.mot is 'Le mot, en majuscules sans accent, de 4 Ã  8 lettres.';
 insert into grand_oral.mots (rang, mot)
 select (o - 1)::smallint, m from unnest(array[
-  'MICRO', 'RIDEAU', 'ESTRADE', 'PUPITRE', 'PODIUM', 'COULISSE', 'GRADIN', 'FAUTEUIL',
+  'MICRO', 'DECOR', 'ESTRADE', 'PUPITRE', 'PODIUM', 'COULISSE', 'GRADIN', 'FAUTEUIL',
   'BILLET', 'AFFICHE', 'SPOT', 'TAPIS', 'CARNET', 'CAHIER', 'STYLO', 'FEUILLE',
-  'LIVRE', 'ALBUM', 'DISQUE', 'VINYLE', 'COSTUME', 'CRAVATE', 'CHAPEAU', 'BOUQUET',
+  'LIVRE', 'ALBUM', 'DISQUE', 'VINYLE', 'COSTUME', 'CRAVATE', 'CHAPEAU', 'TROPHEE',
   'RUBAN', 'BADGE', 'SIFFLET', 'TAMBOUR', 'GUITARE', 'PIANO', 'VIOLON', 'SAXO',
   'CYMBALE', 'BANJO', 'UKULELE', 'CLAIRON', 'HAUTBOIS', 'CHANSON', 'REFRAIN', 'COUPLET',
   'JOURNAL', 'DIALOGUE', 'SCRIPT', 'LETTRE', 'PODCAST', 'CLIP', 'FILM', 'TICKET',
