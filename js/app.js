@@ -66,7 +66,7 @@
   }
   function avecAnnulation(texte, changer) {
     const avant = JSON.stringify(d); changer(); enregistrer(true); rendre();
-    toast(texte, null, 'Annuler', () => { d = JSON.parse(avant); enregistrer(true); rendre(); });
+    toast(texte, null, 'Annuler', () => { d = JSON.parse(avant); d.compteurs.annulations = (d.compteurs.annulations || 0) + 1; enregistrer(true); rendre(); });
   }
   const options = (liste, valeur) => liste.map((o) => '<option value="' + e(o[0]) + '"' + (o[0] === (valeur || '') ? ' selected' : '') + '>' + e(o[1]) + '</option>').join('');
   const champ = (f, valeur, attr) => '<input type="text" spellcheck="true" data-f="' + f + '" value="' + e(valeur) + '" ' + (attr || '') + '>';
@@ -595,6 +595,8 @@
   // ---------- Démarrage ----------
   // Une nouvelle page commence en haut, et le focus va à son contenu (clavier, lecteurs d'écran).
   window.addEventListener('hashchange', () => { rendre(false); window.scrollTo(0, 0); $('#vue').focus({ preventScroll: true }); });
+  // Un jour de travail de plus (sans jamais rien retirer : pas de série à tenir).
+  (function () { const jour = Math.floor(Date.now() / 864e5); if (d.vus.jour !== jour) { d.vus.jour = jour; d.compteurs.jours = (d.compteurs.jours || 0) + 1; } })();
   A.majHautsFaits(d); rendre(false);
   if (!memoireOk) toast('Ce navigateur ne garde pas ton dossier.');
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});

@@ -27,7 +27,7 @@ Hello GO fait partie des [Ressources NSI et SNT](https://babash.github.io/Babash
 - **Un « à savoir » chaque jour** : une règle de l'épreuve ou un conseil, selon l'avancement.
 - **Un coach** dans le plan : nombre de points et durée estimée, équilibre des parties, chiffre sans source, mot technique à définir, définition recopiée.
 - **Un exemple** complet (les biais algorithmiques) et des fiches de méthode.
-- **34 hauts faits**, qui récompensent les bonnes habitudes, pas la quantité.
+- **51 hauts faits**, qui récompensent les bonnes habitudes, pas la quantité.
 
 ## Où en est le projet
 

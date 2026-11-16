@@ -68,7 +68,7 @@ const d2 = dossier(question()); assert.strictEqual(A.majHautsFaits(d2, '2026-11-
 d2.questions[0].parties[0].points.push(pt('Un fait', 'accroche'));
 let g = A.majHautsFaits(d2, '2026-11-16').map((h) => h.id); assert.deepStrictEqual(g.sort(), ['accroche', 'hello']);
 assert.strictEqual(A.majHautsFaits(d2).length, 0, 'pas deux fois');
-d2.questions[0].statut = 'validee'; assert.deepStrictEqual(A.majHautsFaits(d2).map((h) => h.id), ['sujet']);
+d2.questions[0].statut = 'validee'; assert.deepStrictEqual(A.majHautsFaits(d2).map((h) => h.id).sort(), ['sujet', 'volontaire']);
 const d3 = dossier(question()); for (let i = 0; i < 42; i++) d3.questions[0].parties[i % 4].points.push(pt('x' + i));
 assert.ok(A.majHautsFaits(d3).some((h) => h.id === 'q42'));
 assert.strictEqual(new Set(A.HAUTS_FAITS.map((h) => h.id)).size, A.HAUTS_FAITS.length);
@@ -138,3 +138,13 @@ assert.ok(trouves('dansspe', 'mers', 'hggsp').some((t) => /câbles/.test(t))); a
 // des faits exacts : WannaCry est un rançongiciel (pas un virus) ; Wikipédia, « que tout le monde peut modifier » ; pas « presque toutes nos données »
 C.concat(D.SUJETS.map((x) => ({ q: x.t }))).forEach((x) => { assert.ok(!/virus informatique|écrite par tout le monde|presque toutes nos données/.test(x.q), x.q); });
 console.log('mots cherchés et faits : essais passés');
+// hauts faits ajoutés (T74)
+const d5 = dossier(question()); d5.compteurs = { jours: 5, deplacements: 5, annulations: 1 };
+d5.sources = [{ id: 's1', titre: 'A', date: '1948', type: 'experte', lien: 'https://a.fr/x', retiens: 'une idée forte' }];
+d5.mots = [{ id: 'm1', mot: 'Bit', defSource: 'a', defMoi: 'b', analogie: 'un interrupteur' }];
+d5.questions[0].parties[0].points.push({ id: 'p1', texte: 'sudo apt install', etiquette: 'exemple', mots: ['m1'], sources: ['s1'] });
+const g5 = A.majHautsFaits(d5).map((h) => h.id);
+['dory', 'nami', 'ctrlz', 'lara', 'zelda', 'sudo'].forEach((x) => assert.ok(g5.includes(x), x));
+['vingt', 'cape', 'tetris', 'arya', 'onze', 'hermione', 'enola', 'p404', 'leia', 'gear', 'shuri', 'volontaire'].forEach((x) => assert.ok(!g5.includes(x), x));
+assert.ok(A.HAUTS_FAITS.length >= 50);
+console.log('hauts faits : ' + A.HAUTS_FAITS.length);
