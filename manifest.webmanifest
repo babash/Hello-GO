@@ -1,0 +1,12 @@
+{
+  "name": "Hello GO · Grand oral de NSI",
+  "short_name": "Hello GO",
+  "description": "Prépare ton Grand oral de NSI pas à pas.",
+  "lang": "fr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0B1222",
+  "theme_color": "#0B1222",
+  "icons": [{ "src": "icone.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
