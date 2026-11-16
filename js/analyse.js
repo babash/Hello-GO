@@ -130,8 +130,10 @@
     return p;
   }
   // Ce qui intrigue l'élève dans les cartes sans qu'il ou elle l'ait coché dans « Mes goûts » : la surprise.
+  // Rien à comparer tant que « Mes goûts » ne dit rien : pas de surprise (sinon « tu ne l'avais pas coché » serait faux).
   function surprises(reponses, reactions) {
     const g = gouts(reactions), p = profil(reponses), l = [];
+    if (!Object.keys(p.i).length && !Object.keys(p.n).length) return l;
     ['n', 'i'].forEach(function (k) { Object.keys(g[k]).forEach(function (t) { if (g[k][t] >= 2 && !p[k][t]) l.push({ nom: D.TAGS[k][t], n: g[k][t] }); }); });
     return l.sort(function (a, b) { return b.n - a.n; }).slice(0, 3).map(function (x) { return x.nom; });
   }

@@ -140,12 +140,13 @@
     const sug = A.suggestions(d.quiz.reponses, 5, re), surp = A.surprises(d.quiz.reponses, re);
     const resultats = n ? `<h2>Ce qui t’intrigue</h2>
       ${aimees.length ? `<ul class="liste">${aimees.map((x) => { const deja = d.pistes.some((p) => p.titre === x.q);
-        return `<li class="carte sujet"><p class="sur-titre">${e(x.titre)} · ${e(x.date)}</p><p class="gros">${e(x.q)}</p>${deja ? '<p class="fait-texte">Dans tes pistes</p>' : `<button data-a="garder" data-t="${e(x.q)}">Garder comme piste</button>`}</li>`; }).join('')}</ul>` : '<p class="vide">Aucune carte pour le moment : continue, il y en a pour tous les goûts.</p>'}
+        return `<li class="carte sujet"><p class="sur-titre">${e(x.titre)} · ${e(x.date)}</p><p class="gros">${e(x.q)}</p>${deja ? '<p class="fait-texte">Dans tes pistes</p>' : `<button data-a="garder" data-t="${e(x.q)}">Garder comme piste</button>`}</li>`; }).join('')}</ul>`
+        : `<p class="vide">${c ? 'Aucune carte pour le moment : continue, il y en a pour tous les goûts.' : 'Aucune carte ne t’a intrigué·e : dis ce que tu aimes dans « Mes goûts », ou parcours les sujets.'}</p>`}
       ${surp.length ? `<section class="carte savoir"><p class="sur-titre">Ta surprise</p><p class="gros">Tu ne l’avais pas coché dans tes goûts, mais ça t’intrigue : ${e(surp.join(', '))}.</p></section>` : ''}
       ${sug.length ? `<h2>Des sujets qui pourraient te plaire</h2><ul class="liste">${sug.map((x) => carteSujet(x.sujet, x.raisons)).join('')}</ul>` : ''}` : '';
     return ongletsExplorer('decouvrir') + `
     <p class="chapo">Des histoires vraies de l’informatique. Pour chacune, dis simplement si elle t’intrigue : tu découvriras peut-être un sujet auquel tu n’avais pas pensé.</p>
-    ${c && !bilan ? `<section class="carte decouverte" aria-live="polite">
+    ${c && !bilan ? `<section class="carte decouverte">
       <p class="sur-titre">Carte ${n + 1} sur ${total} · ${e(c.cat)}</p>
       <h2>${e(c.titre)} <span class="note">${e(c.date)}</span></h2>
       <p class="gros">${e(c.texte)}</p>
@@ -435,7 +436,9 @@
     const t = ev.target;
     if (t.dataset.quiz) { const q = D.QUIZ.find((x) => x.id === t.dataset.quiz), r = d.quiz.reponses;
       if (q.multi) { r[q.id] = (r[q.id] || []).filter((v) => v !== t.value); if (t.checked) r[q.id].push(t.value); } else r[q.id] = t.value;
-      if (q.id === 'spe') { r.dansspe = []; enregistrer(true); rendre(); const s2 = $('[name="quiz-dansspe"]'); if (s2) s2.focus(); return; }
+      // La spécialité change les réponses de la question suivante : la page est refaite, mais le focus reste sur la spécialité
+      // choisie (les flèches parcourent toujours la liste ; pas de changement de contexte à la saisie).
+      if (q.id === 'spe') { r.dansspe = []; enregistrer(true); rendre(); const s2 = [...document.querySelectorAll('[name="quiz-spe"]')].find((x) => x.value === t.value); if (s2) s2.focus(); return; }
       enregistrer(); return; }
     if (t.dataset.grille) { const o = d.oraux.find((x) => x.id === t.dataset.grille); o.auto = o.auto || {}; o.auto[t.dataset.c] = +t.value; enregistrer(true); rendre(); return; }
     if (t.dataset.coche) { const c = cible(t.dataset.coche); c[0][c[1]] = t.checked; enregistrer(true); return; }
@@ -458,6 +461,9 @@
     if (typeof ev.key === 'string') konami(ev.key); // la saisie automatique envoie des touches sans nom
   });
   function focusPoint(id) { const t = $('[data-id="' + id + '"] textarea'); if (t) t.focus(); }
+  // La carte suivante (ou le bilan) remplace la précédente : le focus va à son titre, pour que le clavier reste dans la carte
+  // et que les lecteurs d'écran la lisent (le bouton pressé n'existe plus).
+  function focusCarte() { const t = $('.decouverte h2, .action .gros'); if (t) { t.tabIndex = -1; t.focus({ preventScroll: true }); t.scrollIntoView({ block: 'center' }); } }
   const SUITE = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a']; let rang = 0;
   function konami(k) { rang = (k === SUITE[rang] || k.toLowerCase() === SUITE[rang]) ? rang + 1 : (k === SUITE[0] ? 1 : 0); if (rang === SUITE.length) { rang = 0; secret(); } }
   function secret() { d.compteurs.secret = 1; enregistrer(true); document.body.classList.add('fete'); setTimeout(() => document.body.classList.remove('fete'), 3000); }
@@ -467,8 +473,8 @@
   const actions = {
     demarrer() { d.profil.prenom = ($('#prenom').value || '').trim().slice(0, 24); d.profil.vu = true; enregistrer(true); location.hash = '#/'; rendre(false); },
     'autre-savoir'() { d.vus.decalage = (d.vus.decalage || 0) + 1; enregistrer(); rendre(); },
-    reagir(b) { d.decouverte.reactions[b.dataset.n] = +b.dataset.v; delete d.vus.suite; enregistrer(true); rendre(false); const t = $('.decouverte h2, .action .gros'); if (t) t.scrollIntoView({ block: 'center' }); },
-    'suite-cartes'() { d.vus.suite = 1; enregistrer(); rendre(false); },
+    reagir(b) { d.decouverte.reactions[b.dataset.n] = +b.dataset.v; delete d.vus.suite; enregistrer(true); rendre(false); focusCarte(); },
+    'suite-cartes'() { d.vus.suite = 1; enregistrer(); rendre(false); focusCarte(); },
     'recommencer-cartes'() { avecAnnulation('Tes avis sur les cartes sont effacés.', () => { d.decouverte.reactions = {}; delete d.vus.suite; }); },
     'quiz-fini'() { d.quiz.fait = true; enregistrer(true); rendre(); const r = $('#resultats'); if (r) r.scrollIntoView({ behavior: 'smooth' }); },
     garder(b) { d.pistes.push({ id: uid(), titre: b.dataset.t, pourquoi: '', idees: [''], candidates: [''] }); enregistrer(true); rendre(); toast('Ajouté à tes pistes.', '#/explorer/pistes', 'Ouvrir'); },

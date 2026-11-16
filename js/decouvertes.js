@@ -116,7 +116,7 @@
   "n": [
    "donnees"
   ],
-  "q": "Pourquoi range-t-on presque toutes nos données dans des tables ?"
+  "q": "Pourquoi range-t-on tant de données dans des tables ?"
  },
  {
   "num": 18,
@@ -343,7 +343,7 @@
   "n": [
    "secu"
   ],
-  "q": "Comment un virus informatique peut-il paralyser des hôpitaux ?"
+  "q": "Comment un rançongiciel peut-il paralyser des hôpitaux ?"
  },
  {
   "num": 63,
@@ -391,7 +391,7 @@
   "n": [
    "web"
   ],
-  "q": "Peut-on faire confiance à une encyclopédie écrite par tout le monde ?"
+  "q": "Peut-on faire confiance à une encyclopédie que tout le monde peut modifier ?"
  },
  {
   "num": 67,

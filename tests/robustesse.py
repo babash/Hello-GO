@@ -2,7 +2,8 @@
 
 Ce que le parcours (tests/parcours.py) ne couvre pas : deux onglets ouverts, un fichier importé
 abîmé ou piégé, le dialogue des liens au clavier, le lien d'évitement, la navigation au clavier,
-la page à 320 px avec de longs mots, et le texte piégé tapé par l'élève (toujours échappé).
+la page à 320 px avec de longs mots, le texte piégé tapé par l'élève (toujours échappé), et « Découvrir »
+et « Mes goûts » au clavier avec un dossier de la version 1.0.0.
 Chaque essai dit « ok » ou « ÉCHEC » ; le code de sortie vaut 1 s'il y a un échec."""
 import functools, http.server, json, os, socketserver, sys, tempfile, threading
 from playwright.sync_api import sync_playwright
@@ -191,6 +192,35 @@ with sync_playwright() as pw:
     p.set_viewport_size({'width': 320, 'height': 700}); p.wait_for_timeout(500)
     cache = p.evaluate('() => { const t = document.querySelector(".texte-pt"); return t.scrollHeight - t.clientHeight; }')
     essai('zone de texte : après un changement de largeur, rien n’est caché', cache <= 2, '%d px cachés' % cache)
+    ctx.close()
+
+    # 8. Découvrir : la carte suivante prend le focus (clavier, lecteurs d'écran) ; pas de « surprise » sans goûts cochés.
+    #    Mes goûts : la spécialité garde le focus, les flèches parcourent la liste. (Dossier de la version 1.0.0 : sans « decouverte »,
+    #    avec les anciennes réponses i, n, a, s, qui sont ignorées.)
+    ctx = nav.new_context(); p = ouvrir(ctx, dossier(quiz={'reponses': {'i': ['musique'], 'n': ['ia'], 'a': 'avenir', 's': 'maths'}, 'fait': True}))
+    p.goto(URL + '#/explorer/decouvrir'); p.wait_for_selector('.decouverte')
+    avant = p.inner_text('.decouverte h2')
+    p.locator('[data-a=reagir][data-v="1"]').focus(); p.keyboard.press('Enter'); p.wait_for_timeout(200)
+    titre = p.evaluate('() => { const a = document.activeElement; return a && a.matches(".decouverte h2") ? a.textContent : "focus : " + (a && a.tagName); }')
+    essai('Découvrir : après un avis, le focus va au titre de la carte suivante', titre == p.inner_text('.decouverte h2') and titre != avant, titre)
+    p.keyboard.press('Tab')
+    essai('Découvrir : puis Tab mène aux boutons de cette carte', p.evaluate('() => document.activeElement.dataset.a') == 'reagir')
+    for _ in range(9):
+        p.locator('[data-a=reagir][data-v="1"]').focus(); p.keyboard.press('Enter'); p.wait_for_timeout(80)
+    essai('Découvrir : au bilan, le focus va au texte du bilan', p.evaluate('() => document.activeElement.matches(".action .gros")'), p.evaluate('() => document.activeElement.tagName'))
+    essai('Découvrir : anciennes réponses (1.0.0) et « Mes goûts » vide : pas de « surprise »', p.locator('text=Ta surprise').count() == 0)
+    p.locator('[data-a=suite-cartes]').focus(); p.keyboard.press('Enter'); p.wait_for_timeout(200)
+    essai('Découvrir : « Voir 10 autres cartes » met le focus sur la carte 11', p.evaluate('() => document.activeElement.matches(".decouverte h2")') and 'Carte 11 sur' in p.inner_text('.decouverte'))
+    p.goto(URL + '#/explorer/quiz'); p.wait_for_selector('.puce')
+    essai('Mes goûts : les anciennes réponses (1.0.0) ne cochent rien', p.locator('#vue input:checked').count() == 0)
+    p.locator('input[name=quiz-spe][value=maths]').focus(); p.keyboard.press('Space'); p.wait_for_timeout(150)
+    p.keyboard.press('ArrowDown'); p.wait_for_timeout(150); p.keyboard.press('ArrowDown'); p.wait_for_timeout(150)
+    etat = p.evaluate('() => [document.activeElement.name, document.activeElement.value, (document.querySelector("input[name=quiz-spe]:checked") || {}).value]')
+    essai('Mes goûts : les flèches parcourent les spécialités, le focus reste dans la liste', etat == ['quiz-spe', 'svt', 'svt'], str(etat))
+    essai('Mes goûts : la question sur la spécialité choisie apparaît', p.locator('label.puce', has_text='Génétique').count() == 1)
+    p.locator('label.puce', has_text='Jeux vidéo').click(); p.wait_for_timeout(500)
+    p.goto(URL + '#/explorer/decouvrir'); p.wait_for_selector('.decouverte')
+    essai('Découvrir : une fois « Mes goûts » rempli, la « surprise » peut apparaître', p.locator('text=Ta surprise').count() == 1)
     ctx.close()
     nav.close()
 srv.shutdown()

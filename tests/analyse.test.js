@@ -109,6 +109,9 @@ assert.strictEqual(A.suggestions({}, 5, {}).length, 0);
 const r2 = {}; C.filter((c) => c.n.includes('secu')).forEach((c) => { r2[c.num] = 1; });
 assert.ok(A.suggestions({}, 5, r2).every((x) => x.sujet.n.includes('secu') || x.score > 0)); assert.ok(A.suggestions({}, 5, r2)[0].sujet.n.includes('secu'));
 assert.ok(A.surprises({ nsi: ['ia'] }, r2).some((x) => /sécurité/.test(x))); assert.ok(!A.surprises({ nsi: ['secret'] }, r2).some((x) => /sécurité/.test(x)));
+// pas de surprise tant que « Mes goûts » ne dit rien (ni réponse, ni étiquette ; anciennes réponses de la version 1.0.0 ignorées)
+assert.deepStrictEqual(A.surprises({}, r2), []); assert.deepStrictEqual(A.surprises({ spe: 'maths', angle: 'recit' }, r2), []);
+assert.deepStrictEqual(A.surprises({ i: ['musique'], n: ['ia'], a: 'avenir', s: 'maths' }, r2), []);
 const d4 = dossier(); d4.decouverte = { reactions: re }; assert.ok(A.majHautsFaits(d4).some((h) => h.id === 'cartes'));
 assert.ok(/Découvrir/.test(A.prochaineAction(dossier()).bouton));
 console.log('découvrir : ' + C.length + ' cartes, essais passés');
@@ -119,4 +122,19 @@ assert.strictEqual(A.dossierValide(bon), true);
 assert.strictEqual(A.dossierValide(Object.assign({}, bon, { decouverte: { reactions: { '"><img>': 1 } } })), false);
 assert.strictEqual(A.dossierValide(Object.assign({}, bon, { decouverte: { reactions: { 4: '<b>' } } })), false);
 assert.strictEqual(A.dossierValide(Object.assign({}, bon, { quiz: { reponses: { gouts: [{}] } } })), false);
+// un fichier de la version 1.0.0 (anciennes réponses i, n, a, s ; pas de « decouverte ») s'importe, et ses réponses sont ignorées
+const ancien = { v: 1, questions: [], quiz: { reponses: { i: ['musique', 'jeux'], n: ['ia'], a: 'avenir', s: 'maths' }, fait: true } };
+assert.strictEqual(A.dossierValide(ancien), true); assert.strictEqual(A.profil(ancien.quiz.reponses).nombre, 0); assert.strictEqual(A.suggestions(ancien.quiz.reponses, 5).length, 0);
 console.log('import : nouveaux champs contrôlés');
+
+// les mots cherchés dans les titres : pas de faux amis (« jeu » dans « enjeux », « art » dans « smart » ou « artificielle »),
+// pas de lien entre « mon île » et la fracture numérique
+const trouves = (qid, id, spe) => { const c = A.choixDe(D.QUIZ.find((x) => x.id === qid), { spe }).find((x) => x[0] === id); const r = new RegExp(c[2].k, 'i'); return D.SUJETS.filter((x) => r.test(x.t)).map((x) => x.t); };
+[['gouts', 'jv'], ['gouts', 'plateau']].forEach(([q, id]) => { assert.ok(trouves(q, id).length && !trouves(q, id).some((t) => /enjeux/.test(t)), id); });
+[['gouts', 'dessin'], ['coeur', 'creer'], ['dansspe', 'creation', 'hlp']].forEach(([q, id, spe]) => { assert.ok(trouves(q, id, spe).length && !trouves(q, id, spe).some((t) => /smart|artificielle/i.test(t)), id); });
+assert.ok(!trouves('coeur', 'prive').some((t) => /centres de données|match/.test(t)));
+assert.ok(trouves('gouts', 'ile').some((t) => /câbles/.test(t)) && !trouves('gouts', 'ile').some((t) => /fracture/.test(t)));
+assert.ok(trouves('dansspe', 'mers', 'hggsp').some((t) => /câbles/.test(t))); assert.ok(trouves('dansspe', 'traduire', 'llce').every((t) => /tradui/.test(t)));
+// des faits exacts : WannaCry est un rançongiciel (pas un virus) ; Wikipédia, « que tout le monde peut modifier » ; pas « presque toutes nos données »
+C.concat(D.SUJETS.map((x) => ({ q: x.t }))).forEach((x) => { assert.ok(!/virus informatique|écrite par tout le monde|presque toutes nos données/.test(x.q), x.q); });
+console.log('mots cherchés et faits : essais passés');

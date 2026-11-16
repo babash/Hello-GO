@@ -31,7 +31,7 @@ Hello GO fait partie des [Ressources NSI et SNT](https://babash.github.io/Babash
 
 ## Où en est le projet
 
-Cette première version garde tout **sur l'appareil de l'élève** : aucun compte, rien n'est envoyé.
+Cette version (1.1.0) garde tout **sur l'appareil de l'élève** : aucun compte, rien n'est envoyé.
 
 À venir, après accord de l'enseignant sur la base de données :
 - le dossier en ligne, avec un code élève en mots et chiffres, pour reprendre sur un autre appareil ;
@@ -41,7 +41,7 @@ Cette première version garde tout **sur l'appareil de l'élève** : aucun compt
 
 ## Données
 
-- Le dossier (prénom ou pseudo, pistes, plans, mots, sources, auto-évaluations) est gardé dans le navigateur de l'élève, sur son appareil. Rien n'est envoyé, aucun service extérieur n'est appelé.
+- Le dossier (prénom ou pseudo, avis sur les cartes, réponses au questionnaire « Mes goûts », dont la deuxième spécialité et l'après-bac, pistes, plans, mots, sources, auto-évaluations) est gardé dans le navigateur de l'élève, sur son appareil. Rien n'est envoyé, aucun service extérieur n'est appelé.
 - « Plus », puis « Réglages » : télécharger son dossier, l'importer sur un autre appareil, ou tout effacer.
 
 ## Pour vérifier
@@ -49,14 +49,14 @@ Cette première version garde tout **sur l'appareil de l'élève** : aucun compt
 ```
 node tests/analyse.test.js     # les analyses (coach, questionnaire, hauts faits, fichiers importés)
 python3 tests/parcours.py      # le parcours complet dans un navigateur, à 4 largeurs d'écran
-python3 tests/robustesse.py    # deux onglets, fichiers abîmés ou piégés, clavier, longues adresses à 320 px
+python3 tests/robustesse.py    # deux onglets, fichiers abîmés ou piégés, clavier, longues adresses à 320 px, dossier de la version 1.0.0
 ```
 
 ## Sources
 
 - Les règles de l'épreuve : note de service du 10 septembre 2026, Bulletin officiel spécial n° 4 du 17 septembre 2026, et la foire aux questions d'Éduscol (septembre 2026).
-- Les cartes à découvrir : « Timeline – Histoire de l'informatique » (TimelineNSI), Babash - NSI Tani Malandi, CC BY-SA 4.0 ; `outils/generer_decouvertes.py` les reprend.
-- Les sujets : exemples du ministère de l'Éducation nationale et sujets du dossier « Grand oral » de l'enseignant.
+- Les cartes à découvrir : « Timeline – Histoire de l'informatique » (TimelineNSI), Babash - NSI Tani Malandi, CC BY-SA 4.0 ; `outils/generer_decouvertes.py` en reprend les textes tels quels et y ajoute, pour chaque carte, la question qu'elle ouvre.
+- Les sujets : exemples du ministère de l'Éducation nationale et sujets du dossier « Grand oral » de l'enseignant ; d'autres sujets, le questionnaire et les questions des cartes ont été écrits avec l'aide de l'IA.
 
 ## Contact
 
@@ -67,7 +67,7 @@ Une question, une idée, un bug ? Les [issues GitHub](https://github.com/babash/
 Conçu par **Babash - NSI Tani Malandi**, avec l'aide de l'IA.
 
 - Le code est sous licence [MIT](LICENSE).
-- Les textes (sujets, conseils, fiches de méthode, exemple) sont sous licence [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.fr).
+- Les textes (sujets, questionnaire, questions des cartes, conseils, fiches de méthode, exemple) sont sous licence [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.fr).
 - Bibliothèques incluses : SortableJS et pdfmake (MIT), voir `vendor/LICENCES-BIBLIOTHEQUES.txt` ; polices sous licence SIL OFL, voir `css/LICENCE-POLICES.txt`.
 
 Tu peux réutiliser et adapter Hello GO en mentionnant Babash - NSI Tani Malandi et la licence. Merci de préciser si tu utilises l'IA pour le modifier.
