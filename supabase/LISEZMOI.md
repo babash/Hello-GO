@@ -28,7 +28,7 @@ Chaque fichier SQL commence par `begin;` et finit par `commit;`, chacun sur sa l
 
 | Table | Ce qu'elle garde | Données d'élèves | Durée |
 |---|---|---|---|
-| `grand_oral.mots` | Les 64 mots des codes, thème « la scène et la parole » : MICRO, RIDEAU, PUPITRE, CHANSON… | non | — |
+| `grand_oral.mots` | Les 64 mots des codes, thème « la scène et la parole » : MICRO, DECOR, PUPITRE, CHANSON… | non | — |
 | `grand_oral.enseignants` | Un espace par enseignant·e : le nom affiché aux élèves (« M. Martin »), l'**empreinte** de son code (le code n'est gardé nulle part), les dates de création et de dernière ouverture. | non | jusqu'à ce que l'enseignant·e supprime son espace |
 | `grand_oral.classes` | Les classes : nom, code de classe public (4 lettres sans I ni O), inscriptions ouvertes ou fermées. NSI seulement ; une classe par élève ; aucun plafond du nombre d'élèves (40 classes au plus par espace). | non | jusqu'à ce que l'enseignant·e la supprime |
 | `grand_oral.eleves` | Un compte par élève : **prénom et initiale du nom** (2 à 24 caractères, jamais le nom complet), code (2 mots et 3 chiffres), le **dossier** de Grand oral tel que la page le tient (pistes, questions, plans, mots, sources, auto-évaluations ; 300 000 caractères au plus), un **résumé** chiffré pour le tableau de la classe (4 000 au plus), les **retours** de l'enseignant·e (150 000 au plus), les numéros de version et les dates (inscription, dernière visite à 10 minutes près, dernières modifications). | **oui** | jusqu'à ce que l'enseignant·e supprime l'élève, sa classe ou son espace |
