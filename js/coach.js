@@ -223,7 +223,7 @@
   // « rates » ne cite que les 10 premières questions, les seules qu'une version 1.4.0 accepte) ; « rates_toutes » cite
   // toutes les questions ratées de la salve. d.banque[id] retient les questions vues et ratées, d'une salve à l'autre.
   function noterSalve(d, z, ids, justes, le) {
-    le = le || new Date().toISOString().slice(0, 10);
+    le = le || jourLocal(new Date()); // le jour du calendrier de l'appareil, comme les visites (et non celui de Greenwich)
     const avant = (d.comprendre || {})[z.id] || {}, s = suiviQuiz(d, z), anciennes = z.questions.slice(0, D.ANCIENNES).map(function (q) { return q.id; });
     const ratees = ids.filter(function (k, i) { return !justes[i]; }), juste = ids.length - ratees.length;
     d.comprendre = d.comprendre || {};
@@ -261,6 +261,18 @@
     const l = Object.keys((d && d.visites) || {}).filter(function (x) { return DATE.test(x); }).sort(), auj = jourLocal(maintenant || new Date());
     const dans = function (n) { return l.filter(function (x) { const e = ecartJours(x, auj); return e >= 0 && e < n; }).length; };
     return { jours: l, j7: dans(7), j30: dans(30), total: l.length, depuis: l[0] || null, derniere: l[l.length - 1] || null };
+  }
+  // Les mois de la frise des visites, du plus ancien au mois en cours ([année, mois]) : les 12 derniers au plus. Un premier
+  // jour à venir ou abîmé (horloge d'un appareil, fuseau d'avance, dossier importé) fait commencer la frise au mois en cours :
+  // jamais de boucle sans fin.
+  function moisFrise(depuis, maintenant) {
+    const auj = jourLocal(maintenant || new Date()), anF = +auj.slice(0, 4), moF = +auj.slice(5, 7), s = String(depuis || '');
+    let an = +s.slice(0, 4), mo = +s.slice(5, 7);
+    if (!DATE.test(s) || !(mo >= 1 && mo <= 12) || an * 12 + mo > anF * 12 + moF) { an = anF; mo = moF; }
+    if ((anF - an) * 12 + (moF - mo) > 12) { an = moF === 12 ? anF : anF - 1; mo = moF === 12 ? 1 : moF + 1; }
+    const l = [];
+    while (l.length < 13) { l.push([an, mo]); if (an === anF && mo === moF) break; mo++; if (mo > 12) { mo = 1; an++; } }
+    return l;
   }
   // L'absence d'un·e élève, d'après la dernière visite que garde la base (vu_le) et la date d'inscription (cree_le) :
   // le voyant s'allume au-delà de 14 jours sans visite ; « jamais revenu·e » : aucune visite après le jour de l'inscription.
@@ -380,7 +392,7 @@
     d.hf = d.hf || {};
     const nouveaux = [];
     HAUTS_FAITS.forEach(function (h) {
-      if (!d.hf[h.id]) { let ok = false; try { ok = h.test(d); } catch (e) { ok = false; } if (ok) { d.hf[h.id] = date || new Date().toISOString().slice(0, 10); nouveaux.push(h); } }
+      if (!d.hf[h.id]) { let ok = false; try { ok = h.test(d); } catch (e) { ok = false; } if (ok) { d.hf[h.id] = date || jourLocal(new Date()); nouveaux.push(h); } }
     });
     return nouveaux;
   }
@@ -453,7 +465,7 @@
 
   const api = { choixDe, profil, gouts, prochaineCarte, surprises, CARTES, coach, coachMot, motComplet, coachSources, suggestions, questionsProbables, phase, prochaineAction, HAUTS_FAITS, majHautsFaits,
     tousLesPoints, ressemblance, contient, aChiffre, reference, dossierValide, SEC_PAR_POINT, quizEssaye, quizSansFaute,
-    surSalve, suiviQuiz, tirerSalve, noterSalve, jourLocal, ecartJours, noterVisite, statsVisites, absence, ABSENCE_MAX, VISITES_MAX, hautsFaitsDates };
+    surSalve, suiviQuiz, tirerSalve, noterSalve, jourLocal, ecartJours, noterVisite, statsVisites, moisFrise, absence, ABSENCE_MAX, VISITES_MAX, hautsFaitsDates };
   racine.HGAnalyse = api;
   if (typeof module !== 'undefined') module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);

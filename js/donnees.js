@@ -172,13 +172,13 @@
     { p: 2, t: 'Le jury peut t’interroger sur tout le programme des spécialités concernées : révise les chapitres liés à ton sujet.' },
     { p: 2, t: 'Écoute la question jusqu’au bout, puis prends quelques secondes avant de répondre.' },
     { p: 2, t: 'Tu ne sais pas ? Dis-le, puis propose un raisonnement : « Je n’ai pas la donnée exacte, mais… ».' },
-    { p: 2, t: 'L’échange n’est pas un contrôle de connaissances : le jury veut voir comment tu argumentes.' },
+    { p: 2, t: 'L’échange est un entretien, pas une interrogation de connaissances : le jury veut voir comment tu argumentes.' },
     { p: 2, t: 'Prépare la question « Pourquoi as-tu choisi ce sujet ? » : elle ouvre souvent l’échange.' },
     { p: 2, t: 'Marque des pauses entre les parties. Un silence court aide le jury à suivre.' },
     { p: 2, t: 'Répète à voix haute, avec un chronomètre, et devant quelqu’un si tu peux.' },
     { p: 2, t: 'Garde la même énergie jusqu’à la dernière phrase : ne la laisse pas tomber.' },
     { p: 2, t: 'Ne récite pas un texte appris par cœur : parle à partir de tes points.' },
-    { p: 2, t: 'Un exposé trop court fait perdre des points : entraîne-toi à tenir les 10 minutes.' },
+    { p: 2, t: 'Ta gestion du temps compte dans la grille : entraîne-toi à tenir les 10 minutes de l’exposé.' },
   ];
 
   // Les 5 critères de la grille indicative nationale, en phrases courtes au « je »
@@ -351,18 +351,18 @@
         ['Tu peux le montrer au jury : un schéma préparé pendant ces 20 minutes peut l’aider à suivre.', 'Oui : tu n’as que les notes écrites pendant la préparation, et un schéma en fait partie. Le jury ne note pas ta feuille.'],
         ['Tu le remplaces par un schéma plus beau, préparé chez toi.', 'Pendant l’exposé, tu n’as que ce que tu as écrit pendant les 20 minutes de préparation.']] },
       { id: 'e16', th: 'deroule', q: 'À l’entraînement, ton exposé ne dure que 6 minutes. Qu’en penses-tu ?', b: 0, r: REVOIR_EPREUVE, o: [
-        ['C’est trop court : un exposé trop court fait perdre des points. Entraîne-toi à tenir les 10 minutes.', 'Oui : l’exposé dure 10 minutes. Entraîne-toi à les tenir, avec un chronomètre.'],
-        ['C’est parfait : le jury préfère les exposés courts.', 'Un exposé trop court fait perdre des points : vise les 10 minutes.'],
-        ['Aucune importance : seule ton argumentation compte.', 'L’argumentation compte, mais un exposé trop court fait perdre des points : vise les 10 minutes.'],
+        ['C’est trop court : l’exposé dure 10 minutes, et la grille regarde ta gestion du temps. Entraîne-toi à les tenir.', 'Oui : l’exposé dure 10 minutes. Entraîne-toi à les tenir, avec un chronomètre.'],
+        ['C’est parfait : le jury préfère les exposés courts.', 'L’exposé dure 10 minutes, et la grille regarde ta gestion du temps : vise les 10 minutes.'],
+        ['Aucune importance : seule ton argumentation compte.', 'L’argumentation compte, mais la grille regarde aussi ta gestion du temps : vise les 10 minutes.'],
         ['Tu compléteras en lisant tes notes le jour J.', 'Tu présentes sans lire : ajoute plutôt des points à ton plan, et entraîne-toi à tenir les 10 minutes.']] },
       { id: 'e17', th: 'echange', q: 'Pendant l’échange, le jury te pose une question dont tu ne connais pas la réponse. Que fais-tu ?', b: 3, r: revoir('jury'), o: [
         ['Tu inventes une réponse qui a l’air sûre.', 'Le jury s’en apercevra : dis plutôt que tu ne sais pas, puis propose un raisonnement.'],
         ['Tu restes silencieux·se jusqu’à la question suivante.', 'Le silence ne t’aide pas : dis que tu ne sais pas, puis propose un raisonnement.'],
         ['Tu réponds à une autre question, que tu connais mieux.', 'Le jury attend une réponse à sa question : dis ce que tu sais, et propose un raisonnement.'],
         ['Tu le dis, puis tu proposes un raisonnement : « Je n’ai pas la donnée exacte, mais… »', 'Oui : dire que tu ne sais pas, puis raisonner, montre comment tu argumentes.']] },
-      { id: 'e18', th: 'echange', q: 'Pendant l’échange, que cherche surtout à voir le jury ?', b: 1, r: REVOIR_EPREUVE, o: [
-        ['Si tu sais réciter ton cours de NSI mot à mot.', 'L’échange n’est pas un contrôle de connaissances : le jury veut voir comment tu argumentes.'],
-        ['Comment tu argumentes : l’échange n’est pas un contrôle de connaissances.', 'Oui : le jury veut voir comment tu argumentes, comment tu réagis et comment tu rebondis.'],
+      { id: 'e18', th: 'echange', q: 'Pendant l’échange, le jury peut t’interroger sur le programme. Que cherche-t-il aussi à voir ?', b: 1, r: REVOIR_EPREUVE, o: [
+        ['Si tu sais réciter ton cours de NSI mot à mot.', 'Réciter ne suffit pas : c’est un entretien, pas une interrogation de connaissances. Le jury veut voir comment tu argumentes.'],
+        ['Comment tu argumentes : c’est un entretien, pas une interrogation de connaissances.', 'Oui : le jury veut voir comment tu argumentes, comment tu réagis et comment tu rebondis.'],
         ['Si tu as appris des réponses par cœur.', 'Une réponse apprise par cœur sonne faux : le jury veut voir comment tu argumentes.'],
         ['Si tu connais des sujets sans lien avec ta question ni avec tes spécialités.', 'Le jury t’interroge sur ton sujet et sur le programme des spécialités concernées.']] },
       { id: 'e19', th: 'notation', q: 'Une vidéo du ministère, de 2021, annonce un coefficient 10. Que retiens-tu ?', b: 2, r: REVOIR_EPREUVE, o: [

@@ -269,12 +269,9 @@
   const MOIS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
   const enListe = (l) => (l.length > 1 ? l.slice(0, -1).join(', ') + ' et ' + l[l.length - 1] : l.join(''));
   function frise(st, maintenant) {
-    const auj = A.jourLocal(maintenant), fin = auj.slice(0, 7), vus = new Set(st.jours);
-    let [an, mo] = st.depuis.slice(0, 7).split('-').map(Number); const [anF, moF] = fin.split('-').map(Number);
-    if ((anF - an) * 12 + (moF - mo) > 12) { an = moF === 12 ? anF : anF - 1; mo = moF === 12 ? 1 : moF + 1; } // les 13 derniers mois au plus
-    const mois = [];
-    for (;;) { mois.push([an, mo]); if (an === anF && mo === moF) break; mo++; if (mo > 12) { mo = 1; an++; } }
-    return mois.reverse().map(([a, m]) => {
+    const auj = A.jourLocal(maintenant), vus = new Set(st.jours);
+    // Les 12 derniers mois au plus ; un premier jour à venir ou abîmé ne fait plus tourner la page sans fin (A.moisFrise).
+    return A.moisFrise(st.depuis, maintenant).reverse().map(([a, m]) => {
       const nb = new Date(a, m, 0).getDate(), z = (k) => (k < 10 ? '0' : '') + k, cle = (j) => a + '-' + z(m) + '-' + z(j), jours = [];
       for (let j = 1; j <= nb; j++) if (vus.has(cle(j))) jours.push(j);
       return `<div class="mois"><h4>${MOIS[m - 1]} ${a} · ${pl(jours.length, 'jour', 'jours')}</h4>

@@ -107,4 +107,19 @@ const jour = (a, m, j, h) => new Date(a, m - 1, j, h === undefined ? 10 : h);
     .forEach((x) => ok(!A.dossierValide(Object.assign({ v: 1, questions: [] }, x)), 'refusé : ' + JSON.stringify(x)));
   ok(A.dossierValide({ v: 1, questions: [], banque: { epreuve: { le: '2026-11-17', vues: { e1: 2, e99: 1 }, ratees: { e99: 1 } }, autre: { le: '' } } }), 'une question ou un quiz d’une version plus récente est accepté');
 }
+// ---------- Gardien (T79) : la frise des mois, et les dates du jour de l'appareil ----------
+{
+  const now = jour(2026, 11, 17), m = (x) => JSON.stringify(A.moisFrise(x, now));
+  ok(m('2026-09-03') === '[[2026,9],[2026,10],[2026,11]]', 'frise : de septembre à novembre');
+  ok(A.moisFrise('2020-01-01', now).length === 12 && m('2020-01-01').endsWith('[2026,11]]'), 'frise : les 12 derniers mois au plus');
+  // Un premier jour à venir ou abîmé (horloge d'un appareil, fuseau d'avance, dossier importé) : le mois en cours, sans boucle sans fin.
+  ['2026-12-01', '2030-01-01', '2026-99-99', '2026-00-15', '', null, 'x'].forEach((x) => ok(m(x) === '[[2026,11]]', 'frise : premier jour ' + JSON.stringify(x) + ', le mois en cours'));
+  ok(m('2026-12-31') === '[[2026,11]]' && JSON.stringify(A.moisFrise('2026-12-01', jour(2026, 12, 31))) === '[[2026,12]]', 'frise : fin d’année');
+  // Les hauts faits et les quiz sont datés du jour de l'appareil, comme les visites (et non du jour de Greenwich).
+  const d = { v: 1, questions: [], hf: {} }, z = D.COMPRENDRE[0], ids = A.tirerSalve(d, z, () => 0.5);
+  A.noterSalve(d, z, ids, ids.map(() => true));
+  ok(d.comprendre[z.id].le === A.jourLocal(new Date()) && d.banque[z.id].le === A.jourLocal(new Date()), 'quiz daté du jour de l’appareil');
+  const g = A.majHautsFaits(d);
+  ok(g.length && g.every((h) => d.hf[h.id] === A.jourLocal(new Date())), 'haut fait daté du jour de l’appareil');
+}
 console.log('suivi : ' + n + ' contrôles (visites, voyant à 13, 14 et 15 jours, hauts faits datés, résumé, salves)');

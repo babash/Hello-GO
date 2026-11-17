@@ -236,4 +236,7 @@ dialog::backdrop { background: rgba(0, 0, 0, .55); } dialog h2 { margin-top: 0; 
 .frise li.auj { outline: 2px solid var(--encre); outline-offset: 1px; } .frise li.futur { border-style: dashed; }
 .hf-chrono li { padding: 4px 0; border-bottom: 1px solid var(--trait); }
 .bloc-md .coche { margin-top: 0; }
+/* Six colonnes : un bouton ou une pastille du tableau ne se coupe jamais au milieu d'un mot (« Voi r »), malgré le
+   overflow-wrap: anywhere de main ; le tableau défile dans son cadre s'il le faut. */
+.tableau-classe button, .tableau-classe .bouton, .tableau-classe .nouveau { white-space: nowrap; overflow-wrap: normal; } .tableau-classe .voyant { overflow-wrap: normal; }
 @media print { .filtres { display: none; } }

@@ -12,12 +12,25 @@ const LE = new Date(2026, 10, 17, 10);
 const piege = '# Titre <img src=x onerror=alert(1)> [clic](javascript:alert(1)) ![i](http://x/y.png) *gras* _it_ `code` | a | ~~b~~ &amp; \\ fin';
 const t = X.texte(piege);
 ok(!/(^|[^\\])[<>[\]*_`|~#]/.test(t.replace(/\\\\/g, '')), 'aucun caractère spécial laissé seul : ' + t);
-ok(t.startsWith('\\# ') && t.includes('\\<img') && t.includes('\\[clic\\]') && t.includes('\\&amp;'), 'barres obliques inverses : ' + t);
+ok(t.startsWith('\\# ') && t.includes('&lt;img') && t.includes('\\[clic\\]') && t.includes('\\&amp;'), 'barres obliques inverses : ' + t);
 ['- puce', '+ puce', '> citation', '1. liste', '12) liste', '= titre'].forEach((s) => ok(X.texte(s).startsWith('\\') || /^\d+\\[.)]/.test(X.texte(s)), 'début de ligne neutralisé : ' + X.texte(s)));
 ok(X.texte('ligne 1\nligne 2\r\n\tligne 3') === 'ligne 1 ligne 2 ligne 3', 'une seule ligne');
 ok(X.texte(String.fromCharCode(0) + 'a' + String.fromCharCode(0x1b) + 'b') === 'a b', 'caractères de contrôle retirés');
 ok(X.lien('Le site', 'https://exemple.org/a(b)') === '[Le site](https://exemple.org/a%28b%29)', 'lien http(s), parenthèses encodées');
 ['javascript:alert(1)', 'data:text/html,x', 'ftp://exemple.org', 'https://exemple.org/a b', 'https://x/"><b>'].forEach((u) => ok(!/\]\(/.test(X.lien('x', u)), 'pas de lien : ' + u));
+
+// Gardien (T79) : les afficheurs GFM font un lien de toute adresse écrite en clair, et la barre oblique inverse qui la suit
+// y entre (elle ne protège plus le caractère suivant) : « < » s'écrit donc « &lt; ». Ni mailto:, ni xmpp:, ni ftp:, ni « // »
+// ne deviennent des liens tout seuls. Dans le titre d'un lien, marked retire les « \ » de « \[ » et « \] » : un lien caché
+// dans le titre s'ouvrirait (data:, javascript:…), d'où des crochets en entités.
+ok(!X.texte('https://exemple.org/<img src=x onerror=alert(1)>').includes('<') && !X.texte('voir www.exemple.org/<b>x</b>').includes('<'), 'après une adresse, aucun « < »');
+ok(X.texte('contact@exemple.fr mailto:a@b.fr xmpp:c@d.fr') === 'contact\\@exemple.fr mailto:a\\@b.fr xmpp:c\\@d.fr', 'pas de lien de courriel : ' + X.texte('contact@exemple.fr mailto:a@b.fr xmpp:c@d.fr'));
+ok(X.texte('ftp://exemple.org //pisteur.example/x file:///etc') === 'ftp:/\\/exemple.org /\\/pisteur.example/x file:/\\//etc', 'pas d’autre adresse que http(s) : ' + X.texte('ftp://exemple.org //pisteur.example/x file:///etc'));
+ok(X.texte('https://exemple.org/a et HTTP://exemple.org') === 'https://exemple.org/a et HTTP://exemple.org', 'http:// et https:// restent lisibles');
+const ln = X.lien('[x](data:text/html,x) ![i](https://pisteur.example/p.png)', 'https://exemple.org/');
+ok(/^\[[^[\]]*\]\(https:\/\/exemple\.org\/\)$/.test(ln) && ln.includes('&#91;x&#93;'), 'titre d’un lien : crochets en entités : ' + ln);
+[':::note', '!!! note', '??? note'].forEach((s) => ok(X.texte(s).startsWith('\\'), 'bloc d’extension neutralisé : ' + X.texte(s)));
+ok(X.texte('a' + String.fromCharCode(0x85) + 'b') === 'a b', 'caractères de contrôle C1 retirés');
 
 // ---------- Un dossier complet ----------
 const d = DOSSIERS['1.4.0']();
@@ -37,7 +50,7 @@ const ordre = ['# Mon dossier de Grand oral · Zoé', '## Ma question : ', '### 
   '## Sources', '- **S1.** Défenseur des droits, « [Algorithmes', '](https://www.defenseurdesdroits.fr/) », 2020', '## Mes pistes', '## Mes oraux et mes vidéos', 'vidéo déposée', '## Vérifie que tu as compris : mes quiz', '## Mes hauts faits'];
 let k = -1; ordre.forEach((x) => { const i = md.indexOf(x, k + 1); ok(i > k, 'dans l’ordre : « ' + x + ' »'); k = i; });
 ok(md.includes('téléchargé le 17 novembre 2026'), 'date du téléchargement');
-ok(md.includes('Comment \\*lutter\\* contre les biais ? \\<script\\>'), 'titre neutralisé');
+ok(md.includes('Comment \\*lutter\\* contre les biais ? &lt;script\\>'), 'titre neutralisé');
 ok(md.includes('(M1, S1)'), 'mots et sources reliés au point');
 ok(md.includes('**Ai-je compris l’épreuve ?** : meilleur score 8 sur 10'), 'quiz sur 10');
 ok(md.includes('- 10 novembre 2026 : Hello, world') && md.indexOf('10 novembre 2026 : Hello') < md.indexOf('17 novembre 2026 : Un plan sans accroc'), 'hauts faits datés, dans l’ordre');
@@ -53,8 +66,8 @@ ok(!/\n{3,}/.test(md), 'pas de grands blancs');
 
 // ---------- Toute la classe ----------
 const cl = X.classe('Terminale NSI', [{ pseudo: 'Zoé B.', code: 'MICRO-DECOR-123', dossier: d, retours: ret }, { pseudo: 'Inès <b>', code: 'TROPHEE-LAMPE-456', dossier: null, retours: R.vides() }], { le: LE });
-ok(cl.startsWith('# Classe Terminale NSI · Hello GO') && cl.includes('## Sommaire') && cl.includes('1. Zoé B.') && cl.includes('2. Inès \\<b\\>'), 'titre et sommaire');
-ok(cl.includes('## Zoé B.') && cl.includes('### Ma question : ') && cl.includes('#### Le plan') && cl.includes('## Inès \\<b\\>') && cl.includes('Aucun dossier lisible'), 'une section par élève, titres décalés');
+ok(cl.startsWith('# Classe Terminale NSI · Hello GO') && cl.includes('## Sommaire') && cl.includes('1. Zoé B.') && cl.includes('2. Inès &lt;b\\>'), 'titre et sommaire');
+ok(cl.includes('## Zoé B.') && cl.includes('### Ma question : ') && cl.includes('#### Le plan') && cl.includes('## Inès &lt;b\\>') && cl.includes('Aucun dossier lisible'), 'une section par élève, titres décalés');
 ok(!cl.includes('MICRO-DECOR-123') && !cl.includes('TROPHEE-LAMPE-456') && !cl.includes('Beau travail'), 'classe : ni codes ni retours par défaut');
 const cl2 = X.classe('T', [{ pseudo: 'Zoé B.', code: 'MICRO-DECOR-123', dossier: d, retours: ret }], { avecCodes: true, avecRetours: true, le: LE });
 ok(cl2.includes('Code : MICRO-DECOR-123') && cl2.includes('Beau travail'), 'classe : codes et retours sur demande');

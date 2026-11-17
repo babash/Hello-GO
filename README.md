@@ -42,7 +42,7 @@ Une seule version, **en ligne**, sur téléphone comme sur ordinateur.
 
 Sans code ni lien de classe, l'application reste utilisable en **mode découverte** : le dossier reste sur l'appareil, et part dans la base quand l'élève rejoint sa classe.
 
-**Exporter** : une classe ou tout votre espace en JSON ; toute une classe en **Markdown** (un fichier, une section par élève), avec ou sans vos retours, et sans les codes sauf si vous cochez « Inclure les codes des élèves ».
+**Exporter** : une classe ou tout votre espace en JSON ; toute une classe en **Markdown** (un fichier, une section par élève), avec ou sans vos retours, et sans les codes sauf si vous cochez « Inclure les codes des élèves ». Les textes des élèves y sont neutralisés : ni HTML, ni image, ni lien autre que http(s), ni titre qui empiète sur la section d'un·e autre élève, même dans un afficheur qui fait un lien de toute adresse écrite en clair (essayé avec marked, markdown-it et micromark).
 
 En fin d'année : exportez votre espace (JSON), puis supprimez vos classes. Rien n'est effacé automatiquement.
 

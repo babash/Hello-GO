@@ -12,21 +12,28 @@
 
   // ---------- Neutraliser un texte ----------
   // Une ligne : les espaces et retours à la ligne deviennent une espace ; chaque caractère qui a un sens en Markdown
-  // (ou en HTML) reçoit une barre oblique inverse ; un début de ligne qui ferait une liste, un titre ou une citation aussi.
+  // (ou en HTML) reçoit une barre oblique inverse ; un début de ligne qui ferait une liste, un titre, une citation ou un
+  // bloc d'une extension (« ::: », « !!! », « ??? ») aussi.
+  // Les afficheurs GFM font un lien de toute adresse écrite en clair, et la barre oblique inverse qui suit une adresse
+  // entre dans ce lien : « < » devient donc « &lt; », qui reste du texte même là ; « @ » et « // » (sauf dans http:// et
+  // https://) sont neutralisés, pour qu'aucun lien mailto:, xmpp:, ftp: ou « // » ne se crée tout seul.
   function texte(t) {
-    let s = String(t == null ? '' : t).replace(/[\x00-\x1f\x7f]+/g, ' ').replace(/\s+/g, ' ').trim();
-    s = s.replace(/[\\`*_[\]<>|~#$^{}]/g, '\\$&').replace(/&(?=#?[A-Za-z0-9]+;)/g, '\\&').replace(/!(?=\\\[)/g, '\\!');
-    s = s.replace(/^([-+=>])/, '\\$1').replace(/^(\d+)([.)])/, '$1\\$2');
+    let s = String(t == null ? '' : t).replace(/[\x00-\x1f\x7f-\x9f]+/g, ' ').replace(/\s+/g, ' ').trim();
+    s = s.replace(/[\\`*_[\]>|~#$^{}@]/g, '\\$&').replace(/&(?=#?[A-Za-z0-9]+;)/g, '\\&').replace(/!(?=\\\[)/g, '\\!');
+    s = s.replace(/(https?:)?\/\//gi, (m, web) => (web ? m : '/\\/')).replace(/</g, '&lt;');
+    s = s.replace(/^([-+=>:!?])/, '\\$1').replace(/^(\d+)([.)])/, '$1\\$2');
     return s;
   }
   const lienSur = (u) => typeof u === 'string' && /^https?:\/\/[^\s<>"\\]+$/i.test(u.trim());
-  // Un lien : [texte](adresse), seulement en http(s) ; les parenthèses de l'adresse sont encodées.
+  // Un lien : [texte](adresse), seulement en http(s) ; les parenthèses de l'adresse sont encodées. Dans le texte du lien,
+  // les crochets s'écrivent en entités : marked y retire les barres obliques inverses de « \[ » et « \] », et un lien
+  // écrit dans un titre deviendrait un vrai lien, d'une adresse quelconque.
   function lien(titre, url) {
     if (!lienSur(url)) return texte(titre || url);
     const u = url.trim().replace(/\(/g, '%28').replace(/\)/g, '%29');
-    return '[' + (texte(titre) || texte(u)) + '](' + u + ')';
+    return '[' + (texte(titre) || texte(u)).replace(/\\\[/g, '&#91;').replace(/\\\]/g, '&#93;') + '](' + u + ')';
   }
-  const dateLongue = (j) => { const m = /^([0-9]{4})-([0-9]{2})-([0-9]{2})/.exec(String(j || '')); if (!m) return null;
+  const dateLongue = (j) => { const m = /^([0-9]{4})-([0-9]{2})-([0-9]{2})/.exec(String(j || '')); if (!m || +m[2] < 1 || +m[2] > 12 || +m[3] < 1 || +m[3] > 31) return null;
     return new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }); };
   const etiquette = (v) => ((D.ETIQUETTES.find((t) => t[0] === v && v) || [])[1]) || '';
   const typeSource = (v) => ((D.TYPES_SOURCE.find((t) => t[0] === v && v) || [])[1]) || '';
@@ -146,7 +153,7 @@
     const hf = A.hautsFaitsDates(d);
     if (hf.length) {
       bloc(); L.push(h(2, 'Mes hauts faits (' + hf.length + ' sur ' + A.HAUTS_FAITS.length + ')'));
-      bloc(); hf.forEach((x) => L.push('- ' + (x.le ? dateLongue(x.le) : 'date inconnue') + ' : ' + texte(x.titre)));
+      bloc(); hf.forEach((x) => L.push('- ' + ((x.le && dateLongue(x.le)) || 'date inconnue') + ' : ' + texte(x.titre)));
     }
     bloc();
     return L.join('\n');
