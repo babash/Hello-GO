@@ -597,6 +597,7 @@
     const h = (location.hash || '#/').slice(2).split('/');
     if (h[0] === 'classe') { chercherClasse(h[1]); return ['classe', '', vues.classe(lireCodeClasse(h[1]))]; }
     if (h[0] === 'entrer') return ['entrer', '', vues.entrer()];
+    if (h[0] === 'prof' && window.HGProf) return ['prof', '', window.HGProf.vue(h.slice(1))];
     if (h[0] === 'rejoindre') return ['rejoindre', '', '<h1>Rejoindre ma classe</h1>' + blocRejoindre()];
     if (!d.profil.vu) return ['bienvenue', '', vues.bienvenue()];
     switch (h[0]) {
@@ -633,7 +634,8 @@
   function rendre(garderDefilement) {
     const y = window.scrollY, r = route(), main = $('#vue');
     main.innerHTML = r[2]; main.dataset.vue = r[0];
-    $('#nav').hidden = !d.profil.vu;
+    $('#nav').hidden = !d.profil.vu || r[0] === 'prof';
+    document.body.classList.toggle('espace-prof', r[0] === 'prof');
     $('#nav').innerHTML = NAV.map((n) => `<a href="${n[0]}"${n[0] === r[1] ? ' aria-current="page"' : ''}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${n[2]}"/></svg><span>${n[1]}</span></a>`).join('');
     main.querySelectorAll('textarea').forEach(ajuster);
     main.querySelectorAll('[data-points]').forEach((ul) => { if (window.Sortable) window.Sortable.create(ul, { group: 'pts', handle: '.grip', animation: 150, onEnd: finGlisser }); });
@@ -861,28 +863,29 @@
 
   // ---------- Le PDF : le plan, puis le lexique, puis les sources ----------
   function charger_script(src) { return new Promise((ok, non) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = () => non(new Error(src)); document.head.appendChild(s); }); }
-  function contenuPdf(q) {
+  function contenuPdf(q, autre) {
+    const dd = autre || d;
     const mots = [], sources = [];
     const numero = (liste, id) => { let i = liste.indexOf(id); if (i < 0) { liste.push(id); i = liste.length - 1; } return i + 1; };
-    const corps = [{ text: 'Grand oral de NSI' + (d.profil.prenom ? ' · ' + d.profil.prenom : ''), style: 'petit' }, { text: q.titre || 'Question sans titre', style: 'titre' }];
+    const corps = [{ text: 'Grand oral de NSI' + (dd.profil.prenom ? ' · ' + dd.profil.prenom : ''), style: 'petit' }, { text: q.titre || 'Question sans titre', style: 'titre' }];
     q.parties.forEach((p) => {
       corps.push({ text: p.titre + (p.minutes ? '  (≈ ' + p.minutes + ' min)' : ''), style: 'partie' });
       if (!p.points.length) corps.push({ text: '(aucun point)', style: 'petit' });
       else corps.push({ ul: p.points.map((x) => { const et = (D.ETIQUETTES.find((t) => t[0] === x.etiquette) || [])[1];
-        const refs = (x.mots || []).filter((i) => d.mots.some((m) => m.id === i)).map((i) => 'M' + numero(mots, i)).concat((x.sources || []).filter((i) => d.sources.some((s) => s.id === i)).map((i) => 'S' + numero(sources, i)));
+        const refs = (x.mots || []).filter((i) => dd.mots.some((m) => m.id === i)).map((i) => 'M' + numero(mots, i)).concat((x.sources || []).filter((i) => dd.sources.some((s) => s.id === i)).map((i) => 'S' + numero(sources, i)));
         return { text: [x.etiquette ? { text: et + ' : ', bold: true } : '', x.texte || '(point vide)', refs.length ? { text: '  [' + refs.join(', ') + ']', style: 'ref' } : ''], margin: [0, 2, 0, 2] }; }) });
     });
-    d.mots.forEach((m) => numero(mots, m.id)); d.sources.forEach((s) => numero(sources, s.id));
+    dd.mots.forEach((m) => numero(mots, m.id)); dd.sources.forEach((s) => numero(sources, s.id));
     corps.push({ text: 'Lexique', style: 'section', pageBreak: 'before' });
     if (!mots.length) corps.push({ text: 'Aucun mot défini.', style: 'petit' });
-    mots.forEach((id, i) => { const m = d.mots.find((x) => x.id === id);
+    mots.forEach((id, i) => { const m = dd.mots.find((x) => x.id === id);
       corps.push({ text: [{ text: 'M' + (i + 1) + '  ', style: 'ref' }, { text: m.mot || '(sans nom)', bold: true }], margin: [0, 8, 0, 2] });
       corps.push({ text: [{ text: 'Source : ', bold: true }, (m.defSource || '—') + (m.sourceTexte ? ' (' + m.sourceTexte + ')' : '')] });
       corps.push({ text: [{ text: 'Avec mes mots : ', bold: true }, m.defMoi || '—'] });
       if (m.analogie) corps.push({ text: [{ text: 'Image : ', bold: true }, m.analogie] }); });
     corps.push({ text: 'Sources', style: 'section', margin: [0, 18, 0, 6] });
     if (!sources.length) corps.push({ text: 'Aucune source.', style: 'petit' });
-    sources.forEach((id, i) => { const s = d.sources.find((x) => x.id === id), type = (D.TYPES_SOURCE.find((t) => t[0] === s.type && s.type) || [])[1];
+    sources.forEach((id, i) => { const s = dd.sources.find((x) => x.id === id), type = (D.TYPES_SOURCE.find((t) => t[0] === s.type && s.type) || [])[1];
       corps.push({ text: [{ text: 'S' + (i + 1) + '  ', style: 'ref' }, A.reference(s) || '(source sans titre)'], margin: [0, 6, 0, 1] });
       if (type || s.retiens) corps.push({ text: [type ? type + '. ' : '', s.retiens ? 'Ce que j’en retiens : ' + s.retiens : ''], style: 'petit' }); });
     return { pageSize: 'A4', pageMargins: [48, 48, 48, 54], content: corps, defaultStyle: { fontSize: 11, lineHeight: 1.25 },
@@ -890,14 +893,17 @@
       styles: { titre: { fontSize: 17, bold: true, margin: [0, 4, 0, 10] }, partie: { fontSize: 13, bold: true, margin: [0, 12, 0, 4] }, section: { fontSize: 15, bold: true, margin: [0, 0, 0, 6] }, petit: { fontSize: 9 }, ref: { fontSize: 8, bold: true } } };
   }
   window.HGContenuPdf = contenuPdf;
-  function faireLePdf(q, bouton) {
+  function faireLePdf(q, bouton, autre) {
     bouton.disabled = true; const avant = bouton.textContent; bouton.textContent = 'Préparation…';
     const pret = window.pdfMake ? Promise.resolve() : charger_script('vendor/pdfmake.min.js').then(() => charger_script('vendor/vfs_fonts.js'));
-    pret.then(() => { window.pdfMake.createPdf(contenuPdf(q)).download('grand-oral-' + nomDeFichier(q.titre || 'plan').slice(0, 40) + '.pdf');
-      d.compteurs.pdf = (d.compteurs.pdf || 0) + 1; enregistrer(true); })
+    pret.then(() => { window.pdfMake.createPdf(contenuPdf(q, autre)).download('grand-oral-' + nomDeFichier(q.titre || 'plan').slice(0, 40) + '.pdf');
+      if (!autre) { d.compteurs.pdf = (d.compteurs.pdf || 0) + 1; enregistrer(true); } })
       .catch(() => toast('Le PDF n’a pas pu être préparé. Vérifie ta connexion, puis réessaie.'))
       .then(() => { bouton.disabled = false; bouton.textContent = avant; });
   }
+
+  // L'espace de l'enseignant·e (js/prof.js) se sert des mêmes outils : échappement, messages, PDF.
+  window.HGOutils = { e, toast, rendre: () => rendre(), pdf: faireLePdf, nomDeFichier, uid };
 
   // ---------- Démarrage ----------
   // Une nouvelle page commence en haut, et le focus va à son contenu (clavier, lecteurs d'écran).

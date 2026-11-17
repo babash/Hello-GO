@@ -1,7 +1,7 @@
 // Hello GO : le service worker garde l'application sur l'appareil, pour qu'elle s'ouvre sans réseau.
 // Changer VERSION à chaque publication : l'ancien cache est alors remplacé.
 const VERSION = 'hello-go-1.3.0';
-const FICHIERS = ['./', 'index.html', 'css/app.css', 'css/polices.css', 'js/donnees.js', 'js/decouvertes.js', 'js/analyse.js', 'js/retours.js', 'js/en-ligne.js', 'js/app.js',
+const FICHIERS = ['./', 'index.html', 'css/app.css', 'css/polices.css', 'js/donnees.js', 'js/decouvertes.js', 'js/analyse.js', 'js/retours.js', 'js/en-ligne.js', 'js/prof.js', 'js/app.js',
   'vendor/sortable.min.js', 'icone.svg', 'manifest.webmanifest'];
 self.addEventListener('install', (ev) => { ev.waitUntil(caches.open(VERSION).then((c) => c.addAll(FICHIERS)).then(() => self.skipWaiting())); });
 // Les caches sont communs à toutes les applications de babash.github.io : on ne supprime que les anciennes versions de Hello GO.

@@ -50,7 +50,8 @@ class Appareil:
         self.p = self.ctx.new_page()
         self.p.on('pageerror', lambda x: erreurs.append(nom + ' erreur JS : ' + str(x)))
         self.p.on('console', lambda m: erreurs.append(nom + ' console : ' + m.text) if m.type == 'error' and 'internetdisconnected' not in m.text.lower() and 'failed to load resource' not in m.text.lower() else None)
-        self.p.on('dialog', lambda dlg: dlg.accept())
+        self.reponses = []  # les réponses aux fenêtres « prompt », dans l'ordre
+        self.p.on('dialog', lambda dlg: dlg.accept(self.reponses.pop(0)) if dlg.type == 'prompt' and self.reponses else dlg.accept())
 
     def servir(self, route):
         req = route.request
