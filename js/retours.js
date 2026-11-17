@@ -62,6 +62,9 @@
     if (hf.length) r.hf_recents = hf.slice(-10).reverse().map((h) => [h.id, compact(h.le)]);
     const v = A.statsVisites(d);
     if (v.total) { r.visites = { n: v.total, depuis: compact(v.depuis), jours: v.jours.slice(-35).map(compact) }; }
+    // La culture (version 1.6.0) : vidéos vues (et avec une note), affirmations vues et réussies, accroches gardées et utilisées.
+    const cu = A.chiffresCulture(d);
+    if (cu.videos || cu.infox || cu.accroches) r.culture = { videos: cu.videos, notes: cu.notes, infox: cu.infox, reussies: cu.reussies, accroches: cu.accroches, utilisees: cu.utilisees };
     // Trop long (beaucoup de réponses au questionnaire, de longs titres) : on retire le moins utile d'abord.
     if (JSON.stringify(r).length > 3900) r.gouts = Object.keys(r.gouts).reduce((o, k) => { o[k] = Array.isArray(r.gouts[k]) ? r.gouts[k].length : 1; return o; }, {});
     if (JSON.stringify(r).length > 3900) r.questions.forEach((q) => { q.titre = court(q.titre, 40); });
@@ -162,6 +165,8 @@
     (d.pistes || []).forEach((p) => { ajoute('Piste', p.titre); ajoute('Piste', p.pourquoi); (p.idees || []).concat(p.candidates || []).forEach((t) => ajoute('Piste', t)); });
     (d.oraux || []).forEach((o) => { ajoute('Oral', o.nom); ajoute('Oral', o.objectifs); });
     (d.interets || []).concat(d.ponts || []).forEach((t) => ajoute('Centre d’intérêt', t));
+    const vids = ((d.culture || {}).videos) || {};
+    Object.keys(vids).forEach((k) => { const v = vids[k]; if (v && typeof v === 'object') { ajoute('Vidéo, ce que j’en retiens', v.retiens); ajoute('Vidéo, ce qui m’a intrigué·e', v.intrigue); } });
     return l;
   }
   function textesAbsents(local, base) {

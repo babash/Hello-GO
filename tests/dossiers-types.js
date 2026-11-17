@@ -41,5 +41,10 @@ function v150() {
   return d;
 }
 
-const DOSSIERS = { '1.0.0': v100, '1.1.0': v110, '1.2.0': v120, '1.3.0': v130, '1.3.1': v130, '1.3.2': v130, '1.4.0': v140, '1.5.0': v150 };
+// 1.6.0 : la culture (vidéos regardées et notes, « Info ou infox ? », accroches gardées, affirmation du jour).
+function v160() { const d = v150(); d.culture = { videos: { 'craquer-wordle': { vue: '2026-11-18', retiens: 'L’entropie mesure l’information', intrigue: 'Le meilleur premier mot', piste: 'pi1' }, 'terres-rares': { avis: -1 } },
+  infox: { 'bug-hopper': { v: 1, j: 1, d: 1, le: '2026-11-18' }, 'pacman-256': { v: 2, j: 1, d: 0, le: '2026-11-18' } }, accroches: { 'pacman-256': { le: '2026-11-18', q: 'q1', p: 'p1' } },
+  salves: 1, sansfaute: 0, jour: { j: '2026-11-18', id: 'bug-hopper' } }; d.hf.video1 = '2026-11-18'; return d; }
+
+const DOSSIERS = { '1.0.0': v100, '1.1.0': v110, '1.2.0': v120, '1.3.0': v130, '1.3.1': v130, '1.3.2': v130, '1.4.0': v140, '1.5.0': v150, '1.6.0': v160 };
 module.exports = { VERSIONS, DOSSIERS };

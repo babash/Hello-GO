@@ -150,7 +150,7 @@ assert.ok(A.HAUTS_FAITS.length >= 50);
 console.log('hauts faits : ' + A.HAUTS_FAITS.length);
 
 // ---------- Les quiz « Vérifie que tu as compris » (1.4.0) ----------
-assert.strictEqual(A.HAUTS_FAITS.length, 54, 'hauts faits : 52 + 2 pour les quiz');
+assert.strictEqual(A.HAUTS_FAITS.length, 60, 'hauts faits : 52 + 2 pour les quiz + 6 pour la culture');
 assert.deepStrictEqual(D.COMPRENDRE.map((z) => z.id), ['epreuve', 'plan']);
 const cibles = ['#/aide/epreuve', '#/aide/exemple'].concat(D.FICHES.map((f) => '#/aide/' + f.id));
 const idsQ = new Set();
