@@ -9,7 +9,7 @@
   // worker et les caches de Hello GO effacés, puis la page rechargée à une adresse neuve), puis on explique, avec les détails
   // techniques à recopier. Le dossier de l'élève (localStorage) n'est jamais touché. Le même message est écrit dans
   // index.html (HG_PANNE), pour le cas où ce fichier-ci ne peut pas s'exécuter : les deux textes vont ensemble.
-  const VERSION_APP = '1.6.0'; // la même que HG_VERSION (index.html), sw.js et les ?v= de index.html (tests/versions.test.js)
+  const VERSION_APP = '1.7.0'; // la même que HG_VERSION (index.html), sw.js et les ?v= de index.html (tests/versions.test.js)
   window.HG_VERSION_APP = VERSION_APP;
   const MODULES = [['HGDonnees', 'js/donnees.js'], ['HGDecouvertes', 'js/decouvertes.js'], ['HGCulture', 'js/culture.js'], ['HGAnalyse', 'js/coach.js'],
     ['HGRetours', 'js/retours.js'], ['HGExport', 'js/export.js'], ['HGEnLigne', 'js/en-ligne.js'], ['HGProf', 'js/prof.js']];
@@ -271,8 +271,8 @@
   let pile = null;
   function toast(texte, vers, bouton, action) {
     pile = pile || $('#toasts');
-    const t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status');
-    t.innerHTML = '<span>' + e(texte) + '</span>' + (bouton ? (vers ? '<a href="' + vers + '">' + e(bouton) + '</a>' : '<button type="button">' + e(bouton) + '</button>') : '');
+    const t = document.createElement('div'), hf = /^Haut fait débloqué/.test(texte); t.className = 'toast' + (hf ? ' toast-hf' : ''); t.setAttribute('role', 'status');
+    t.innerHTML = (hf ? picto('etoile') : '') + '<span>' + e(texte) + '</span>' + (bouton ? (vers ? '<a href="' + vers + '">' + e(bouton) + '</a>' : '<button type="button">' + e(bouton) + '</button>') : '');
     if (action) $('button', t).addEventListener('click', () => { action(); t.remove(); });
     while (pile.children.length >= 3) pile.firstChild.remove();
     pile.appendChild(t); setTimeout(() => t.remove(), 7000);
@@ -294,26 +294,82 @@
   const retoursSur = (type, id) => R.pour(retoursProf, type, id).map(unRetour).join('');
   const enLigne = () => !!EL.session();
 
+  // ---------- Les pictogrammes (version 1.7.0) : dessins originaux, au trait, 24 × 24, couleur du texte ----------
+  // Toujours décoratifs (aria-hidden) : le texte voisin dit la même chose.
+  const PICTOS = {
+    explorer: 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm3.5 6.5-2 5-5 2 2-5z',
+    construire: 'M4 20h16M6 20v-5h5v5M13 20v-9h5v9M9.5 15V9h5v2',
+    preparer: 'M12 3a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3zM6 11a6 6 0 0 0 12 0M12 17v4M9 21h6',
+    art: 'M12 3a9 9 0 0 0 0 18c1.5 0 2-1 2-2s-1-1.5-1-2.5 1-1.5 2-1.5h2a4 4 0 0 0 4-4c0-4.4-4-8-9-8zM7.5 11h.01M10 7h.01M15 7.5h.01',
+    jeux: 'M7 8h10a4 4 0 0 1 4 4v3a2 2 0 0 1-3.6 1.2L16 15H8l-1.4 1.2A2 2 0 0 1 3 15v-3a4 4 0 0 1 4-4zM8 10.5v3M6.5 12h3M15.5 11.5h.01M17.5 13h.01',
+    societe: 'M12 3v18M5 7h14M5 7l-3 6a3 3 0 0 0 6 0zM19 7l-3 6a3 3 0 0 0 6 0zM8 21h8',
+    sciences: 'M9 3h6M10 3v6L4.5 18.5A1.7 1.7 0 0 0 6 21h12a1.7 1.7 0 0 0 1.5-2.5L14 9V3M7 15h10',
+    numerique: 'M8 2h8a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zM11 18h2',
+    monde: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM3 12h18M12 3c2.5 2.7 3.5 5.7 3.5 9s-1 6.3-3.5 9c-2.5-2.7-3.5-5.7-3.5-9S9.5 5.7 12 3z',
+    coeur: 'M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z',
+    livre: 'M4 5a2 2 0 0 1 2-2h13v15H6a2 2 0 0 0-2 2zM4 20a2 2 0 0 0 2 2h13v-4',
+    pont: 'M2 17h20M4 17v-5M20 17v-5M2 12c4-5 16-5 20 0M8 17v-5.5M12 17v-6.5M16 17v-5.5',
+    code: 'M8 7l-5 5 5 5M16 7l5 5-5 5M13.5 4l-3 16',
+    angle: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zM12 11a1 1 0 1 0 0 2 1 1 0 0 0 0-2z',
+    apres: 'M4 21V4M4 4h12l-2 4 2 4H4',
+    recit: 'M3 5c3-1 6-1 9 1 3-2 6-2 9-1v14c-3-1-6-1-9 1-3-2-6-2-9-1zM12 6v14',
+    comment: 'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1',
+    debat: 'M3 5h11v7H7l-4 3zM10 15v2h7l4 3V10h-4',
+    avenir: 'M14 4c3-1 6-1 6-1s0 3-1 6l-6 6-4-4zM9 11l-4 1-2 3 4 1M13 15l-1 4-3 2-1-4M15 9h.01',
+    idee: 'M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.9.7 1.5 1.6 1.5 2.6V17h4v-.5c0-1 .6-1.9 1.5-2.6A6 6 0 0 0 12 3z',
+    infox: 'M4 4h16v12H9l-5 4zM8.5 10l2 2 4-4',
+    video: 'M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zM10 9v6l5-3z',
+    points: 'M4 5h16M4 10h16M4 15h10M4 20h7',
+    mots: 'M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3zM5 17a3 3 0 0 1 3-3h11',
+    sources: 'M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1',
+    etoile: 'M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z',
+    non: 'M6 6l12 12M18 6L6 18',
+    oui: 'M12 3l1.8 5.4L19 10l-5.2 1.6L12 17l-1.8-5.4L5 10l5.2-1.6zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z',
+    suite: 'M5 12h14M13 6l6 6-6 6',
+    retour: 'M19 12H5M11 6l-6 6 6 6',
+    // Les catégories des cartes de la Timeline
+    algo: 'M4 4h6v5H4zM14 15h6v5h-6zM7 9v3h10v3M14 6.5h6',
+    cle: 'M8 10a4 4 0 1 0 0 4M8 12h13M17 12v3M20 12v2',
+    bouclier: 'M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6zM9 12l2 2 4-4',
+    puce: 'M7 7h10v10H7zM10 3v4M14 3v4M10 17v4M14 17v4M3 10h4M3 14h4M17 10h4M17 14h4',
+    ia: 'M9 4a3 3 0 0 0-3 3 3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 6 0V5.5A2 2 0 0 0 9 4zM15 4a3 3 0 0 1 3 3 3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-6 0',
+    libre: 'M18 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM6 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM18 22a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM8.6 13.5l6.8 4M15.4 6.5l-6.8 4',
+    reseau: 'M12 3v6M12 15v6M5 12h14M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6zM3 12h2M19 12h2',
+    fenetre: 'M3 5h18v14H3zM3 9h18M6 7h.01M8.5 7h.01',
+    onde: 'M2 12c2-6 4-6 6 0s4 6 6 0 4-6 6 0M22 12h-2'
+  };
+  const picto = (nom, classe) => PICTOS[nom] ? `<svg class="picto${classe ? ' ' + classe : ''}" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="${PICTOS[nom]}"/></svg>` : '';
+  const PICTO_CATEGORIE = { 'Algorithmique': 'algo', 'Cryptographie': 'cle', 'Cybersécurité': 'bouclier', 'Hardware': 'puce', 'Intelligence Artificielle': 'ia', 'Internet': 'monde',
+    'Langage de programmation': 'code', 'Logiciel libre': 'libre', 'Réseau': 'reseau', 'Systèmes et logiciels': 'fenetre', 'Théorie de l’information': 'onde' };
+  const PICTO_QUESTION = { gouts: 'etoile', coeur: 'coeur', spe: 'livre', dansspe: 'pont', nsi: 'code', angle: 'angle', apres: 'apres' };
+  const PICTO_GROUPE = ['art', 'jeux', 'societe', 'sciences', 'numerique', 'monde'];
+  const PICTO_CHOIX = { recit: 'recit', comment: 'comment', debat: 'debat', avenir: 'avenir' };
+  // Le motif de Hello GO : une bulle de parole d'où partent des ondes (dessin original, décoratif).
+  const MOTIF = `<svg class="motif" viewBox="0 0 160 120" aria-hidden="true" focusable="false">
+    <path class="motif-ondes" d="M118 30a34 34 0 0 1 0 44M130 20a50 50 0 0 1 0 64M142 10a66 66 0 0 1 0 84"/>
+    <path class="motif-bulle" d="M20 18h76a12 12 0 0 1 12 12v40a12 12 0 0 1-12 12H52l-20 18v-18H20A12 12 0 0 1 8 70V30a12 12 0 0 1 12-12z"/>
+    <text class="motif-texte" x="58" y="62" text-anchor="middle">GO</text></svg>`;
+
   // ---------- Les vues ----------
   const vues = {};
 
   vues.bienvenue = () => `
-    <section class="carte bienvenue">
-      <p class="logo-grand">Hello <b>GO</b></p>
-      <h1>Prépare ton Grand oral de NSI, pas à pas</h1>
-      <ol class="etapes">
-        <li><b>Explore</b> : découvre des histoires de l’informatique, trouve un sujet qui te plaît, puis ta question.</li>
-        <li><b>Construis</b> ton plan point par point, avec tes mots et tes sources.</li>
-        <li><b>Prépare</b> l’échange avec le jury et tes oraux blancs.</li>
+    <section class="bienvenue">
+      <div class="heros">${MOTIF}<div><p class="logo-grand">Hello <b>GO</b></p>
+      <h1>Prépare ton Grand oral de NSI, pas à pas</h1></div></div>
+      <ol class="etapes tuiles-etapes">
+        <li style="--i:0">${picto('explorer')}<span><b>Explore</b> : découvre des histoires de l’informatique, trouve un sujet qui te plaît, puis ta question.</span></li>
+        <li style="--i:1">${picto('construire')}<span><b>Construis</b> ton plan point par point, avec tes mots et tes sources.</span></li>
+        <li style="--i:2">${picto('preparer')}<span><b>Prépare</b> l’échange avec le jury et tes oraux blancs.</span></li>
       </ol>
     </section>
-    ${blocRejoindre()}
+    <div class="deux-colonnes">${blocRejoindre()}
     <section class="carte"><h2>Essayer sans compte</h2>
       <label>Ton prénom (ou un pseudo), jamais ton nom de famille
         <input type="text" id="prenom" maxlength="24" autocomplete="given-name" placeholder="Ton prénom"></label>
       <p class="note">Sans compte, ton dossier reste <b>sur cet appareil seulement</b>, dans ce navigateur. Tu pourras rejoindre ta classe plus tard : ton dossier te suivra.</p>
-      <button class="principal" data-a="demarrer">C’est parti</button>
-    </section>`;
+      <button class="principal" data-a="demarrer">C’est parti ${picto('suite')}</button>
+    </section></div>`;
   function blocRejoindre() {
     return `<section class="carte rejoindre"><h2>Rejoindre ma classe</h2>
       <p>Ton enseignant·e t’a donné un lien ou un code de classe (4 lettres) : ton dossier sera gardé en ligne, et tu le retrouveras sur ton téléphone comme au lycée.</p>
@@ -363,74 +419,117 @@
     ${s && sessionExpiree ? '<section class="carte alerte"><p>Ta session a expiré sur cet appareil : ton travail reste ici, et part dès que tu entres de nouveau ton code.</p><p><a class="bouton principal" href="#/entrer">Entrer mon code</a></p></section>' : ''}
     ${n ? `<a class="carte lien-carte nouveautes" href="#/retours"><span class="pastille">${n}</span> ${n > 1 ? 'nouveautés' : 'nouveauté'} de ton enseignant·e</a>` : ''}
     ${aPartExiste() ? '<p class="note"><a href="#/a-part">Relire ma saisie mise de côté</a></p>' : ''}
-    <section class="carte action">
+    <section class="carte action heros-etape">
       <p class="sur-titre">Ta prochaine étape · ${e(pa.duree)}</p>
       <p class="gros">${e(pa.texte)}</p>
-      <a class="bouton principal" href="${pa.vers}">${e(pa.bouton)}</a>
+      <a class="bouton principal" href="${pa.vers}">${e(pa.bouton)} ${picto('suite')}</a>
+      ${chemin(debut)}
     </section>
-    ${blocConseil()}
-    ${blocInfoxJour()}
-    ${blocVideoAccueil()}
+    ${blocDose()}
     <section class="chiffres">
-      <a href="#/questions"><b>${nPoints}</b> ${nPoints > 1 ? 'points' : 'point'}</a>
-      <a href="#/mots"><b>${d.mots.length}</b> ${d.mots.length > 1 ? 'mots' : 'mot'}</a>
-      <a href="#/sources"><b>${d.sources.length}</b> ${d.sources.length > 1 ? 'sources' : 'source'}</a>
-      <a href="#/hauts-faits"><b>${nHf}</b> ${nHf > 1 ? 'hauts faits' : 'haut fait'}</a>
+      <a href="#/questions">${picto('points')}<b>${nPoints}</b> ${nPoints > 1 ? 'points' : 'point'}</a>
+      <a href="#/mots">${picto('mots')}<b>${d.mots.length}</b> ${d.mots.length > 1 ? 'mots' : 'mot'}</a>
+      <a href="#/sources">${picto('sources')}<b>${d.sources.length}</b> ${d.sources.length > 1 ? 'sources' : 'source'}</a>
+      <a href="#/hauts-faits">${picto('etoile')}<b>${nHf}</b> ${nHf > 1 ? 'hauts faits' : 'haut fait'}</a>
     </section>
     ${blocComprendre()}
-    ${s ? (retoursProf.items.length ? '<p class="bas"><a href="#/retours">Tous les retours de ton enseignant·e</a></p>' : '') : `<section class="carte invitation"><h2>Retrouve ton dossier partout</h2><p>Pour le moment, ton dossier reste sur cet appareil. Rejoins ta classe avec le lien ou le code de ton enseignant·e : ton dossier te suit, et ton enseignant·e peut te faire des retours.</p><p><a class="bouton" href="#/rejoindre">Rejoindre ma classe</a></p></section>`}
-    ${debut.every((x) => x[1]) ? '' : `<section class="carte"><h2>Par où commencer</h2><ul class="coches">${debut.map((x) => `<li class="${x[1] ? 'fait' : ''}"><a href="${x[2]}">${e(x[0])}</a></li>`).join('')}</ul></section>`}`;
+    ${s ? (retoursProf.items.length ? '<p class="bas"><a href="#/retours">Tous les retours de ton enseignant·e</a></p>' : '') : `<section class="carte invitation"><h2>Retrouve ton dossier partout</h2><p>Pour le moment, ton dossier reste sur cet appareil. Rejoins ta classe avec le lien ou le code de ton enseignant·e : ton dossier te suit, et ton enseignant·e peut te faire des retours.</p><p><a class="bouton" href="#/rejoindre">Rejoindre ma classe</a></p></section>`}`;
   };
+  // « Par où commencer » (version 1.7.0) : les 7 premières étapes, dans la carte de la prochaine étape, avec la progression.
+  function chemin(debut) {
+    const faits = debut.filter((x) => x[1]).length;
+    if (faits === debut.length) return '';
+    return `<div class="chemin"><p class="chemin-titre"><span>Par où commencer</span> <span class="note">${faits} sur ${debut.length}</span></p>
+      <div class="avance" aria-hidden="true"><span style="width:${Math.round(100 * faits / debut.length)}%"></span></div>
+      <ol class="coches chemin-etapes">${debut.map((x) => `<li class="${x[1] ? 'fait' : ''}"><a href="${x[2]}">${e(x[0])}${x[1] ? '<span class="lecteur"> (fait)</span>' : ''}</a></li>`).join('')}</ol></div>`;
+  }
+  // « Ta dose du jour » (version 1.7.0) : le conseil, l'affirmation et la vidéo du jour, côte à côte, à faire défiler
+  // (au doigt, à la souris, au clavier par Tab, ou avec les boutons). Tout reste dans la page : rien n'est caché.
+  let doseActive = 0;
+  function blocDose() {
+    const l = [['idee', 'Conseil', blocConseil()], ['infox', 'Info ou infox ?', blocInfoxJour()], ['video', 'Vidéo', blocVideoAccueil()]].filter((x) => x[2]);
+    if (doseActive >= l.length) doseActive = 0;
+    return `<section class="dose" aria-labelledby="titre-dose"><div class="dose-tete"><h2 id="titre-dose">Ta dose du jour</h2>
+      <div class="dose-onglets" role="group" aria-label="Aller à">${l.map((x, i) => `<button type="button" class="mini" data-a="dose" data-i="${i}"${i === doseActive ? ' aria-current="true"' : ''}>${picto(x[0])}<span>${x[1]}</span></button>`).join('')}</div></div>
+      <div class="dose-piste">${l.map((x, i) => `<div class="dose-diapo" data-i="${i}">${x[2]}</div>`).join('')}</div></section>`;
+  }
 
   function ongletsExplorer(actif) {
     return `<h1>Explorer</h1><nav class="onglets" aria-label="Explorer">${[['decouvrir', 'Découvrir'], ['infox', 'Info ou infox ?'], ['quiz', 'Mes goûts'], ['videos', 'Vidéos'], ['sujets', 'Sujets'], ['pistes', 'Mes pistes' + (d.pistes.length ? ' (' + d.pistes.length + ')' : '')]]
       .map((o) => `<a href="#/explorer/${o[0]}"${o[0] === actif ? ' aria-current="page"' : ''}>${o[1]}</a>`).join('')}</nav>`;
   }
-  function carteSujet(s, raisons) {
+  // Un sujet ; proposé (raisons), il apparaît à son tour (--i) et dit pourquoi, chaque raison dans sa pastille.
+  function carteSujet(s, raisons, i) {
     const deja = d.pistes.some((p) => p.titre === s.t);
-    return `<li class="carte sujet"><p class="sur-titre">${e(s.th)}</p><p class="gros">${e(s.t)}</p>
-      ${raisons && raisons.length ? `<p class="note">Parce que tu as choisi : ${e([...new Set(raisons)].join(', '))}.</p>` : ''}
+    return `<li class="carte sujet${raisons && raisons.length ? ' propose' : ''}"${i !== undefined ? ` style="--i:${i}"` : ''}><p class="sur-titre">${e(s.th)}</p><p class="gros">${e(s.t)}</p>
+      ${raisons && raisons.length ? `<p class="parce-que"><span class="note">Parce que tu as choisi :</span> ${[...new Set(raisons)].map((r) => `<span class="raison">${e(r)}</span>`).join('<span class="lecteur">, </span>')}<span class="lecteur">.</span></p>` : ''}
       ${deja ? '<p class="fait-texte">Dans tes pistes</p>' : `<button data-a="garder" data-t="${e(s.t)}">Garder comme piste</button>`}</li>`;
   }
   vues.decouvrir = () => {
     const re = d.decouverte.reactions, n = Object.keys(re).length, total = A.CARTES.length, c = A.prochaineCarte(re);
     const aimees = A.CARTES.filter((x) => re[x.num] === 1), bilan = n >= 10 && (n % 10 === 0 || !c) && !d.vus.suite;
     const sug = A.suggestions(d.quiz.reponses, 5, re), surp = A.surprises(d.quiz.reponses, re);
-    const resultats = n ? `<h2>Ce qui t’intrigue</h2>
-      ${aimees.length ? `<ul class="liste">${aimees.map((x) => { const deja = d.pistes.some((p) => p.titre === x.q);
-        return `<li class="carte sujet"><p class="sur-titre">${e(x.titre)} · ${e(x.date)}</p><p class="gros">${e(x.q)}</p>${deja ? '<p class="fait-texte">Dans tes pistes</p>' : `<button data-a="garder" data-t="${e(x.q)}">Garder comme piste</button>`}</li>`; }).join('')}</ul>`
-        : `<p class="vide">${c ? 'Aucune carte pour le moment : continue, il y en a pour tous les goûts.' : 'Aucune carte ne t’a intrigué·e : dis ce que tu aimes dans « Mes goûts », ou parcours les sujets.'}</p>`}
-      ${surp.length ? `<section class="carte savoir"><p class="sur-titre">Ta surprise</p><p class="gros">Tu ne l’avais pas coché dans tes goûts, mais ça t’intrigue : ${e(surp.join(', '))}.</p></section>` : ''}
-      ${sug.length ? `<h2>Des sujets qui pourraient te plaire</h2><ul class="liste">${sug.map((x) => carteSujet(x.sujet, x.raisons)).join('')}</ul>` : ''}` : '';
+    // Pendant les cartes, ce qui intrigue reste replié (« Ta collection ») ; au bilan, tout se révèle, une carte après l'autre.
+    const listeAimees = aimees.length ? `<ul class="liste">${aimees.map((x, i) => { const deja = d.pistes.some((p) => p.titre === x.q);
+        return `<li class="carte sujet" style="--i:${i}"><p class="sur-titre">${picto(PICTO_CATEGORIE[x.cat] || 'etoile')} ${e(x.titre)} · ${e(x.date)}</p><p class="gros">${e(x.q)}</p>${deja ? '<p class="fait-texte">Dans tes pistes</p>' : `<button data-a="garder" data-t="${e(x.q)}">Garder comme piste</button>`}</li>`; }).join('')}</ul>`
+      : `<p class="vide">${picto('oui')} ${c ? 'Aucune carte pour le moment : continue, il y en a pour tous les goûts.' : 'Aucune carte ne t’a intrigué·e : dis ce que tu aimes dans « Mes goûts », ou parcours les sujets.'}</p>`;
+    const enCartes = c && !bilan;
+    const surprise = surp.length ? `<section class="carte savoir surprise"><p class="sur-titre">${picto('oui')} Ta surprise</p><p class="gros">Tu ne l’avais pas coché dans tes goûts, mais ça t’intrigue : ${e(surp.join(', '))}.</p></section>` : '';
+    const resultats = !n ? '' : enCartes ? (aimees.length ? `<details class="carte collection"><summary>${picto('oui')} Ta collection : ${pluriel(aimees.length, 'carte')} qui t’intrigue${aimees.length > 1 ? 'nt' : ''}</summary>${listeAimees}</details>` : '') + surprise
+      : `<div class="revelation"><h2>Ce qui t’intrigue</h2>${listeAimees}
+      ${surprise}
+      ${sug.length ? `<h2>Des sujets qui pourraient te plaire</h2><ul class="liste">${sug.map((x, i) => carteSujet(x.sujet, x.raisons, i + aimees.length)).join('')}</ul>` : ''}</div>`;
+    const serie = n % 10, ic = c ? PICTO_CATEGORIE[c.cat] || 'etoile' : '';
     return ongletsExplorer('decouvrir') + `
-    <p class="chapo">Des histoires vraies de l’informatique. Pour chacune, dis simplement si elle t’intrigue : tu découvriras peut-être un sujet auquel tu n’avais pas pensé.</p>
-    ${c && !bilan ? `<section class="carte decouverte">
-      <p class="sur-titre">Carte ${n + 1} sur ${total} · ${e(c.cat)}</p>
+    <p class="chapo">Des histoires vraies de l’informatique. Dis si chacune t’intrigue : tu découvriras peut-être un sujet auquel tu n’avais pas pensé.</p>
+    ${enCartes ? `<div class="pile-cartes"><section class="carte decouverte a-glisser${dernierAvis ? ' entree' : ''}" data-cat="${e(ic)}">
+      <div class="carte-tete"><span class="cat-picto">${picto(ic)}</span><p class="sur-titre">Carte ${n + 1} sur ${total} · ${e(c.cat)}</p></div>
+      <ol class="serie" aria-hidden="true">${[...Array(10).keys()].map((k) => `<li class="${k < serie ? 'vu' : k === serie ? 'ici' : ''}"></li>`).join('')}</ol>
       <h2>${e(c.titre)} <span class="note">${e(c.date)}</span></h2>
       <p class="gros">${e(c.texte)}</p>
       <p>${e(c.note)}</p>
       <p class="question-carte">${e(c.q)}</p>
-      <div class="deux"><button data-a="reagir" data-n="${c.num}" data-v="-1">Pas pour moi</button><button class="principal" data-a="reagir" data-n="${c.num}" data-v="1">Ça m’intrigue</button></div>
-      <p class="note"><a href="https://babash.github.io/TimelineNSI/" target="_blank" rel="noopener">Voir toutes les cartes sur la Timeline</a></p>
-    </section>` : `<section class="carte action"><p class="gros">${c ? 'Tu as vu ' + n + ' cartes sur ' + total + '. Regarde ce qui ressort, ou continue.' : 'Tu as vu toutes les cartes.'}</p>
-      ${c ? '<button class="principal" data-a="suite-cartes">Voir 10 autres cartes</button>' : ''} <a class="bouton" href="#/explorer/quiz">Dire ce que j’aime</a></section>`}
+      <div class="deux grands"><button data-a="reagir" data-n="${c.num}" data-v="-1">${picto('non')}Pas pour moi</button><button class="principal" data-a="reagir" data-n="${c.num}" data-v="1">${picto('oui')}Ça m’intrigue</button></div>
+      <p class="note">Au clavier : flèche gauche pour « Pas pour moi », flèche droite pour « Ça m’intrigue ». Sur téléphone, tu peux aussi glisser la carte.
+        <a href="https://babash.github.io/TimelineNSI/" target="_blank" rel="noopener">Voir toutes les cartes sur la Timeline</a></p>
+      <span class="tampon tampon-oui" aria-hidden="true">Ça m’intrigue</span><span class="tampon tampon-non" aria-hidden="true">Pas pour moi</span>
+    </section></div>` : `<section class="carte action bilan"><p class="sur-titre">${picto('oui')} ${c ? 'Bilan de tes 10 cartes' : 'Toutes les cartes'}</p><p class="gros">${c ? 'Tu as vu ' + n + ' cartes sur ' + total + '. Regarde ce qui ressort, ou continue.' : 'Tu as vu toutes les cartes.'}</p>
+      ${aimees.length ? `<p class="compteur"><b>${aimees.length}</b> ${aimees.length > 1 ? 'cartes t’intriguent' : 'carte t’intrigue'}</p>` : ''}
+      <p class="boutons">${c ? '<button class="principal" data-a="suite-cartes">Voir 10 autres cartes</button>' : ''} <a class="bouton" href="#/explorer/quiz">Dire ce que j’aime</a></p></section>`}
     ${resultats}
     ${n ? '<p class="bas"><button class="discret" data-a="recommencer-cartes">Revoir toutes les cartes depuis le début</button></p>' : ''}`;
   };
+  // « Mes goûts » (version 1.7.0) : une question par écran, avec la progression, en grandes tuiles ; ou tout sur une page
+  // (« Tout voir sur une page »). Les réponses sont les mêmes, au même endroit du dossier (quiz.reponses).
+  let etapeGouts = 0, goutsListe = false;
+  const questionsGouts = () => D.QUIZ.filter((q) => !(q.selon && !A.choixDe(q, d.quiz.reponses).length));
   vues.quiz = () => {
     const r = d.quiz.reponses, sug = d.quiz.fait ? A.suggestions(r, 5, d.decouverte.reactions) : [];
+    const qs = questionsGouts(), N = qs.length + 1; etapeGouts = Math.max(0, Math.min(etapeGouts, N - 1));
+    const cache = (i) => (!goutsListe && i !== etapeGouts ? ' hidden' : '');
+    const nb = (q) => q.multi ? (r[q.id] || []).length : r[q.id] ? 1 : 0;
+    const tuile = (q) => (c) => { const coche = q.multi ? (r[q.id] || []).includes(c[0]) : r[q.id] === c[0], ic = q.id === 'angle' ? PICTO_CHOIX[c[0]] : '';
+      return `<label class="puce${ic ? ' avec-picto' : ''}"><input type="${q.multi ? 'checkbox' : 'radio'}" name="quiz-${q.id}" data-quiz="${q.id}" value="${c[0]}"${coche ? ' checked' : ''}><span>${ic ? picto(ic) : ''}${e(c[1])}<svg class="coche-anim" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></label>`; };
+    const pointEtape = (i, titre, ic, fait, id) => `<li><button type="button" class="point-etape${fait ? ' fait' : ''}" data-a="gouts-aller" data-e="${i}" data-q="${id}" aria-label="Question ${i + 1} : ${e(titre)}${fait ? ' (répondue)' : ''}"${!goutsListe && i === etapeGouts ? ' aria-current="step"' : ''}>${picto(ic)}</button></li>`;
     return ongletsExplorer('quiz') + `
     <p class="chapo">Plus tu coches, plus les propositions te ressemblent. Rien n’est définitif : tu peux revenir changer tes réponses.</p>
-    ${D.QUIZ.map((q) => { const liste = A.choixDe(q, r); if (q.selon && !liste.length) return '';
-      const puce = (c) => { const coche = q.multi ? (r[q.id] || []).includes(c[0]) : r[q.id] === c[0];
-        return `<label class="puce"><input type="${q.multi ? 'checkbox' : 'radio'}" name="quiz-${q.id}" data-quiz="${q.id}" value="${c[0]}"${coche ? ' checked' : ''}><span>${e(c[1])}</span></label>`; };
-      return `<fieldset class="carte"><legend>${e(q.titre)}</legend><p class="note">${e(q.aide)}</p>
-        ${q.groupes ? q.groupes.map((g) => `<h3>${e(g[0])}</h3><div class="puces">${g[1].map(puce).join('')}</div>`).join('') : `<div class="puces">${liste.map(puce).join('')}</div>`}</fieldset>`; }).join('')}
-    <section class="carte"><h2>Une actualité ou une question qui t’a marqué·e</h2><p class="note">Facultatif. Elle devient une piste.</p>
+    <div class="gouts${goutsListe ? ' gouts-liste' : ''}">
+    ${goutsListe ? '' : `<div class="gouts-tete"><p class="sur-titre" id="gouts-etape" tabindex="-1">Question ${etapeGouts + 1} sur ${N}</p>
+      <div class="avance" aria-hidden="true"><span style="width:${Math.round(100 * (etapeGouts + 1) / N)}%"></span></div>
+      <ol class="gouts-points">${qs.map((q, i) => pointEtape(i, q.titre, PICTO_QUESTION[q.id] || 'etoile', nb(q) > 0, q.id)).join('')}${pointEtape(qs.length, 'Une actualité qui t’a marqué·e', 'idee', false, 'actualite')}</ol></div>`}
+    ${qs.map((q, i) => { const liste = A.choixDe(q, r);
+      return `<fieldset class="carte etape-gouts" data-etape="${i}"${cache(i)}><legend>${picto(PICTO_QUESTION[q.id] || 'etoile', 'picto-titre')}${e(q.titre)}</legend><p class="note">${e(q.aide)}</p>
+        ${q.groupes ? q.groupes.map((g, k) => `<h3>${picto(PICTO_GROUPE[k] || 'etoile')}${e(g[0])}</h3><div class="puces tuiles">${g[1].map(tuile(q)).join('')}</div>`).join('') : `<div class="puces tuiles${q.id === 'angle' ? ' tuiles-grandes' : ''}">${liste.map(tuile(q)).join('')}</div>`}</fieldset>`; }).join('')}
+    <section class="carte etape-gouts" data-etape="${qs.length}"${cache(qs.length)}><h2>${picto('idee', 'picto-titre')}Une actualité ou une question qui t’a marqué·e</h2><p class="note">Facultatif. Elle devient une piste.</p>
       <input type="text" id="piste-libre" placeholder="Par exemple : une panne, une arnaque, une invention…" aria-label="Une actualité qui m’a marqué·e"><button data-a="piste-libre">Ajouter à mes pistes</button></section>
-    <button class="principal" data-a="quiz-fini">Voir mes sujets</button>
-    <div id="resultats">${d.quiz.fait ? `<h2>Des sujets pour toi</h2>${sug.length ? `<ul class="liste">${sug.map((x) => carteSujet(x.sujet, x.raisons)).join('')}</ul>` : '<p>Coche au moins une réponse pour avoir des propositions.</p>'}
-      <p><a href="#/explorer/sujets">Voir tous les sujets</a></p>${troisVideos('Des vidéos pour toi')}` : ''}</div>`;
+    <div class="gouts-nav">
+      ${!goutsListe && etapeGouts > 0 ? `<button type="button" data-a="gouts-aller" data-e="${etapeGouts - 1}">${picto('retour')}Précédente</button>` : ''}
+      ${!goutsListe && etapeGouts < N - 1 ? `<button type="button" class="principal" data-a="gouts-aller" data-e="${etapeGouts + 1}">Suivante${picto('suite')}</button>` : ''}
+      <button class="${goutsListe || etapeGouts === N - 1 ? 'principal' : 'discret'}" data-a="quiz-fini">Voir mes sujets</button>
+      <button type="button" class="discret" data-a="gouts-liste">${goutsListe ? 'Une question à la fois' : 'Tout voir sur une page'}</button>
+    </div></div>
+    <div id="resultats">${d.quiz.fait ? `<div class="revelation"><h2>Des sujets pour toi</h2>${sug.length ? `<ul class="liste">${sug.map((x, i) => carteSujet(x.sujet, x.raisons, i)).join('')}</ul>` : '<p class="vide">Coche au moins une réponse pour avoir des propositions.</p>'}
+      <p><a href="#/explorer/sujets">Voir tous les sujets</a></p>${troisVideos('Des vidéos pour toi')}</div>` : ''}</div>`;
   };
   vues.sujets = (arg) => {
     const themes = [...new Set(D.SUJETS.map((s) => s.th))];
@@ -860,10 +959,11 @@
         <p class="bas"><button class="principal" data-a="infox-commencer">Encore une salve</button> <button data-a="infox-quitter">Terminer</button></p>${mesAccroches()}`;
     }
     const a = A.lInfox(S.ids[S.i]), rep = S.reponses[S.i], valide = rep !== undefined;
-    return tete + `<p class="sur-titre">Affirmation ${S.i + 1} sur ${n}</p><div class="avance" aria-hidden="true"><span style="width:${Math.round(100 * (S.i + (valide ? 1 : 0)) / n)}%"></span></div>
+    return tete + `<p class="sur-titre">${picto('infox')} Affirmation ${S.i + 1} sur ${n}</p><div class="avance" aria-hidden="true"><span style="width:${Math.round(100 * (S.i + (valide ? 1 : 0)) / n)}%"></span></div>
       <section class="carte infox-carte${valide ? '' : ' a-glisser'}" data-infox="${e(a.id)}"><p class="gros" id="infox-affirmation" tabindex="-1">${typo(a.affirmation)}</p>
         ${valide ? '' : `<div class="deux grands"><button data-a="infox-repondre" data-r="0"><span aria-hidden="true">← </span>Infox</button><button class="principal" data-a="infox-repondre" data-r="1">Info<span aria-hidden="true"> →</span></button></div>
-        <p class="note">Au clavier : flèche gauche pour « Infox », flèche droite pour « Info ». Sur téléphone, tu peux aussi glisser la carte.</p>`}</section>
+        <p class="note">Au clavier : flèche gauche pour « Infox », flèche droite pour « Info ». Sur téléphone, tu peux aussi glisser la carte.</p>
+        <span class="tampon tampon-oui" aria-hidden="true">Info</span><span class="tampon tampon-non" aria-hidden="true">Infox</span>`}</section>
       <div aria-live="polite">${valide ? verdictInfox(a, rep === a.vrai, 'infox-retour') : ''}</div>
       <p class="bas"><button class="discret" data-a="infox-quitter">Arrêter la salve</button>${valide ? `<button class="principal" data-a="infox-suivante">${S.i + 1 < n ? 'Affirmation suivante' : 'Voir mon score'}</button>` : ''}</p>`;
   };
@@ -974,11 +1074,24 @@
     document.body.classList.toggle('espace-prof', r[0] === 'prof');
     $('#nav').innerHTML = NAV.map((n) => `<a href="${n[0]}"${n[0] === r[1] ? ' aria-current="page"' : ''}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${n[2]}"/></svg><span>${n[1]}</span></a>`).join('');
     main.querySelectorAll('textarea').forEach(ajuster);
+    montrerDose(false);
     main.querySelectorAll('[data-points]').forEach((ul) => { if (window.Sortable) window.Sortable.create(ul, { group: 'pts', handle: '.grip', animation: 150, onEnd: finGlisser }); });
     if (garderDefilement !== false) window.scrollTo(0, y);
     montrerEtat(etat);
     // Les retours affichés sur leur page sont lus (la mention « Nouveau » reste jusqu'à la page suivante).
     if (r[0] === 'retours' && nonLus().length) { const su = d.suivi = d.suivi || {}; su.lus = su.lus || {}; nonLus().forEach((x) => { su.lus[x.id] = 1; }); enregistrer(true); }
+  }
+  // « Ta dose du jour » : la diapo choisie est montrée (sans animation après un nouveau rendu), et le bouton qui lui
+  // correspond suit le défilement au doigt.
+  function montrerDose(anime) {
+    const piste = $('.dose-piste'); if (!piste) return;
+    const l = [...piste.children], marque = (i) => document.querySelectorAll('[data-a=dose]').forEach((b) => { if (+b.dataset.i === i) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current'); });
+    const x = l[doseActive] || l[0]; if (!x) return;
+    piste.scrollTo({ left: x.offsetLeft - l[0].offsetLeft, behavior: anime && !bougeReduit() ? 'smooth' : 'auto' }); marque(doseActive);
+    let minut = null;
+    piste.onscroll = () => { clearTimeout(minut); minut = setTimeout(() => {
+      let i = 0, best = Infinity; l.forEach((y, k) => { const dist = Math.abs(y.offsetLeft - l[0].offsetLeft - piste.scrollLeft); if (dist < best) { best = dist; i = k; } });
+      doseActive = i; marque(i); }, 90); };
   }
   function ajuster(t) { t.style.height = 'auto'; t.style.height = (t.scrollHeight + 2) + 'px'; }
   // Téléphone tourné, fenêtre réduite : les zones de texte reprennent leur hauteur (sinon la fin d'un point est cachée).
@@ -1056,17 +1169,36 @@
     if (salveInfox && !salveInfox.fini && (ev.key === 'ArrowLeft' || ev.key === 'ArrowRight') && $('#vue').dataset.vue === 'infox' && !/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) && !$('#dialogue').open && !ev.altKey && !ev.ctrlKey && !ev.metaKey) {
       if (salveInfox.reponses[salveInfox.i] === undefined) { ev.preventDefault(); repondreInfox(ev.key === 'ArrowRight'); }
     }
+    // Découvrir : flèche gauche « Pas pour moi », flèche droite « Ça m'intrigue » (hors des champs et des liens).
+    if ((ev.key === 'ArrowLeft' || ev.key === 'ArrowRight') && $('#vue').dataset.vue === 'decouvrir' && $('.decouverte') && !/^(INPUT|TEXTAREA|SELECT|SUMMARY)$/.test(t.tagName) && !$('#dialogue').open && !ev.altKey && !ev.ctrlKey && !ev.metaKey && !ev.shiftKey) {
+      const c = $('.decouverte [data-a=reagir]'); if (c) { ev.preventDefault(); reagirCarte(c.dataset.n, ev.key === 'ArrowRight' ? 1 : -1); }
+    }
     if (typeof ev.key === 'string') konami(ev.key); // la saisie automatique envoie des touches sans nom
   });
-  // Sur téléphone, « Info ou infox ? » se joue aussi en glissant la carte (à droite : info, à gauche : infox) ; jamais obligatoire.
+  // Sur téléphone, « Info ou infox ? » et « Découvrir » se jouent aussi en glissant la carte (à droite : info ou « Ça m'intrigue »,
+  // à gauche : infox ou « Pas pour moi ») ; jamais obligatoire : les boutons et les flèches du clavier font la même chose.
+  // Pendant le geste, la carte suit le doigt et le tampon de la réponse apparaît (rien ne bouge si le mouvement est réduit).
   let glisse = null;
-  document.addEventListener('touchstart', (ev) => { const c = ev.target.closest && ev.target.closest('.infox-carte.a-glisser');
-    glisse = c && ev.touches.length === 1 && !ev.target.closest('button') ? { x: ev.touches[0].clientX, y: ev.touches[0].clientY } : null; }, { passive: true });
-  document.addEventListener('touchend', (ev) => { if (!glisse) return; const t = ev.changedTouches[0], dx = t.clientX - glisse.x, dy = t.clientY - glisse.y; glisse = null;
-    if (Math.abs(dx) > 80 && Math.abs(dy) < 60) repondreInfox(dx > 0); }, { passive: true });
+  const bougeReduit = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.addEventListener('touchstart', (ev) => { const c = ev.target.closest && ev.target.closest('.a-glisser');
+    glisse = c && ev.touches.length === 1 && !ev.target.closest('button, a, summary') ? { x: ev.touches[0].clientX, y: ev.touches[0].clientY, c } : null; }, { passive: true });
+  document.addEventListener('touchmove', (ev) => { if (!glisse || bougeReduit()) return; const dx = ev.touches[0].clientX - glisse.x, dy = ev.touches[0].clientY - glisse.y;
+    if (Math.abs(dy) > Math.abs(dx) * 1.5) return;
+    glisse.c.style.transform = 'translateX(' + dx + 'px) rotate(' + (dx / 30) + 'deg)'; glisse.c.style.setProperty('--glisse', Math.max(-1, Math.min(1, dx / 100))); glisse.c.classList.add('glisse'); }, { passive: true });
+  document.addEventListener('touchend', (ev) => { if (!glisse) return; const t = ev.changedTouches[0], dx = t.clientX - glisse.x, dy = t.clientY - glisse.y, c = glisse.c; glisse = null;
+    c.style.transform = ''; c.style.removeProperty('--glisse'); c.classList.remove('glisse');
+    if (!(Math.abs(dx) > 80 && Math.abs(dy) < 60)) return;
+    if (c.classList.contains('infox-carte')) repondreInfox(dx > 0);
+    else if (c.classList.contains('decouverte')) { const b = $('[data-a=reagir]', c); if (b) reagirCarte(b.dataset.n, dx > 0 ? 1 : -1); } }, { passive: true });
   function focusPoint(id) { const t = $('[data-id="' + id + '"] textarea'); if (t) t.focus(); }
   // La carte suivante (ou le bilan) remplace la précédente : le focus va à son titre, pour que le clavier reste dans la carte
   // et que les lecteurs d'écran la lisent (le bouton pressé n'existe plus).
+  // Un avis sur une carte de « Découvrir » (bouton, flèche du clavier ou glissement) : la carte suivante entre (sans attendre).
+  let dernierAvis = 0;
+  function reagirCarte(num, v) {
+    if (!A.CARTES.some((x) => String(x.num) === String(num))) return;
+    d.decouverte.reactions[num] = v; delete d.vus.suite; dernierAvis = v; enregistrer(true); rendre(false); dernierAvis = 0; focusCarte();
+  }
   function focusCarte() { const t = $('.decouverte h2, .action .gros'); if (t) { t.tabIndex = -1; t.focus({ preventScroll: true }); t.scrollIntoView({ block: 'center' }); } }
   const SUITE = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a']; let rang = 0;
   function konami(k) { rang = (k === SUITE[rang] || k.toLowerCase() === SUITE[rang]) ? rang + 1 : (k === SUITE[0] ? 1 : 0); if (rang === SUITE.length) { rang = 0; secret(); } }
@@ -1077,10 +1209,13 @@
   const actions = {
     demarrer() { d.profil.prenom = ($('#prenom').value || '').trim().slice(0, 24); d.profil.vu = true; noterVisite(); enregistrer(true); location.hash = '#/'; rendre(false); },
     'autre-savoir'() { d.vus.decalage = (d.vus.decalage || 0) + 1; enregistrer(); rendre(); },
-    reagir(b) { d.decouverte.reactions[b.dataset.n] = +b.dataset.v; delete d.vus.suite; enregistrer(true); rendre(false); focusCarte(); },
+    reagir(b) { reagirCarte(b.dataset.n, +b.dataset.v); },
     'suite-cartes'() { d.vus.suite = 1; enregistrer(); rendre(false); focusCarte(); },
     'recommencer-cartes'() { avecAnnulation('Tes avis sur les cartes sont effacés.', () => { d.decouverte.reactions = {}; delete d.vus.suite; }); },
-    'quiz-fini'() { d.quiz.fait = true; enregistrer(true); rendre(); const r = $('#resultats'); if (r) r.scrollIntoView({ behavior: 'smooth' }); },
+    'gouts-aller'(b) { etapeGouts = +b.dataset.e; rendre(false); const t = $('#gouts-etape'); if (t) { t.focus({ preventScroll: true }); t.scrollIntoView({ block: 'nearest' }); } },
+    'gouts-liste'() { goutsListe = !goutsListe; rendre(); const t = $('[data-a=gouts-liste]'); if (t) t.focus(); },
+    'dose'(b) { doseActive = +b.dataset.i; montrerDose(true); },
+    'quiz-fini'() { d.quiz.fait = true; enregistrer(true); rendre(); const r = $('#resultats'); if (r) r.scrollIntoView({ behavior: bougeReduit() ? 'auto' : 'smooth' }); },
     garder(b) { d.pistes.push({ id: uid(), titre: b.dataset.t, pourquoi: '', idees: [''], candidates: [''] }); enregistrer(true); rendre(); toast('Ajouté à tes pistes.', '#/explorer/pistes', 'Ouvrir'); },
     'piste-libre'() { const v = $('#piste-libre').value.trim(); if (!v) return toast('Écris d’abord ton idée.'); d.pistes.push({ id: uid(), titre: v, pourquoi: '', idees: [''], candidates: [''] }); enregistrer(true); location.hash = '#/explorer/pistes'; },
     'plus-pont'() { d.ponts.push(''); enregistrer(); rendre(); },
