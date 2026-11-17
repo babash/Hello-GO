@@ -1,8 +1,10 @@
-// Hello GO : l'application. Le dossier est gardé sur l'appareil (localStorage) ; rien n'est envoyé.
+// Hello GO : l'application de l'élève. Le dossier est gardé sur l'appareil (localStorage) et, quand l'élève a rejoint
+// sa classe, dans la base : il se retrouve alors depuis n'importe quel appareil avec son code. Sans compte (mode
+// découverte), rien n'est envoyé.
 (function () {
   'use strict';
-  const D = window.HGDonnees, A = window.HGAnalyse;
-  const CLE = 'hellogo:dossier:v1';
+  const D = window.HGDonnees, A = window.HGAnalyse, R = window.HGRetours, EL = window.HGEnLigne;
+  const CLE = 'hellogo:dossier:v1', CLE_APART = 'hellogo:a-part:v1', CLE_BASE = 'hellogo:base:v1';
   const $ = (s, r) => (r || document).querySelector(s);
   const e = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
@@ -22,9 +24,10 @@
     return dossierNeuf();
   }
   let d = charger(), minuterie = null, memoireOk = true, enAttente = false;
-  function ecrire() {
+  function ecrire(venuDeLaBase) {
     clearTimeout(minuterie); enAttente = false;
-    try { localStorage.setItem(CLE, JSON.stringify(d)); memoireOk = true; } catch (x) { memoireOk = false; toast('Impossible d’enregistrer sur cet appareil. Télécharge ton dossier dans « Plus », puis « Réglages ».'); }
+    try { localStorage.setItem(CLE, JSON.stringify(d)); memoireOk = true; } catch (x) { memoireOk = false; if (!EL.session()) toast('Impossible d’enregistrer sur cet appareil. Télécharge ton dossier dans « Plus », puis « Réglages ».'); }
+    if (!venuDeLaBase && EL.session()) { EL.majSession({ attente: true }); planifierEnvoi(); }
   }
   function enregistrer(tout_de_suite) {
     clearTimeout(minuterie);
@@ -33,15 +36,129 @@
     if (nouveaux.length) { ecrire(); nouveaux.forEach((h) => toast('Haut fait débloqué : ' + h.titre, '#/hauts-faits', 'Voir')); }
   }
   // En quittant, on n'écrit que ce qui attend encore : un vieil onglet n'écrase jamais le travail fait dans un autre.
-  window.addEventListener('pagehide', () => { if (enAttente) ecrire(); });
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && enAttente) ecrire(); });
+  window.addEventListener('pagehide', () => { if (enAttente) ecrire(); envoiFermeture(); });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') { if (enAttente) ecrire(); envoyer(); } else { envoyer(); interroger(); } });
   // Un autre onglet a enregistré : on reprend son dossier.
   window.addEventListener('storage', (ev) => {
     if (ev.key !== null && ev.key !== CLE) return;
-    clearTimeout(minuterie); enAttente = false; d = charger();
+    clearTimeout(minuterie); enAttente = false; d = charger(); retoursProf = R.nettoyer(EL.retours());
     const dlg = $('#dialogue'); if (dlg && dlg.open) dlg.close('annuler');
     rendre();
   });
+
+  // ---------- La version en ligne : l'envoi, les conflits, le hors ligne, les retours ----------
+  // Le dossier vit toujours dans localStorage (copie de travail) ; il part dans la base quelques secondes après la
+  // dernière frappe, à la fermeture de la page et au retour du réseau. Chaque envoi porte la version connue : si la base
+  // a changé entre-temps (autre appareil, ou correction), sa version est reprise, et ce qui n'était pas encore envoyé
+  // est gardé à part (« Ma saisie mise de côté »), jamais perdu en silence.
+  let retoursProf = R.nettoyer(EL.retours()), envoiMinuterie = null, enCours = false, etat = '', sessionExpiree = false;
+  const DELAI_ENVOI = 3000, DELAI_RETOURS = 20000;
+  function montrerEtat(t) {
+    etat = t; const z = $('#etat-sync'); if (!z) return;
+    const textes = { ok: 'Enregistré', envoi: 'Enregistrement…', attente: 'Modifié', horsligne: 'Hors ligne : sera envoyé', expire: 'Session expirée', erreur: 'Pas enregistré en ligne' };
+    z.textContent = EL.session() ? (textes[t] || '') : ''; z.className = 'etat-sync ' + t;
+  }
+  function planifierEnvoi() { clearTimeout(envoiMinuterie); montrerEtat('attente'); envoiMinuterie = setTimeout(envoyer, DELAI_ENVOI); }
+  function dossierAEnvoyer() { const c = JSON.parse(JSON.stringify(d)); return c; }
+  // La dernière version connue de la base (celle sur laquelle on travaille) : elle sert à fusionner en cas de conflit.
+  const garderBase = (t) => { try { if (t == null) localStorage.removeItem(CLE_BASE); else localStorage.setItem(CLE_BASE, typeof t === 'string' ? t : JSON.stringify(t)); } catch (x) { /* pas de place : la fusion sera moins fine */ } };
+  const lireBase = () => { try { return JSON.parse(localStorage.getItem(CLE_BASE)); } catch (x) { return null; } };
+  function envoyer() {
+    const s = EL.session(); clearTimeout(envoiMinuterie);
+    if (!s || !s.attente || enCours || sessionExpiree) return Promise.resolve();
+    if (enAttente) ecrire();
+    enCours = true; montrerEtat('envoi');
+    const envoye = JSON.stringify(d), dossier = dossierAEnvoyer();
+    return EL.rpc('go_sauvegarde', { p_jeton: s.jeton, p_dossier: dossier, p_resume: R.resume(dossier), p_version_connue: s.version || 0 }).then((r) => {
+      enCours = false;
+      if (r && r.ok) { garderBase(envoye); const encore = JSON.stringify(d) !== envoye; EL.majSession({ version: r.dossier_version, attente: encore }); montrerEtat(encore ? 'attente' : 'ok'); if (encore) planifierEnvoi(); return; }
+      if (r && r.conflit) return conflit(r.dossier, r.dossier_version);
+      if (r && /expiré/.test(r.message || '')) { sessionExpiree = true; montrerEtat('expire'); rendre(); return; }
+      montrerEtat('erreur'); toast(r && r.message ? r.message : 'Ton dossier n’a pas pu être enregistré en ligne.');
+    }, (x) => { enCours = false; montrerEtat(x.reseau ? 'horsligne' : 'erreur'); });
+  }
+  function envoiFermeture() {
+    const s = EL.session(); if (!s || !s.attente || enCours || sessionExpiree) return;
+    EL.rpcFermeture('go_sauvegarde', { p_jeton: s.jeton, p_dossier: d, p_resume: R.resume(d), p_version_connue: s.version || 0 });
+  }
+  // La base a une version plus récente : on fusionne (ce qui n'a changé que d'un côté est gardé), puis on renvoie.
+  // Un même texte changé des deux côtés prend la version de la base ; celui de l'appareil est gardé à part.
+  function conflit(distant, version) {
+    if (!A.dossierValide(distant)) { montrerEtat('erreur'); return; }
+    const connu = lireBase(), f = connu ? R.fusionner(connu, d, distant) : { resultat: distant, conflit: true };
+    const fusion = A.dossierValide(f.resultat) ? f.resultat : distant;
+    // ce qui avait été écrit ici (absent de la version connue) et qui n'est pas dans la fusion
+    const connus = new Set(R.textesAbsents(connu || {}, {}).map((x) => x[1])), absents = R.textesAbsents(d, fusion).filter((x) => !connus.has(x[1]));
+    if (absents.length) { try { localStorage.setItem(CLE_APART, JSON.stringify({ le: new Date().toISOString(), textes: absents.slice(0, 300) })); } catch (x) { /* pas de place */ } }
+    adopter(distant, version, fusion, absents.length > 0);
+    if (absents.length) toast('Ton dossier a été mis à jour. Ce que tu venais d’écrire est gardé à part.', '#/a-part', 'Relire');
+  }
+  function adopter(distant, version, fusion, forcer) {
+    const prenom = d.profil.prenom, s = EL.session();
+    d = Object.assign(dossierNeuf(), JSON.parse(JSON.stringify(fusion || distant))); d.profil = Object.assign({}, d.profil, { vu: true, prenom: (s && s.pseudo) || prenom });
+    garderBase(distant); ecrire(true);
+    const encore = !!fusion && JSON.stringify(fusion) !== JSON.stringify(distant);
+    EL.majSession({ version: version, attente: encore }); montrerEtat(encore ? 'attente' : 'ok'); if (encore) planifierEnvoi();
+    if (!appliquerRetours()) { if (forcer) rendre(); else rendreSiLibre(); }
+  }
+  // On ne refait pas la page sous les doigts de l'élève : on attend qu'il ou elle quitte le champ.
+  let aRefaire = false;
+  function rendreSiLibre() {
+    const f = document.activeElement;
+    if (f && $('#vue').contains(f) && /^(INPUT|TEXTAREA|SELECT)$/.test(f.tagName)) { aRefaire = true; return; }
+    if ($('#dialogue').open) { aRefaire = true; return; }
+    aRefaire = false; rendre();
+  }
+  document.addEventListener('focusout', () => { if (aRefaire) setTimeout(() => { const f = document.activeElement; if (aRefaire && !(f && /^(INPUT|TEXTAREA|SELECT)$/.test(f.tagName))) rendreSiLibre(); }, 50); });
+  // Les retours : à l'ouverture, puis toutes les 20 secondes quand la page est visible (jamais de temps réel).
+  function interroger() {
+    const s = EL.session(); if (!s || sessionExpiree || document.visibilityState === 'hidden') return Promise.resolve();
+    return EL.rpc('go_retours', { p_jeton: s.jeton, p_version_connue: s.retoursVersion == null ? -1 : s.retoursVersion }).then((r) => {
+      if (!r || !r.ok) { if (r && /expiré/.test(r.message || '')) { sessionExpiree = true; montrerEtat('expire'); rendre(); } return; }
+      if (etat === 'horsligne') montrerEtat(EL.session().attente ? 'attente' : 'ok');
+      if (r.change) { retoursProf = R.nettoyer(r.retours); EL.garderRetours(retoursProf); EL.majSession({ retoursVersion: r.retours_version }); if (!appliquerRetours()) rendreSiLibre(); }
+      const s2 = EL.session();
+      if (s2.attente) return envoyer();
+      if (r.dossier_version > (s2.version || 0) && !enCours) return reprendre();
+    }, (x) => { if (x.reseau) montrerEtat('horsligne'); });
+  }
+  function reprendre() {
+    const s = EL.session(); if (!s) return Promise.resolve();
+    return EL.rpc('go_reprise', { p_jeton: s.jeton }).then((r) => {
+      if (!r || !r.ok) { if (r && r.message) { sessionExpiree = true; montrerEtat('expire'); rendre(); } return; }
+      sessionExpiree = false;
+      EL.majSession({ pseudo: r.pseudo, code: r.code_affiche, classe: r.classe, enseignant: r.enseignant, retoursVersion: r.retours_version });
+      retoursProf = R.nettoyer(r.retours); EL.garderRetours(retoursProf);
+      const s2 = EL.session();
+      if (s2.attente) { appliquerRetours(); rendreSiLibre(); return envoyer(); }
+      if (r.dossier && r.dossier_version !== (s2.version || 0)) return adopter(r.dossier, r.dossier_version);
+      if (!r.dossier && (s2.version || 0) === 0) { EL.majSession({ attente: true }); return envoyer(); }
+      montrerEtat('ok'); if (!appliquerRetours()) rendreSiLibre();
+    }, (x) => { if (x.reseau) montrerEtat('horsligne'); });
+  }
+  // Ce que les retours changent dans le dossier, une seule fois chacun : le mot demandé est créé, la question validée.
+  function appliquerRetours() {
+    const su = d.suivi = d.suivi || {}; su.def = su.def || {}; su.faits = su.faits || {}; let change = false;
+    const norm = (t) => String(t || '').toLowerCase().normalize('NFD').replace(/\p{M}/gu, '').trim();
+    retoursProf.items.forEach((x) => {
+      if (x.type === 'definir' && !su.def[x.id]) {
+        let m = d.mots.find((y) => norm(y.mot) === norm(x.mot));
+        if (!m) { m = { id: uid(), mot: x.mot, defSource: '', sourceTexte: '', defMoi: '', analogie: '' }; d.mots.push(m); }
+        su.def[x.id] = m.id; change = true;
+      }
+      if (x.type === 'validation' && !su.faits[x.id]) {
+        const q = laQuestion(x.qid);
+        if (q) q.statut = x.etat === 'validee' ? 'validee' : (q.statut === 'validee' ? 'proposee' : q.statut);
+        su.faits[x.id] = 1; change = true;
+      }
+    });
+    if (change) { enregistrer(true); rendreSiLibre(); }
+    return change;
+  }
+  const nonLus = () => retoursProf.items.filter((x) => !((d.suivi || {}).lus || {})[x.id]);
+  const motsDemandes = () => new Set(Object.values((d.suivi || {}).def || {}));
+  window.addEventListener('online', () => { envoyer().then(interroger); });
+  setInterval(() => { if (EL.session()) { if (etat === 'horsligne' || etat === 'erreur') envoyer(); interroger(); } }, DELAI_RETOURS);
 
   function nouvelleQuestion(titre, idees) {
     const q = { id: uid(), titre: titre || '', statut: 'brouillon', echange: [], parties: [
@@ -74,6 +191,12 @@
   const conseils = (liste) => liste.length ? '<ul class="conseils">' + liste.map((c) => '<li class="' + (c.niveau || 'info') + '">' + e(c.texte || c) + '</li>').join('') + '</ul>' : '';
   const aide = (texte) => '<details class="aide"><summary aria-label="Aide">?</summary><p>' + texte + '</p></details>';
   const exemple = '<a class="lien-exemple" href="#/aide/exemple">Voir un exemple</a>';
+  // Un retour de l'enseignant·e : tout texte venu de la base est échappé ; la mention de l'IA quand le retour la porte.
+  const mentionIA = (x) => x.ia ? '<span class="mention-ia">Préparé avec l’aide d’une IA, relu par ton prof</span>' : '';
+  const nouveauRetour = (x) => ((d.suivi || {}).lus || {})[x.id] ? '' : '<span class="nouveau">Nouveau</span>';
+  const unRetour = (x) => `<div class="retour-prof"><p><b>Ton prof</b> ${nouveauRetour(x)}</p><p>${e(x.texte)}</p>${mentionIA(x)}</div>`;
+  const retoursSur = (type, id) => R.pour(retoursProf, type, id).map(unRetour).join('');
+  const enLigne = () => !!EL.session();
 
   // ---------- Les vues ----------
   const vues = {};
@@ -87,11 +210,48 @@
         <li><b>Construis</b> ton plan point par point, avec tes mots et tes sources.</li>
         <li><b>Prépare</b> l’échange avec le jury et tes oraux blancs.</li>
       </ol>
+    </section>
+    ${blocRejoindre()}
+    <section class="carte"><h2>Essayer sans compte</h2>
       <label>Ton prénom (ou un pseudo), jamais ton nom de famille
         <input type="text" id="prenom" maxlength="24" autocomplete="given-name" placeholder="Ton prénom"></label>
-      <p class="note">Pour le moment, ton dossier est gardé <b>sur cet appareil seulement</b>, dans ce navigateur. Reviens toujours avec le même appareil, et télécharge ton dossier de temps en temps (« Plus », puis « Réglages »).</p>
+      <p class="note">Sans compte, ton dossier reste <b>sur cet appareil seulement</b>, dans ce navigateur. Tu pourras rejoindre ta classe plus tard : ton dossier te suivra.</p>
       <button class="principal" data-a="demarrer">C’est parti</button>
     </section>`;
+  function blocRejoindre() {
+    return `<section class="carte rejoindre"><h2>Rejoindre ma classe</h2>
+      <p>Ton prof t’a donné un lien ou un code de classe (4 lettres) : ton dossier sera gardé en ligne, et tu le retrouveras sur ton téléphone comme au lycée.</p>
+      <div class="ligne-champ"><input type="text" id="code-classe" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Code de classe" aria-label="Code de classe"><button data-a="aller-classe">Rejoindre</button></div>
+      <p><a class="bouton" href="#/entrer">J’ai déjà un code</a></p></section>`;
+  }
+  const dossierRempli = () => !!(d.questions.length || d.pistes.length || d.mots.length || d.sources.length || Object.keys(d.decouverte.reactions).length || d.quiz.fait);
+
+  vues.classe = (code) => {
+    const s = EL.session();
+    if (s) return `<h1>Rejoindre une classe</h1><section class="carte"><p>Tu es déjà inscrit·e sur cet appareil : <b>${e(s.pseudo)}</b>, dans la classe ${e(s.classe)}.</p>
+      <p>Ce n’est pas toi ? Quitte d’abord cet appareil dans les <a href="#/reglages">réglages</a>.</p><p><a class="bouton principal" href="#/">Revenir à mon dossier</a></p></section>`;
+    const c = infoClasse;
+    return `<h1>Rejoindre ma classe</h1>
+    <section class="carte" id="zone-classe">${!c || c.code !== code ? '<p>Recherche de la classe…</p>' : c.erreur ? `<p class="erreur">${e(c.erreur)}</p><p><a href="#/">Revenir à l’accueil</a></p>`
+      : `<p class="sur-titre">Classe ${e(c.classe)} · ${e(c.enseignant)}</p>
+      ${c.ouverte ? `<label>Ton prénom et l’initiale de ton nom
+        <input type="text" id="pseudo" maxlength="24" autocomplete="off" placeholder="Par exemple : Inès B." value="${e(d.profil.prenom)}"></label>
+      <p class="note">Jamais ton nom complet. Ton prof te reconnaîtra avec ton prénom et ton initiale.</p>
+      ${dossierRempli() ? '<label class="coche"><input type="checkbox" id="envoyer-local" checked> Envoyer le dossier déjà commencé sur cet appareil</label>' : ''}
+      <button class="principal" data-a="inscription">M’inscrire</button>` : '<p class="erreur">Les inscriptions de cette classe sont fermées : demande à ton prof de les ouvrir.</p>'}`}</section>
+    <p><a href="#/entrer">J’ai déjà un code</a></p>`;
+  };
+  vues.entrer = () => `<h1>J’ai déjà un code</h1>
+    <section class="carte"><label>Ton code (2 mots et 3 chiffres)
+      <input type="text" id="code-eleve" maxlength="40" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Par exemple : MICRO-DECOR-123"></label>
+      <p class="note">Majuscules ou minuscules, avec ou sans tirets : peu importe. Tu l’as perdu ? Ton prof le retrouve.</p>
+      ${!EL.session() && dossierRempli() ? '<label class="coche"><input type="checkbox" id="envoyer-local" checked> Si mon compte est encore vide, y envoyer le dossier commencé sur cet appareil</label>' : ''}
+      <button class="principal" data-a="connexion">Entrer</button></section>
+    ${d.profil.vu ? '' : '<p><a href="#/">Revenir à l’accueil</a></p>'}`;
+  vues.tonCode = () => { const s = EL.session(); if (!s) return vues.entrer(); return `<h1>Ton code</h1>
+    <section class="carte action"><p class="sur-titre">Note-le maintenant</p><p class="code-eleve">${e(s.code)}</p>
+      <p>Avec ce code, tu retrouves ton dossier depuis n’importe quel appareil : ton téléphone, l’ordinateur du lycée, celui de chez toi. Note-le dans ton agenda ou ton carnet. Si tu le perds, ton prof le retrouve.</p>
+      <p><a class="bouton principal" href="#/">Je l’ai noté</a></p></section>`; };
 
   vues.accueil = () => {
     const pa = A.prochaineAction(d), ph = A.phase(d);
@@ -103,8 +263,13 @@
     const debut = [['Découvrir 10 cartes', Object.keys(d.decouverte.reactions).length >= 10, '#/explorer/decouvrir'], ['Dire ce que j’aime', d.quiz.fait, '#/explorer/quiz'], ['Garder une piste', d.pistes.length > 0 || d.questions.length > 0, '#/explorer/sujets'],
       ['Choisir ma question', d.questions.length > 0, '#/explorer/pistes'], ['Écrire 5 points', nPoints >= 5, '#/questions'],
       ['Définir 3 mots', d.mots.filter(A.motComplet).length >= 3, '#/mots'], ['Ajouter 2 sources', d.sources.length >= 2, '#/sources']];
+    const s = EL.session(), n = s ? nonLus().length : 0;
     return `
     <h1>Salut${d.profil.prenom ? ' ' + e(d.profil.prenom) : ''} !</h1>
+    ${s ? `<p class="compte">Classe ${e(s.classe)} · ${e(s.enseignant)} · <a href="#/reglages">Ce n’est pas toi ?</a></p>` : ''}
+    ${s && sessionExpiree ? '<section class="carte alerte"><p>Ta session a expiré sur cet appareil : ton travail reste ici, et part dès que tu entres de nouveau ton code.</p><p><a class="bouton principal" href="#/entrer">Entrer mon code</a></p></section>' : ''}
+    ${n ? `<a class="carte lien-carte nouveautes" href="#/retours"><span class="pastille">${n}</span> ${n > 1 ? 'nouveautés' : 'nouveauté'} de ton prof</a>` : ''}
+    ${localStorage.getItem(CLE_APART) ? '<p class="note"><a href="#/a-part">Relire ma saisie mise de côté</a></p>' : ''}
     <section class="carte action">
       <p class="sur-titre">Ta prochaine étape · ${e(pa.duree)}</p>
       <p class="gros">${e(pa.texte)}</p>
@@ -121,6 +286,7 @@
       <a href="#/sources"><b>${d.sources.length}</b> ${d.sources.length > 1 ? 'sources' : 'source'}</a>
       <a href="#/hauts-faits"><b>${nHf}</b> ${nHf > 1 ? 'hauts faits' : 'haut fait'}</a>
     </section>
+    ${s ? (retoursProf.items.length ? '<p class="bas"><a href="#/retours">Tous les retours de ton prof</a></p>' : '') : `<section class="carte invitation"><h2>Retrouve ton dossier partout</h2><p>Pour le moment, ton dossier reste sur cet appareil. Rejoins ta classe avec le lien ou le code de ton prof : ton dossier te suit, et ton prof peut te faire des retours.</p><p><a class="bouton" href="#/rejoindre">Rejoindre ma classe</a></p></section>`}
     ${debut.every((x) => x[1]) ? '' : `<section class="carte"><h2>Par où commencer</h2><ul class="coches">${debut.map((x) => `<li class="${x[1] ? 'fait' : ''}"><a href="${x[2]}">${e(x[0])}</a></li>`).join('')}</ul></section>`}`;
   };
 
@@ -200,6 +366,7 @@
       <ul class="simples">${(p.candidates || []).map((t, i) => `<li>${champ('piste.' + p.id + '.candidates.' + i, t, 'aria-label="Question possible"')}
         <button data-a="choisir" data-p="${p.id}" data-i="${i}">Choisir</button><button class="croix" data-a="suppr-liste" data-p="${p.id}" data-l="candidates" data-i="${i}" aria-label="Supprimer la question">✕</button></li>`).join('')}</ul>
       <button class="discret" data-a="plus-liste" data-p="${p.id}" data-l="candidates">+ Une question possible</button>
+      ${retoursSur('piste', p.id)}
       <p class="bas"><button class="discret danger" data-a="suppr-piste" data-p="${p.id}">Supprimer cette piste</button></p>
     </section>`).join('')}`;
 
@@ -227,7 +394,7 @@
         <span class="pousse"></span>
         <button class="mini" data-a="monter" data-q="${q.id}" data-p="${p.id}" aria-label="Monter le point">↑</button>
         <button class="mini" data-a="descendre" data-q="${q.id}" data-p="${p.id}" aria-label="Descendre le point">↓</button>
-        <button class="mini croix" data-a="suppr-pt" data-q="${q.id}" data-p="${p.id}" aria-label="Supprimer le point">✕</button></div></div></li>`;
+        <button class="mini croix" data-a="suppr-pt" data-q="${q.id}" data-p="${p.id}" aria-label="Supprimer le point">✕</button></div>${retoursSur('point', p.id)}</div></li>`;
   }
   vues.question = (id, sous) => {
     const q = laQuestion(id); if (!q) return vues.questions();
@@ -235,8 +402,10 @@
       ${zoneTexte('q.' + q.id + '.titre', q.titre, 'class="titre-question" placeholder="Ma question" aria-label="Ma question"')}
       <div class="statut"><span class="badge ${q.statut}">${STATUTS[q.statut]}</span>
         ${q.statut === 'brouillon' ? `<button class="mini" data-a="statut" data-q="${q.id}" data-s="proposee">Je la propose à mon prof</button>` : ''}
-        ${q.statut === 'proposee' ? `<button class="mini" data-a="statut" data-q="${q.id}" data-s="validee">Mon prof l’a validée</button>` : ''}
-        ${aide('Montre ta question à ton prof en classe. Quand il ou elle est d’accord, indique-le ici.')}</div>
+        ${q.statut === 'proposee' && !enLigne() ? `<button class="mini" data-a="statut" data-q="${q.id}" data-s="validee">Mon prof l’a validée</button>` : ''}
+        ${aide(enLigne() ? 'Propose ta question : ton prof la valide depuis son espace, ou te demande de la retravailler.' : 'Montre ta question à ton prof en classe. Quand il ou elle est d’accord, indique-le ici.')}</div>
+      ${(() => { const v = R.validation(retoursProf, q.id); return v ? `<div class="retour-prof ${v.etat}"><p><b>${v.etat === 'validee' ? 'Ton prof a validé ta question' : 'Ton prof te demande de retravailler ta question'}</b> ${nouveauRetour(v)}</p>${v.texte ? '<p>' + e(v.texte) + '</p>' : ''}${mentionIA(v)}</div>` : ''; })()}
+      ${retoursSur('question', q.id)}
       <nav class="onglets" aria-label="Ma question"><a href="#/question/${q.id}"${sous ? '' : ' aria-current="page"'}>Plan</a>
         <a href="#/question/${q.id}/echange"${sous === 'echange' ? ' aria-current="page"' : ''}>Échange (${(q.echange || []).length})</a></nav>`;
     if (sous === 'echange') {
@@ -244,7 +413,9 @@
       return entete + `<p class="chapo">L’échange dure 10 minutes, autant que l’exposé. Note ici les questions que le jury pourrait poser, et tes idées de réponse.</p>
       ${(q.echange || []).map((x) => `<section class="carte"><div class="tete">${champ('ech.' + q.id + '.' + x.id + '.question', x.question, 'class="titre" aria-label="Question du jury"')}
         <button class="croix" data-a="suppr-ech" data-q="${q.id}" data-e="${x.id}" aria-label="Supprimer la question">✕</button></div>
-        ${zoneTexte('ech.' + q.id + '.' + x.id + '.reponse', x.reponse, 'placeholder="Mes idées de réponse, en quelques mots-clés" aria-label="Ma réponse"')}</section>`).join('')}
+        ${zoneTexte('ech.' + q.id + '.' + x.id + '.reponse', x.reponse, 'placeholder="Mes idées de réponse, en quelques mots-clés" aria-label="Ma réponse"')}${retoursSur('echange', x.id)}</section>`).join('')}
+      ${(() => { const deja = new Set((q.echange || []).map((x) => x.question.trim())); const l = retoursProf.items.filter((x) => x.type === 'question' && (!x.qid || x.qid === q.id) && !deja.has(x.texte.trim()));
+        return l.length ? `<section class="carte"><h2>Proposées par ton prof</h2><ul class="simples">${l.map((x) => `<li><span>${e(x.texte)} ${mentionIA(x)}</span><button data-a="garder-ech" data-q="${q.id}" data-t="${e(x.texte)}">Garder</button></li>`).join('')}</ul></section>` : ''; })()}
       <section class="carte"><input type="text" id="ech-libre" placeholder="Une question que le jury pourrait poser" aria-label="Nouvelle question du jury"><button data-a="plus-ech" data-q="${q.id}">Ajouter</button></section>
       ${prob.length ? `<section class="carte"><h2>Des questions probables</h2><p class="note">Proposées d’après ton plan et tes mots.</p><ul class="simples">${prob.map((t) => `<li><span>${e(t)}</span><button data-a="garder-ech" data-q="${q.id}" data-t="${e(t)}">Garder</button></li>`).join('')}</ul></section>` : ''}`;
     }
@@ -261,20 +432,21 @@
   };
 
   function zoneMot(m) { return conseils(m.mot ? A.coachMot(m) : []); }
-  vues.mots = () => `
+  vues.mots = () => { const demandes = motsDemandes(); return `
     <h1>Mes mots</h1>
     <p class="chapo">Chaque mot important se définit de deux manières : avec une source, puis avec tes mots. ${exemple}</p>
     ${d.mots.length ? '' : '<p class="vide">Aucun mot pour le moment. Commence par le mot le plus important de ton sujet.</p>'}
     ${d.mots.map((m) => `<section class="carte mot-carte">
       <div class="tete">${champ('mots.' + m.id + '.mot', m.mot, 'class="titre" placeholder="Le mot" aria-label="Le mot"')}
         <span class="badge ${A.motComplet(m) ? 'validee' : 'brouillon'}" data-zone="etat-mot" data-m="${m.id}">${A.motComplet(m) ? 'Complet' : 'À compléter'}</span>
+        ${demandes.has(m.id) ? '<span class="badge prof">Demandé par ton prof</span>' : ''}
         <button class="croix" data-a="suppr-mot" data-m="${m.id}" aria-label="Supprimer le mot">✕</button></div>
       <label>Définition d’une source ${zoneTexte('mots.' + m.id + '.defSource', m.defSource, 'placeholder="La définition exacte, recopiée"')}</label>
       <label>D’où vient-elle ? ${champ('mots.' + m.id + '.sourceTexte', m.sourceTexte, 'placeholder="Un dictionnaire, un cours, un site officiel…"')}</label>
       <label>Avec mes mots ${zoneTexte('mots.' + m.id + '.defMoi', m.defMoi, 'placeholder="Comme je l’expliquerais à un·e camarade"')}</label>
       <label>Une image simple, pour le membre du jury non spécialiste ${champ('mots.' + m.id + '.analogie', m.analogie, 'placeholder="C’est comme…"')}</label>
-      <div data-zone="mot" data-m="${m.id}">${zoneMot(m)}</div></section>`).join('')}
-    <button class="ajouter" data-a="plus-mot">+ Ajouter un mot</button>`;
+      <div data-zone="mot" data-m="${m.id}">${zoneMot(m)}</div>${demandes.has(m.id) ? retoursProf.items.filter((x) => x.type === 'definir' && (d.suivi.def || {})[x.id] === m.id && x.texte).map(unRetour).join('') : ''}${retoursSur('mot', m.id)}</section>`).join('')}
+    <button class="ajouter" data-a="plus-mot">+ Ajouter un mot</button>`; };
 
   function zoneSources() { return conseils(A.coachSources(d)); }
   vues.sources = () => `
@@ -288,7 +460,8 @@
       <div class="grille2"><label>Auteur·e ou site ${champ('sources.' + s.id + '.auteur', s.auteur)}</label><label>Date ${champ('sources.' + s.id + '.date', s.date, 'placeholder="2025"')}</label></div>
       <label>Lien <input type="url" inputmode="url" data-f="sources.${s.id}.lien" value="${e(s.lien)}" placeholder="https://…"></label>
       <label>Type <select data-f="sources.${s.id}.type">${options(D.TYPES_SOURCE, s.type)}</select></label>
-      <label>Ce que j’en retiens, avec mes mots ${zoneTexte('sources.' + s.id + '.retiens', s.retiens)}</label></section>`).join('')}
+      <label>Ce que j’en retiens, avec mes mots ${zoneTexte('sources.' + s.id + '.retiens', s.retiens)}</label>${retoursSur('source', s.id)}</section>`).join('')}
+    ${blocRessources(false)}
     <button class="ajouter" data-a="plus-source">+ Ajouter une source</button>`;
 
   vues.oraux = () => `
@@ -303,7 +476,8 @@
       <details${n ? ' open' : ''}><summary>Je m’évalue${n === 5 ? ' · ' + note + ' / 20' : ''}</summary>
       ${D.GRILLE.map((c) => `<fieldset class="critere"><legend>${e(c.titre)}</legend>${c.niveaux.map((t, i) => `<label class="niveau"><input type="radio" name="g-${o.id}-${c.id}" data-grille="${o.id}" data-c="${c.id}" value="${i + 1}"${(o.auto || {})[c.id] === i + 1 ? ' checked' : ''}><span><b>${i + 1}</b> ${e(t)}</span></label>`).join('')}</fieldset>`).join('')}
       </details>
-      <label>Mes deux objectifs pour la prochaine fois ${zoneTexte('oral.' + o.id + '.objectifs', o.objectifs)}</label></section>`; }).join('')}
+      ${blocEvaluation(o, n)}
+      <label>Mes deux objectifs pour la prochaine fois ${zoneTexte('oral.' + o.id + '.objectifs', o.objectifs)}</label>${retoursSur('oral', o.id)}</section>`; }).join('')}
     <button class="ajouter" data-a="plus-oral">+ Ajouter une vidéo ou un entraînement</button>`;
 
   vues.hf = () => {
@@ -314,12 +488,65 @@
         <p>${ok ? e(h.pourquoi) : e(h.cache ? h.indice : h.cond)}</p></div></li>`; }).join('')}</ul>`).join('')}`;
   };
 
+  // L'évaluation de l'enseignant·e se montre après l'auto-évaluation complète : l'élève se juge d'abord, puis compare.
+  function blocEvaluation(o, n) {
+    const ev = R.evaluation(retoursProf, o.id); if (!ev) return '';
+    if (n < 5) return '<p class="note">Ton prof a évalué cet oral : termine ton auto-évaluation pour voir son avis.</p>';
+    const total = Object.values(ev.notes).reduce((a, b) => a + b, 0), complet = Object.keys(ev.notes).length === 5;
+    return `<div class="retour-prof"><p><b>L’évaluation de ton prof</b>${complet ? ' · ' + total + ' / 20' : ''} ${nouveauRetour(ev)}</p>
+      <ul class="comparaison">${D.GRILLE.map((c) => `<li>${e(c.titre)} : toi <b>${(o.auto || {})[c.id] || '–'}</b>, ton prof <b>${ev.notes[c.id] || '–'}</b></li>`).join('')}</ul>
+      ${ev.texte ? '<p>' + e(ev.texte) + '</p>' : ''}${mentionIA(ev)}</div>`;
+  }
+  // Les ressources suggérées : « Ajouter à mes sources » ou « Plus tard ». Le lien ne s'ouvre que s'il est en http(s).
+  function blocRessources(tout) {
+    const etat = (d.suivi || {}).ressources || {};
+    const l = retoursProf.items.filter((x) => x.type === 'ressource' && (tout || etat[x.id] !== 'ajoutee'));
+    if (!l.length) return '';
+    return `<section class="carte"><h2>Proposées par ton prof</h2>${l.map((x) => `<div class="retour-prof"><p><b>${e(x.titre || x.url)}</b> ${nouveauRetour(x)}</p>
+      ${R.lienSur(x.url) ? `<p><a href="${e(x.url)}" target="_blank" rel="noopener noreferrer">${e(x.url)}</a></p>` : ''}${x.texte ? '<p>' + e(x.texte) + '</p>' : ''}
+      ${x.verifier ? '<p class="note">Lien à vérifier avant de t’en servir.</p>' : ''}${mentionIA(x)}
+      ${etat[x.id] === 'ajoutee' ? '<p class="fait-texte">Dans tes sources</p>' : `<p><button data-a="ressource-ajouter" data-r="${x.id}">Ajouter à mes sources</button>${etat[x.id] === 'plus-tard' ? '' : ` <button class="discret" data-a="ressource-plus-tard" data-r="${x.id}">Plus tard</button>`}</p>`}</div>`).join('')}</section>`;
+  }
+  const CIBLE_NOM = { point: 'ton point', mot: 'ton mot', source: 'ta source', piste: 'ta piste', question: 'ta question', echange: 'ta question pour l’échange', oral: 'ton oral' };
+  function ouEst(x) {
+    const c = x.cible || {};
+    if (c.type === 'point') { for (const q of d.questions) { const p = lePoint(q, c.id); if (p) return ['Sur ton point', p.texte, '#/question/' + q.id]; } }
+    if (c.type === 'mot') { const m = d.mots.find((y) => y.id === c.id); if (m) return ['Sur ton mot', m.mot, '#/mots']; }
+    if (c.type === 'source') { const m = d.sources.find((y) => y.id === c.id); if (m) return ['Sur ta source', m.titre, '#/sources']; }
+    if (c.type === 'piste') { const m = d.pistes.find((y) => y.id === c.id); if (m) return ['Sur ta piste', m.titre, '#/explorer/pistes']; }
+    if (c.type === 'question') { const m = laQuestion(c.id); if (m) return ['Sur ta question', m.titre, '#/question/' + m.id]; }
+    if (c.type === 'echange') { for (const q of d.questions) { const m = (q.echange || []).find((y) => y.id === c.id); if (m) return ['Sur ta question pour l’échange', m.question, '#/question/' + q.id + '/echange']; } }
+    if (c.type === 'oral') { const m = d.oraux.find((y) => y.id === c.id); if (m) return ['Sur ton oral', m.nom, '#/oraux']; }
+    if (c.type === 'bilan') return ['Bilan', '', ''];
+    return [c.type ? 'Sur ' + (CIBLE_NOM[c.type] || 'ton dossier') + ' (supprimé depuis)' : '', '', ''];
+  }
+  vues.retours = () => {
+    const l = retoursProf.items.slice().reverse(), lus = (d.suivi || {}).lus || {};
+    const quoi = (x) => {
+      if (x.type === 'commentaire') { const o = ouEst(x); return `<p class="sur-titre">${e(o[0])}</p>${o[1] ? `<p class="cite">« ${e(o[1])} »</p>` : ''}<p>${e(x.texte)}</p>${o[2] ? `<p><a href="${o[2]}">Y aller</a></p>` : ''}`; }
+      if (x.type === 'definir') return `<p class="sur-titre">Un mot à définir</p><p class="gros">${e(x.mot)}</p>${x.texte ? '<p>' + e(x.texte) + '</p>' : ''}<p><a href="#/mots">Ouvrir mes mots</a></p>`;
+      if (x.type === 'ressource') return `<p class="sur-titre">Une ressource</p><p><b>${e(x.titre || x.url)}</b></p>${x.texte ? '<p>' + e(x.texte) + '</p>' : ''}<p><a href="#/sources">Voir dans mes sources</a></p>`;
+      if (x.type === 'question') return `<p class="sur-titre">Une question pour l’échange</p><p>${e(x.texte)}</p>${d.questions.length ? `<p><a href="#/question/${(laQuestion(x.qid) || d.questions[0]).id}/echange">Préparer l’échange</a></p>` : ''}`;
+      if (x.type === 'validation') { const q = laQuestion(x.qid); return `<p class="sur-titre">${x.etat === 'validee' ? 'Question validée' : 'Question à retravailler'}</p>${q ? `<p class="cite">« ${e(q.titre)} »</p>` : ''}${x.texte ? '<p>' + e(x.texte) + '</p>' : ''}`; }
+      if (x.type === 'evaluation') { const o = d.oraux.find((y) => y.id === x.oral); return `<p class="sur-titre">L’évaluation d’un oral</p><p>${e(o ? o.nom : 'Un oral')}</p><p><a href="#/oraux">Comparer avec mon auto-évaluation</a></p>`; }
+      return '';
+    };
+    return `<h1>Les retours de ton prof</h1>
+    ${l.length ? l.map((x) => `<section class="carte retour-carte">${lus[x.id] ? '' : '<span class="nouveau">Nouveau</span>'}${quoi(x)}${mentionIA(x)}</section>`).join('') : '<p class="vide">Pas encore de retour. Ton prof les écrit depuis son espace : ils apparaîtront ici et à côté de ton travail.</p>'}`;
+  };
+  vues.aPart = () => { let a = null; try { a = JSON.parse(localStorage.getItem(CLE_APART)); } catch (x) { /* illisible */ }
+    return `<h1>Ma saisie mise de côté</h1>
+    ${a && Array.isArray(a.textes) && a.textes.length ? `<p class="chapo">Ton dossier a été mis à jour pendant que tu écrivais. Voici ce que tu avais écrit et qui n’y est plus : recopie ce que tu veux garder.</p>
+      <ul class="liste">${a.textes.map((t) => `<li class="carte"><p class="sur-titre">${e(t[0])}</p><p class="cite">${e(t[1])}</p></li>`).join('')}</ul>
+      <p class="bas"><button class="discret" data-a="effacer-a-part">J’ai fini : effacer cette copie</button></p>` : '<p class="vide">Rien n’est mis de côté.</p>'}`; };
+
   vues.plus = () => `<h1>Plus</h1><nav class="menu">
     <a href="#/oraux">Mes oraux<span>Oraux blancs, vidéos, auto-évaluation</span></a>
     <a href="#/hauts-faits">Mes hauts faits<span>${Object.keys(d.hf).length} sur ${A.HAUTS_FAITS.length}</span></a>
     <a href="#/aide">Aide et méthode<span>Comprendre l’épreuve, fiches de méthode</span></a>
     <a href="#/aide/exemple">Voir un exemple<span>Un plan complet sur les biais algorithmiques</span></a>
-    <a href="#/reglages">Réglages<span>Télécharger, importer ou effacer mon dossier</span></a></nav>`;
+    ${enLigne() ? `<a href="#/retours">Les retours de mon prof<span>${retoursProf.items.length} retour${retoursProf.items.length > 1 ? 's' : ''}</span></a>` : ''}
+    <a href="#/reglages">Réglages<span>${enLigne() ? 'Mon code, quitter cet appareil, télécharger mon dossier' : 'Rejoindre ma classe, télécharger, importer ou effacer mon dossier'}</span></a></nav>`;
 
   const fiche = (titre, corps, attr) => `<details class="carte fiche" ${attr || ''}><summary>${titre}</summary>${corps}</details>`;
   vues.aide = () => `<h1>Aide et méthode</h1>
@@ -348,14 +575,19 @@
       <ul class="points lecture">${p.points.map((pt) => `<li class="pt"><div class="corps"><p>${e(pt[1])}</p><span class="etq">${e((D.ETIQUETTES.find((t) => t[0] === pt[0]) || ['', ''])[1])}</span></div></li>`).join('')}</ul></section>`).join('')}
     <h2>Le lexique</h2>${x.mots.map((m) => `<section class="carte"><b>${e(m.mot)}</b><p><span class="note">Source :</span> ${e(m.defSource)}</p><p><span class="note">Avec mes mots :</span> ${e(m.defMoi)}</p><p><span class="note">Image :</span> ${e(m.analogie)}</p></section>`).join('')}`; };
 
-  vues.reglages = () => `<h1>Réglages</h1>
-    <section class="carte"><h2>Mon prénom</h2>${champ('profil.prenom', d.profil.prenom, 'maxlength="24" aria-label="Mon prénom"')}</section>
+  vues.reglages = () => { const s = EL.session(); return `<h1>Réglages</h1>
+    ${s ? `<section class="carte"><h2>Mon compte</h2><p><b>${e(s.pseudo)}</b>, classe ${e(s.classe)} (${e(s.enseignant)}).</p>
+      <p>Mon code : <span class="code-eleve petit" id="mon-code" hidden>${e(s.code)}</span> <button class="mini" data-a="voir-code" aria-controls="mon-code">Voir mon code</button></p>
+      <p class="note">Ton prénom ou ton initiale est faux ? Demande à ton prof de les corriger.</p></section>
+    <section class="carte"><h2>Quitter cet appareil</h2><p>Sur un ordinateur partagé du lycée, quitte l’appareil en partant : la personne suivante ne verra pas ton dossier. Il reste en ligne : tu le retrouves avec ton code.</p>
+      <button data-a="deconnexion">Quitter cet appareil</button></section>`
+    : `<section class="carte"><h2>Mon prénom</h2>${champ('profil.prenom', d.profil.prenom, 'maxlength="24" aria-label="Mon prénom"')}</section>${blocRejoindre()}`}
     <section class="carte"><h2>Mon dossier</h2>
-      <p>Ton dossier est gardé <b>sur cet appareil seulement</b>. Pour le sauvegarder ou le passer sur un autre appareil, télécharge-le, puis importe-le.</p>
+      ${s ? '<p>Ton dossier est gardé en ligne et sur cet appareil. Tu peux aussi en télécharger une copie.</p>' : '<p>Ton dossier est gardé <b>sur cet appareil seulement</b>. Pour le sauvegarder ou le passer sur un autre appareil, télécharge-le, puis importe-le.</p>'}
       <p><button data-a="exporter">Télécharger mon dossier</button> <label class="bouton fichier">Importer un dossier<input type="file" id="import" accept="application/json,.json"></label></p></section>
-    <section class="carte"><h2>Tout effacer</h2><p>Pour effacer ton dossier de cet appareil, écris EFFACER, puis valide. C’est définitif.</p>
-      <input type="text" id="confirmer" aria-label="Écris EFFACER pour confirmer" autocomplete="off"><button class="danger" data-a="effacer">Effacer mon dossier</button></section>
-    <p class="note">Hello GO, version ${window.HG_VERSION}.</p>`;
+    ${s ? '' : `<section class="carte"><h2>Tout effacer</h2><p>Pour effacer ton dossier de cet appareil, écris EFFACER, puis valide. C’est définitif.</p>
+      <input type="text" id="confirmer" aria-label="Écris EFFACER pour confirmer" autocomplete="off"><button class="danger" data-a="effacer">Effacer mon dossier</button></section>`}
+    <p class="note">Hello GO, version ${window.HG_VERSION}.</p>`; };
 
   // ---------- Le routeur ----------
   const NAV = [['#/', 'Accueil', 'M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z'], ['#/explorer/decouvrir', 'Explorer', 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm3.5 6.5-2 5-5 2 2-5z'],
@@ -363,6 +595,9 @@
     ['#/sources', 'Sources', 'M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1'], ['#/plus', 'Plus', 'M5 12h.01M12 12h.01M19 12h.01']];
   function route() {
     const h = (location.hash || '#/').slice(2).split('/');
+    if (h[0] === 'classe') { chercherClasse(h[1]); return ['classe', '', vues.classe(lireCodeClasse(h[1]))]; }
+    if (h[0] === 'entrer') return ['entrer', '', vues.entrer()];
+    if (h[0] === 'rejoindre') return ['rejoindre', '', '<h1>Rejoindre ma classe</h1>' + blocRejoindre()];
     if (!d.profil.vu) return ['bienvenue', '', vues.bienvenue()];
     switch (h[0]) {
       case '': return ['accueil', '#/', vues.accueil()];
@@ -376,8 +611,24 @@
       case 'aide': return ['aide', '#/plus', h[1] === 'exemple' ? vues.exemple() : vues.aide()];
       case 'reglages': return ['reglages', '#/plus', vues.reglages()];
       case 'plus': return ['plus', '#/plus', vues.plus()];
+      case 'ton-code': return ['ton-code', '#/', vues.tonCode()];
+      case 'retours': return ['retours', '#/plus', vues.retours()];
+      case 'a-part': return ['a-part', '#/', vues.aPart()];
       default: return ['accueil', '#/', vues.accueil()];
     }
+  }
+  // Le lien de classe : le nom de la classe et de l'enseignant·e, demandés une fois par code.
+  let infoClasse = null;
+  const lireCodeClasse = (c) => String(c || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 8);
+  function chercherClasse(brut) {
+    const code = lireCodeClasse(brut);
+    if (EL.session() || (infoClasse && infoClasse.code === code)) return;
+    infoClasse = { code: code, attente: true };
+    if (code.length !== 4) { infoClasse = { code: code, erreur: 'Ce code de classe n’existe pas : il a 4 lettres. Vérifie le lien donné par ton prof.' }; return; }
+    EL.rpc('go_classe_par_code', { p_code_classe: code }).then((r) => {
+      infoClasse = r && r.ok ? { code: code, classe: r.classe, enseignant: r.enseignant, ouverte: r.ouverte } : { code: code, erreur: (r && r.message) || 'Ce code de classe n’existe pas.' };
+    }, (x) => { infoClasse = { code: code, erreur: x.reseau ? 'Pas de réseau : reconnecte-toi, puis recharge la page.' : 'La classe n’a pas pu être trouvée. Réessaie dans un moment.' }; })
+      .then(() => { if (location.hash.startsWith('#/classe/')) rendre(); });
   }
   function rendre(garderDefilement) {
     const y = window.scrollY, r = route(), main = $('#vue');
@@ -387,6 +638,9 @@
     main.querySelectorAll('textarea').forEach(ajuster);
     main.querySelectorAll('[data-points]').forEach((ul) => { if (window.Sortable) window.Sortable.create(ul, { group: 'pts', handle: '.grip', animation: 150, onEnd: finGlisser }); });
     if (garderDefilement !== false) window.scrollTo(0, y);
+    montrerEtat(etat);
+    // Les retours affichés sur leur page sont lus (la mention « Nouveau » reste jusqu'à la page suivante).
+    if (r[0] === 'retours' && nonLus().length) { const su = d.suivi = d.suivi || {}; su.lus = su.lus || {}; nonLus().forEach((x) => { su.lus[x.id] = 1; }); enregistrer(true); }
   }
   function ajuster(t) { t.style.height = 'auto'; t.style.height = (t.scrollHeight + 2) + 'px'; }
   // Téléphone tourné, fenêtre réduite : les zones de texte reprennent leur hauteur (sinon la fin d'un point est cachée).
@@ -508,8 +762,61 @@
     exporter() { ecrire(); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(d, null, 1)], { type: 'application/json' }));
       a.download = 'hello-go-' + nomDeFichier(d.profil.prenom || 'dossier') + '-' + new Date().toISOString().slice(0, 10) + '.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); },
     effacer() { if ($('#confirmer').value.trim() !== 'EFFACER') return toast('Écris EFFACER dans la case pour confirmer.'); d = dossierNeuf(); ecrire(); location.hash = '#/'; rendre(false); },
+    'aller-classe'() { const c = lireCodeClasse($('#code-classe').value); if (!c) return toast('Écris le code de classe donné par ton prof.'); location.hash = '#/classe/' + c; },
+    inscription(b) {
+      const pseudo = ($('#pseudo').value || '').trim().replace(/\s+/g, ' '), envoyerLocal = !!($('#envoyer-local') && $('#envoyer-local').checked), c = infoClasse;
+      if (pseudo.length < 2) return toast('Écris ton prénom et l’initiale de ton nom, par exemple « Inès B. ».');
+      const mots = pseudo.split(' ');
+      if (mots.length > 1 && mots[mots.length - 1].replace('.', '').length > 2) return toast('Seulement ton prénom et l’initiale de ton nom, par exemple « Inès B. » : jamais ton nom complet.');
+      b.disabled = true;
+      EL.rpc('go_inscription', { p_code_classe: c.code, p_pseudo: pseudo }).then((r) => {
+        b.disabled = false;
+        if (!r || !r.ok) return toast((r && r.message) || 'L’inscription n’a pas pu se faire.');
+        entrerAvec(r, envoyerLocal, true); location.hash = '#/ton-code';
+      }, (x) => { b.disabled = false; toast(x.reseau ? 'Pas de réseau : reconnecte-toi, puis réessaie.' : 'L’inscription n’a pas pu se faire. Réessaie dans un moment.'); });
+    },
+    connexion(b) {
+      const code = R.lireCode($('#code-eleve').value), envoyerLocal = !!($('#envoyer-local') && $('#envoyer-local').checked);
+      if (code.replace(/-/g, '').length < 6) return toast('Écris ton code : 2 mots et 3 chiffres.');
+      b.disabled = true;
+      EL.rpc('go_connexion', { p_code: code }).then((r) => {
+        b.disabled = false;
+        if (!r || !r.ok) return toast((r && r.message) || 'Ce code n’a pas marché.');
+        const meme = EL.session() && EL.session().code === r.code_affiche;
+        entrerAvec(r, envoyerLocal || meme, meme); location.hash = '#/'; reprendre();
+      }, (x) => { b.disabled = false; toast(x.reseau ? 'Pas de réseau : reconnecte-toi, puis réessaie.' : 'L’entrée n’a pas pu se faire. Réessaie dans un moment.'); });
+    },
+    'voir-code'(b) { const z = $('#mon-code'); z.hidden = !z.hidden; b.textContent = z.hidden ? 'Voir mon code' : 'Cacher mon code'; },
+    deconnexion() {
+      const s = EL.session(); if (!s) return;
+      const fin = () => { EL.fermerSession(); try { localStorage.removeItem(CLE); localStorage.removeItem(CLE_APART); localStorage.removeItem(CLE_BASE); } catch (x) { /* rien */ }
+        d = dossierNeuf(); retoursProf = R.vides(); sessionExpiree = false; etat = ''; location.hash = '#/'; rendre(false); toast('Tu as quitté cet appareil. Ton dossier t’attend en ligne.'); };
+      const partir = () => EL.rpc('go_deconnexion', { p_jeton: s.jeton }).then(fin, fin);
+      if (s.attente || enAttente) {
+        ecrire(); return envoyer().then(() => { const s2 = EL.session(); if (s2 && s2.attente) { if (window.confirm('Ton dernier travail n’est pas encore envoyé (pas de réseau). Si tu quittes cet appareil maintenant, il sera perdu. Quitter quand même ?')) partir(); } else partir(); });
+      }
+      partir();
+    },
+    'ressource-ajouter'(b) { const x = retoursProf.items.find((y) => y.id === b.dataset.r); if (!x) return;
+      d.sources.push({ id: uid(), titre: x.titre || '', auteur: '', lien: R.lienSur(x.url) ? x.url : '', type: '', date: '', retiens: '' });
+      const su = d.suivi = d.suivi || {}; su.ressources = su.ressources || {}; su.ressources[x.id] = 'ajoutee'; enregistrer(true); rendre(); toast('Ajoutée à tes sources : note ce que tu en retiens.'); },
+    'ressource-plus-tard'(b) { const su = d.suivi = d.suivi || {}; su.ressources = su.ressources || {}; su.ressources[b.dataset.r] = 'plus-tard'; enregistrer(true); rendre(); },
+    'effacer-a-part'() { try { localStorage.removeItem(CLE_APART); } catch (x) { /* rien */ } location.hash = '#/'; },
     logo() { const t = Date.now(); touches = t - dernier < 600 ? touches + 1 : 1; dernier = t; if (touches >= 7) { touches = 0; secret(); } },
   };
+  // Après l'inscription ou l'entrée avec un code : la session de cet appareil. Le dossier déjà commencé ici part avec
+  // (s'il est demandé) ; sinon il est remplacé par celui du compte, et ce qui était écrit ici reste lisible à part.
+  function entrerAvec(r, garderLocal, neuf) {
+    const avant = EL.session();
+    EL.ouvrirSession({ jeton: r.jeton, pseudo: r.pseudo, code: r.code_affiche, classe: r.classe, enseignant: r.enseignant,
+      version: avant && avant.code === r.code_affiche ? avant.version : 0, attente: !!(garderLocal && dossierRempli()) || !!(avant && avant.code === r.code_affiche && avant.attente), retoursVersion: null });
+    if (!garderLocal && dossierRempli() && !(avant && avant.code !== r.code_affiche)) { const t = R.textesAbsents(d, {}); if (t.length) try { localStorage.setItem(CLE_APART, JSON.stringify({ le: new Date().toISOString(), textes: t.slice(0, 300) })); } catch (x) { /* rien */ } }
+    if (!garderLocal) d = dossierNeuf();
+    if (neuf || !d.profil.prenom) d.profil.prenom = r.pseudo;
+    d.profil.vu = true; sessionExpiree = false; retoursProf = R.vides(); EL.garderRetours(null);
+    if (!(avant && avant.code === r.code_affiche)) garderBase(null);
+    ecrire(true); if (EL.session().attente) envoyer();
+  }
   function bouger(b, sens) {
     const q = laQuestion(b.dataset.q);
     for (let i = 0; i < q.parties.length; i++) { const l = q.parties[i].points, j = l.findIndex((x) => x.id === b.dataset.p); if (j < 0) continue;
@@ -598,6 +905,7 @@
   // Un jour de travail de plus (sans jamais rien retirer : pas de série à tenir).
   (function () { const jour = Math.floor(Date.now() / 864e5); if (d.vus.jour !== jour) { d.vus.jour = jour; d.compteurs.jours = (d.compteurs.jours || 0) + 1; } })();
   A.majHautsFaits(d); rendre(false);
+  if (EL.session()) { if (EL.session().attente) montrerEtat('attente'); reprendre().then(interroger); }
   if (!memoireOk) toast('Ce navigateur ne garde pas ton dossier.');
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 })();

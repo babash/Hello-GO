@@ -308,6 +308,7 @@
     const criteres = D.GRILLE.map(function (c) { return c.id; });
     const grille = function (a) { return objet(a) && Object.keys(a).every(function (k) { return criteres.indexOf(k) >= 0 && [1, 2, 3, 4].indexOf(a[k]) >= 0; }); };
     const oral = function (o) { return objet(o) && id(o.id) && textes(o, ['nom', 'date', 'objectifs']) && sinon(o.video, oui) && sinon(o.auto, grille); };
+    const cles = function (o) { return objet(o) && Object.keys(o).every(id); };
     const valeurs = function (o, f) { return objet(o) && Object.keys(o).every(function (k) { return f(o[k]); }); };
     const reponses = function (r) { return valeurs(r, function (v) { return typeof v === 'string' || liste(v, function (x) { return typeof x === 'string'; }); }); };
     const reactions = function (r) { return objet(r) && Object.keys(r).every(function (k) { return /^[0-9]{1,3}$/.test(k) && (r[k] === 1 || r[k] === -1); }); };
@@ -319,7 +320,12 @@
       && sinon(n.sources, function (l) { return liste(l, source); }) && sinon(n.oraux, function (l) { return liste(l, oral); })
       && sinon(n.decouverte, function (o) { return objet(o) && reactions(o.reactions); })
       && sinon(n.hf, function (o) { return valeurs(o, function (v) { return typeof v === 'string'; }); })
-      && sinon(n.compteurs, function (o) { return valeurs(o, entier); }) && sinon(n.vus, function (o) { return valeurs(o, entier); });
+      && sinon(n.compteurs, function (o) { return valeurs(o, entier); }) && sinon(n.vus, function (o) { return valeurs(o, entier); })
+      // Ce que l'élève a fait des retours de son enseignant·e (version en ligne) : lus, mots créés, ressources gardées.
+      && sinon(n.suivi, function (o) { return objet(o) && Object.keys(o).every(function (k) { return ['lus', 'faits', 'def', 'ressources'].indexOf(k) >= 0; })
+        && sinon(o.lus, function (x) { return cles(x) && valeurs(x, entier); }) && sinon(o.faits, function (x) { return cles(x) && valeurs(x, entier); })
+        && sinon(o.def, function (x) { return cles(x) && valeurs(x, id); })
+        && sinon(o.ressources, function (x) { return cles(x) && valeurs(x, function (v) { return v === 'ajoutee' || v === 'plus-tard'; }); }); });
   }
 
   const api = { choixDe, profil, gouts, prochaineCarte, surprises, CARTES, coach, coachMot, motComplet, coachSources, suggestions, questionsProbables, phase, prochaineAction, HAUTS_FAITS, majHautsFaits,

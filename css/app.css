@@ -164,3 +164,24 @@ dialog::backdrop { background: rgba(0, 0, 0, .55); } dialog h2 { margin-top: 0; 
 .decouverte h2 { font-size: 1.35rem; } .decouverte h2 .note { font-family: var(--texte); font-weight: 400; }
 .question-carte { background: var(--accent-fond); border-radius: 10px; padding: 10px 12px; font-weight: 700; }
 .deux { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0 6px; } .deux button { min-height: 52px; }
+
+/* Version en ligne (1.3.0) : l'état d'enregistrement, les retours de l'enseignant·e, le code de l'élève. */
+.etat-sync { margin-left: auto; font-size: .78rem; color: var(--doux); white-space: nowrap; }
+.etat-sync.horsligne, .etat-sync.expire, .etat-sync.erreur { color: var(--alerte); font-weight: 700; }
+.compte { color: var(--doux); font-size: .88rem; margin-top: -.4rem; }
+.ligne-champ { display: flex; gap: 8px; flex-wrap: wrap; } .ligne-champ input { flex: 1 1 10rem; width: auto; }
+.carte.alerte { background: var(--alerte-fond); border-color: transparent; }
+.erreur { color: var(--danger); font-weight: 700; }
+.code-eleve { font-family: var(--titre); font-size: 1.7rem; font-weight: 700; letter-spacing: .04em; color: var(--encre); margin: .4rem 0; overflow-wrap: anywhere; }
+.code-eleve.petit { font-size: 1.05rem; }
+.retour-prof { border-left: 4px solid var(--mot); background: var(--mot-fond); border-radius: 8px; padding: 8px 10px; margin: 8px 0; }
+.retour-prof p { margin: .2rem 0; } .retour-prof.validee { border-left-color: var(--ok); background: var(--ok-fond); } .retour-prof.retravailler { border-left-color: var(--alerte); background: var(--alerte-fond); }
+.mention-ia { display: block; font-size: .78rem; color: var(--doux); font-style: italic; }
+.nouveau { display: inline-block; font-size: .72rem; font-weight: 700; padding: 1px 8px; border-radius: 999px; background: var(--fort); color: var(--sur-fort); vertical-align: middle; }
+.nouveautes { display: flex; align-items: center; gap: 10px; font-weight: 700; }
+.pastille { display: inline-flex; min-width: 2rem; height: 2rem; align-items: center; justify-content: center; border-radius: 999px; background: var(--fort); color: var(--sur-fort); font-weight: 700; padding: 0 6px; }
+.badge.prof { background: var(--mot-fond); color: var(--mot); border-color: transparent; }
+.cite { border-left: 3px solid var(--trait); padding-left: 8px; color: var(--encre); white-space: pre-wrap; }
+.comparaison { padding-left: 1.1rem; margin: .3rem 0; }
+.retour-carte .nouveau { float: right; }
+@media print { .nav, .haut, .pied, #toasts, .etat-sync { display: none !important; } body { padding: 0; } }
