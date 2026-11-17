@@ -1,19 +1,27 @@
-/* Hello GO : feuille de style. Ambiance « réseau la nuit » du site Ressources NSI et SNT, en clair et en obscur. */
+/* Hello GO : feuille de style. Sa propre identité (version 1.7.0) : la nuit du réseau, des ondes de parole, une touche
+   chaude pour ce qui se gagne et ce qui se révèle ; en clair et en obscur. L'espace de l'enseignant·e reste sobre et dense. */
 :root {
-  --fond: #EDF1F7; --carte: #FFFFFF; --carte2: #F3F6FB; --encre: #0D1530; --doux: #46536E; --trait: #C3CDDF;
-  --accent: #0A6B85; --accent-fond: #DDF3F8; --fort: #0D1530; --sur-fort: #FFFFFF;
+  --fond: #F1F3FA; --carte: #FFFFFF; --carte2: #F2F5FB; --encre: #0D1530; --doux: #46536E; --trait: #CDD5E6; --trait-fort: #7B88A6;
+  --accent: #0A6B85; --accent-fond: #DDF3F8; --fort: #0B5E75; --sur-fort: #FFFFFF;
+  --vif: #B2381B; --vif-fond: #FFE9E0;
   --ok: #17603A; --ok-fond: #DFF3E7; --alerte: #8A4B00; --alerte-fond: #FFF1D6; --danger: #A8123A;
   --mot: #4A3AA8; --mot-fond: #ECE9FB; --src: #0C5F4C; --src-fond: #DDF3EC;
+  --ombre: 0 1px 2px rgba(13, 21, 48, .06), 0 6px 18px rgba(13, 21, 48, .07);
+  --ombre-forte: 0 2px 4px rgba(13, 21, 48, .08), 0 14px 32px rgba(13, 21, 48, .12);
+  --rayon: 18px;
   --titre: "Chakra Petch", "Bahnschrift", "Arial Narrow", system-ui, sans-serif;
   --texte: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --fond: #060A13; --carte: #0B1222; --carte2: #111B31; --encre: #E3EDFF; --doux: #9CABC8; --trait: #26355A;
+    --fond: #060A13; --carte: #0B1222; --carte2: #111B31; --encre: #E3EDFF; --doux: #9CABC8; --trait: #2A3A60; --trait-fort: #61739C;
     --accent: #5EEAFF; --accent-fond: #0C2A3A; --fort: #5EEAFF; --sur-fort: #04121C;
+    --vif: #FFA285; --vif-fond: #3A1A12;
     --ok: #7BE0A6; --ok-fond: #0D2A1C; --alerte: #FFC56B; --alerte-fond: #33240A; --danger: #FF8FA8;
     --mot: #C3B8FF; --mot-fond: #211A4A; --src: #7FE3C6; --src-fond: #0B2A24;
+    --ombre: 0 1px 2px rgba(0, 0, 0, .4), 0 6px 18px rgba(0, 0, 0, .35);
+    --ombre-forte: 0 0 0 1px rgba(94, 234, 255, .18), 0 14px 32px rgba(0, 0, 0, .5);
     color-scheme: dark;
   }
 }
@@ -258,3 +266,176 @@ dialog::backdrop { background: rgba(0, 0, 0, .55); } dialog h2 { margin-top: 0; 
 .pourquoi summary { cursor: pointer; font-weight: 700; color: var(--accent); min-height: 44px; display: flex; align-items: center; }
 .conseil h3 { margin-top: 0; }
 .accroches li > div, .chaines li > div { flex: 1; min-width: 0; }
+
+/* ========== Version 1.7.0 : une identité plus affirmée, un début de parcours plus vivant ========== */
+.lecteur { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.picto { width: 1.25em; height: 1.25em; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; vertical-align: -.25em; }
+body:not(.espace-prof) { background:
+  radial-gradient(60rem 26rem at 110% -6rem, color-mix(in srgb, var(--accent) 13%, transparent), transparent 70%),
+  radial-gradient(40rem 22rem at -10% -4rem, color-mix(in srgb, var(--vif) 9%, transparent), transparent 70%) no-repeat, var(--fond); }
+h1 { font-size: 1.75rem; letter-spacing: -.01em; }
+.carte { border-radius: var(--rayon); box-shadow: var(--ombre); border-color: color-mix(in srgb, var(--trait) 70%, transparent); }
+.lien-carte { transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease; }
+.lien-carte:hover { transform: translateY(-2px); box-shadow: var(--ombre-forte); }
+button, .bouton { border-radius: 12px; transition: transform .1s ease, background-color .15s ease, border-color .15s ease, box-shadow .15s ease; }
+button:active:not(:disabled), .bouton:active { transform: translateY(1px) scale(.97); }
+.principal { box-shadow: 0 2px 0 color-mix(in srgb, var(--fort) 55%, #000); }
+.principal:hover { border-color: var(--fort); filter: brightness(1.08); }
+.principal:active:not(:disabled) { box-shadow: none; }
+.principal .picto, .bouton .picto { transition: transform .15s ease; } .principal:hover .picto { transform: translateX(3px); }
+.logo b, .logo-grand b { background: linear-gradient(90deg, var(--accent), var(--vif)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+@media (forced-colors: active) { .logo b, .logo-grand b { color: CanvasText; background: none; } }
+.nav a { position: relative; transition: color .15s ease; }
+.nav a[aria-current] svg { transform: translateY(-1px); }
+@media (max-width: 899px) { .nav a[aria-current]::before { content: ""; position: absolute; top: 6px; width: 48px; height: 30px; border-radius: 999px; background: var(--accent-fond); z-index: -1; } .nav a { isolation: isolate; } }
+.onglets a { transition: background-color .15s ease, color .15s ease; } .onglets a:hover { border-color: var(--accent); color: var(--encre); }
+.avance span { transition: width .35s ease; background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 55%, var(--vif))); }
+.vide { display: flex; gap: 8px; align-items: flex-start; background: var(--carte2); border: 1px dashed var(--trait); border-radius: 14px; padding: 12px 14px; }
+.vide .picto { color: var(--vif); margin-top: 2px; }
+
+/* Les contours des commandes (champs, boutons, tuiles) : au moins 3:1 sur leur fond. */
+button, .bouton, input[type=text], input[type=search], input[type=url], input[type=date], select, textarea, .puce span, .onglets a, .point-etape { border-color: var(--trait-fort); }
+.discret, .lien, .principal, .titre-question, .titre-partie, .texte-pt, .ajouter { border-color: transparent; }
+.principal { border-color: var(--fort); } .ajouter { border-color: var(--accent); }
+
+/* L'arrivée : le motif (une bulle de parole et ses ondes), les trois étapes, rejoindre ou essayer. */
+.bienvenue { margin-top: 12px; }
+.heros { display: flex; align-items: center; gap: 14px; margin: 8px 0 4px; }
+.heros h1 { margin: .2rem 0 0; font-size: 1.45rem; }
+.motif { width: 104px; flex: none; overflow: visible; }
+.motif-bulle { fill: var(--accent-fond); stroke: var(--accent); stroke-width: 4; stroke-linejoin: round; }
+.motif-ondes { fill: none; stroke: var(--vif); stroke-width: 5; stroke-linecap: round; animation: ondes 2.4s ease-in-out infinite; }
+.motif-texte { font: 700 34px var(--titre); fill: var(--accent); }
+@keyframes ondes { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
+.tuiles-etapes { list-style: none; padding: 0; display: grid; gap: 10px; margin: 14px 0; }
+.tuiles-etapes li { display: flex; gap: 12px; align-items: flex-start; background: var(--carte); border-radius: var(--rayon); padding: 12px 14px; box-shadow: var(--ombre); margin: 0; animation: monte .45s ease both; animation-delay: calc(var(--i, 0) * 90ms); }
+.tuiles-etapes .picto { width: 40px; height: 40px; padding: 8px; border-radius: 12px; background: var(--accent-fond); color: var(--accent); }
+.tuiles-etapes li:nth-child(2) .picto { background: var(--vif-fond); color: var(--vif); } .tuiles-etapes li:nth-child(3) .picto { background: var(--mot-fond); color: var(--mot); }
+.deux-colonnes { display: grid; gap: 0 14px; }
+@media (min-width: 760px) { .tuiles-etapes { grid-template-columns: repeat(3, 1fr); } .tuiles-etapes li { flex-direction: column; } .deux-colonnes { grid-template-columns: 1fr 1fr; align-items: start; } .heros h1 { font-size: 1.9rem; } .motif { width: 140px; } }
+@keyframes monte { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+/* L'accueil : la prochaine étape et le chemin, « Ta dose du jour », les chiffres. */
+.heros-etape { position: relative; overflow: hidden; border-width: 0; background: linear-gradient(135deg, var(--carte) 55%, color-mix(in srgb, var(--accent-fond) 80%, var(--carte))); box-shadow: var(--ombre-forte); }
+.heros-etape::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 6px; background: linear-gradient(var(--accent), var(--vif)); }
+.heros-etape .gros { font: 700 1.25rem/1.35 var(--titre); }
+.chemin { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--trait); }
+.chemin-titre { display: flex; justify-content: space-between; font-weight: 700; margin: 0; }
+.chemin-etapes { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.5rem), 1fr)); gap: 0 12px; margin-top: 6px; font-size: .92rem; }
+.coches li::before { content: ""; width: 18px; height: 18px; top: 9px; left: 2px; border: 2px solid var(--doux); border-radius: 6px; box-sizing: border-box; }
+.coches li.fait::before { content: ""; background: var(--ok) no-repeat center / 14px; border-color: var(--ok);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); animation: coche .35s ease both; }
+@media (prefers-color-scheme: dark) { .coches li.fait::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%2304121C' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); } }
+@keyframes coche { from { transform: scale(.4); } 70% { transform: scale(1.15); } to { transform: none; } }
+.dose { margin: 18px 0 12px; }
+.dose-tete { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 10px; }
+.dose-tete h2 { margin: 0; }
+.dose-onglets { display: flex; flex-wrap: wrap; gap: 6px; }
+.dose-onglets button { border-radius: 999px; gap: 5px; min-height: 40px; padding: 4px 12px; }
+.dose-onglets button[aria-current] { background: var(--fort); color: var(--sur-fort); border-color: var(--fort); font-weight: 700; }
+.dose-piste { position: relative; display: grid; grid-auto-flow: column; grid-auto-columns: 88%; align-items: start; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 2px 14px; margin: 6px -2px 0; scrollbar-width: thin; overscroll-behavior-x: contain; }
+.dose-diapo { scroll-snap-align: start; min-width: 0; display: flex; }
+.dose-diapo > section { flex: 1; margin: 0; }
+.dose-diapo > .video-accueil { display: flex; flex-direction: column; background: var(--carte); border-radius: var(--rayon); box-shadow: var(--ombre); padding: 0 14px 6px; border: 1px solid color-mix(in srgb, var(--trait) 70%, transparent); }
+.dose-diapo > .video-accueil > .carte { box-shadow: none; border: 0; padding: 0; margin: 4px 0; flex: 1; }
+.dose .savoir { background: var(--accent-fond); }
+.dose .infox-jour { border-width: 2px; }
+@media (min-width: 700px) { .dose-piste { grid-auto-columns: calc(50% - 6px); } }
+.chiffres a { display: flex; flex-direction: column; align-items: center; gap: 2px; background: var(--carte); box-shadow: var(--ombre); border-radius: 16px; transition: transform .15s ease; }
+.chiffres a:hover { transform: translateY(-2px); }
+.chiffres .picto { color: var(--accent); width: 22px; height: 22px; }
+
+/* Découvrir : une pile de cartes, qu'on joue aux boutons, aux flèches ou en glissant. */
+.pile-cartes { position: relative; margin: 14px 0 22px; }
+.pile-cartes::before, .pile-cartes::after { content: ""; position: absolute; inset: 0; border-radius: var(--rayon); background: var(--carte); border: 1px solid var(--trait); }
+.pile-cartes::before { transform: translateY(12px) scale(.94); opacity: .5; } .pile-cartes::after { transform: translateY(6px) scale(.97); opacity: .8; }
+.decouverte, .infox-carte { position: relative; z-index: 1; overflow: hidden; margin: 0; box-shadow: var(--ombre-forte); transition: transform .25s ease; --glisse: 0; }
+.decouverte { border: 0; border-top: 6px solid var(--teinte, var(--accent)); }
+.decouverte.glisse, .infox-carte.glisse { transition: none; }
+.decouverte.entree { animation: entree .35s cubic-bezier(.2, .8, .3, 1.2) both; }
+@keyframes entree { from { opacity: 0; transform: translateY(18px) scale(.96) rotate(-1deg); } to { opacity: 1; transform: none; } }
+.carte-tete { display: flex; align-items: center; gap: 10px; }
+.cat-picto { display: inline-flex; width: 40px; height: 40px; border-radius: 12px; align-items: center; justify-content: center; background: var(--accent-fond); color: var(--accent); flex: none; }
+.cat-picto .picto { width: 24px; height: 24px; }
+.serie { list-style: none; padding: 0; margin: 10px 0 0; display: flex; gap: 4px; }
+.serie li { flex: 1; height: 5px; border-radius: 9px; background: var(--carte2); border: 1px solid var(--trait); }
+.serie li.vu { background: var(--accent); border-color: var(--accent); } .serie li.ici { background: var(--vif); border-color: var(--vif); }
+.decouverte h2 { margin-top: 12px; }
+.question-carte { border-left: 4px solid var(--vif); }
+.deux button .picto { width: 22px; height: 22px; }
+.decouverte .deux.grands button { font-size: 1.05rem; padding: 8px 10px; gap: 6px; line-height: 1.2; }
+.deux.grands [data-v="-1"] .picto, .deux.grands [data-r="0"] .picto { color: var(--danger); }
+.tampon { position: absolute; top: 18px; padding: 4px 12px; border: 3px solid; border-radius: 10px; font: 700 1.1rem var(--titre); text-transform: uppercase; letter-spacing: .04em; background: var(--carte); pointer-events: none; opacity: 0; }
+.tampon-oui { right: 14px; color: var(--ok); transform: rotate(8deg); opacity: clamp(0, var(--glisse), 1); }
+.tampon-non { left: 14px; color: var(--danger); transform: rotate(-8deg); opacity: clamp(0, calc(var(--glisse) * -1), 1); }
+.decouverte[data-cat=cle], .decouverte[data-cat=bouclier] { --teinte: var(--mot); }
+.decouverte[data-cat=ia], .decouverte[data-cat=onde] { --teinte: var(--vif); }
+.decouverte[data-cat=monde], .decouverte[data-cat=reseau], .decouverte[data-cat=libre] { --teinte: var(--src); }
+.collection summary { cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 8px; min-height: 32px; }
+.collection summary .picto { color: var(--vif); }
+.bilan { text-align: center; border-width: 0; box-shadow: var(--ombre-forte); }
+.bilan .boutons { justify-content: center; }
+.compteur { margin: 4px 0 12px; } .compteur b { display: block; font: 700 2.6rem/1 var(--titre); color: var(--vif); animation: pop .5s ease both .15s; }
+@keyframes pop { from { transform: scale(.3); opacity: 0; } 70% { transform: scale(1.15); } to { transform: none; opacity: 1; } }
+
+/* La révélation des sujets, cartes et vidéos proposés : un par un, avec « parce que tu as choisi… » en évidence. */
+.revelation .liste > li, .revelation .surprise { animation: monte .45s ease both; animation-delay: calc(var(--i, 0) * 110ms); }
+.sujet.propose { border-left: 5px solid var(--vif); }
+.parce-que { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0 10px; }
+.raison { display: inline-block; padding: 3px 10px; border-radius: 999px; background: var(--vif-fond); color: var(--vif); font-weight: 700; font-size: .88rem; }
+.pourquoi-video { border-left-color: var(--vif); }
+.surprise { background: var(--vif-fond); } .surprise .sur-titre { color: var(--vif); font-weight: 700; }
+
+/* Mes goûts : une question par écran, la progression, de grandes tuiles. */
+.gouts-tete { margin: 8px 0 4px; }
+.gouts-points { list-style: none; padding: 0; margin: 10px 0 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.point-etape { width: 40px; height: 40px; min-height: 40px; padding: 0; border-radius: 50%; color: var(--doux); background: var(--carte); }
+.point-etape .picto { width: 20px; height: 20px; }
+.point-etape.fait { background: var(--accent-fond); color: var(--accent); border-color: var(--accent); }
+.point-etape[aria-current] { background: var(--fort); color: var(--sur-fort); border-color: var(--fort); transform: scale(1.1); }
+.etape-gouts { animation: monte .3s ease both; }
+.etape-gouts legend { float: left; width: 100%; padding: 0; margin-bottom: 4px; } .etape-gouts legend + * { clear: both; }
+.etape-gouts legend, .etape-gouts h2 { display: flex; gap: 10px; align-items: center; font: 700 1.2rem var(--titre); }
+.picto-titre { width: 34px; height: 34px; padding: 6px; border-radius: 10px; background: var(--vif-fond); color: var(--vif); }
+.etape-gouts h3 { display: flex; gap: 8px; align-items: center; margin-top: 16px; }
+.etape-gouts h3 .picto { color: var(--accent); }
+.gouts-liste .etape-gouts { animation: none; }
+.tuiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.5rem), 1fr)); gap: 8px; }
+.tuiles .puce span { position: relative; width: 100%; height: 100%; min-height: 54px; border-radius: 14px; padding: 10px 30px 10px 12px; line-height: 1.25; gap: 8px; background: var(--carte); border-width: 2px; transition: background-color .15s ease, border-color .15s ease, transform .1s ease; }
+.tuiles .puce span:hover { border-color: var(--accent); }
+.tuiles .puce input:active + span { transform: scale(.97); }
+.tuiles-grandes { grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr)); }
+.tuiles-grandes .puce span { flex-direction: column; align-items: flex-start; min-height: 96px; font-weight: 700; }
+.tuiles-grandes .picto { width: 30px; height: 30px; color: var(--vif); }
+.tuiles .puce input:checked + span .picto { color: inherit; }
+.coche-anim { position: absolute; right: 8px; top: 50%; width: 18px; height: 18px; margin-top: -9px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 24; stroke-dashoffset: 24; opacity: 0; }
+.puce input:checked + span .coche-anim { opacity: 1; animation: trace .3s ease forwards; }
+@keyframes trace { to { stroke-dashoffset: 0; } }
+.gouts-nav { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 12px 0; }
+.gouts-nav [data-a=gouts-liste] { margin-left: auto; }
+
+/* Info ou infox ? : la carte suit le doigt ; « Bien vu ! » s'allume. */
+.infox-carte { border-radius: var(--rayon); }
+.retour-quiz.juste { animation: pop .35s ease both; }
+
+/* Les hauts faits : le message s'ouvre avec un petit éclat. */
+.toast-hf { position: relative; background: linear-gradient(90deg, var(--fort), color-mix(in srgb, var(--fort) 70%, var(--vif))); }
+.toast-hf .picto { width: 22px; height: 22px; animation: pop .5s ease both; }
+.toast-hf::after { content: ""; position: absolute; left: 22px; top: 50%; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; box-shadow: 0 -18px 0 -2px var(--vif), 16px -9px 0 -2px var(--sur-fort), 16px 9px 0 -2px var(--vif), 0 18px 0 -2px var(--sur-fort), -16px 9px 0 -2px var(--vif), -16px -9px 0 -2px var(--sur-fort); animation: eclat .6s ease-out both; pointer-events: none; }
+@keyframes eclat { from { transform: scale(.2); opacity: 1; } to { transform: scale(1.6); opacity: 0; } }
+.hf .gagne { box-shadow: var(--ombre); } .hf .gagne .medaille { color: var(--vif); }
+
+/* L'espace de l'enseignant·e : la même palette, sans décor ni animation, dense. */
+.espace-prof .carte { box-shadow: none; border-radius: 12px; border-color: var(--trait); }
+.espace-prof button, .espace-prof .bouton { border-radius: 10px; }
+.espace-prof .principal { box-shadow: none; }
+
+/* Mouvement réduit : rien ne bouge, tout reste là. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+  button:active:not(:disabled), .bouton:active, .lien-carte:hover, .chiffres a:hover { transform: none; }
+}
+@media print {
+  body:not(.espace-prof) { background: #fff; } .carte, .chiffres a { box-shadow: none; } .motif, .dose-onglets, .tampon, .pile-cartes::before, .pile-cartes::after { display: none; }
+  .dose-piste { display: block; overflow: visible; } .logo b, .logo-grand b { color: #000; background: none; }
+}
