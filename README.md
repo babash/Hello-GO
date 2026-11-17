@@ -37,7 +37,7 @@ Une seule version, **en ligne**, sur téléphone comme sur ordinateur.
 2. **Créez une classe** : vous obtenez son lien et son QR code. Chaque élève s'inscrit avec son prénom et l'initiale de son nom, et reçoit un code de 2 mots et 3 chiffres (comme `MICRO-DECOR-123`) qui suffit pour retrouver son dossier depuis n'importe quel appareil. Aucun plafond du nombre d'élèves.
 3. **Le tableau de la classe** : une ligne par élève (question, points, mots, sources, oraux évalués, dernière visite, nouveau travail depuis votre dernière visite) et tous les codes, masqués par défaut, à révéler ou à imprimer.
 4. **Le dossier d'un·e élève** : son plan, ses mots, ses sources, ses pistes et ses oraux, avec vos outils : commenter un point, un mot, une source, une piste ou une question ; demander une définition ; suggérer une ressource ou une question pour l'échange ; valider une question ou demander de la retravailler ; évaluer un oral blanc ou une vidéo sur la grille ; corriger un texte (rare, sans annonce) ; télécharger son PDF.
-5. **Avec une IA de votre choix** (facultatif) : « Copier pour l'IA » donne le dossier en texte simple, sans prénom ni code, avec des repères stables (`P3` un point, `M1` un mot, `S2` une source, `Q1` une question de l'échange), des consignes au début et le format de réponse à la fin. Collez sa réponse : chaque ligne `@…` devient un brouillon que vous relisez avant de l'envoyer ; l'élève voit « préparé avec l'aide d'une IA, relu par ton prof ».
+5. **Avec une IA de votre choix** (facultatif) : « Copier pour l'IA » donne le dossier en texte simple, sans prénom ni code, avec des repères stables (`P3` un point, `M1` un mot, `S2` une source, `Q1` une question de l'échange), des consignes au début et le format de réponse à la fin. Collez sa réponse : chaque ligne `@…` devient un brouillon que vous relisez avant de l'envoyer ; l'élève voit « préparé avec l'aide d'une IA, relu par ton enseignant·e ».
 
 Sans code ni lien de classe, l'application reste utilisable en **mode découverte** : le dossier reste sur l'appareil, et part dans la base quand l'élève rejoint sa classe.
 
@@ -45,7 +45,7 @@ En fin d'année : exportez votre espace (JSON), puis supprimez vos classes. Rien
 
 ## Où en est le projet
 
-Version 1.3.0 : la version en ligne (élève et enseignant·e), sur la base appliquée le 17/11/2026 (dossier [`supabase/`](supabase/LISEZMOI.md)).
+Version 1.3.1 : la version en ligne (élève et enseignant·e), sur la base appliquée le 17/11/2026 (dossier [`supabase/`](supabase/LISEZMOI.md)) ; depuis la 1.3.1, l'interface dit « ton enseignant·e » partout où elle disait « ton prof ».
 
 À venir : un correcteur de grammaire sans serveur (Grammalecte).
 

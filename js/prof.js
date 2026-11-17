@@ -251,7 +251,7 @@
         <textarea data-brouillon="${i}" rows="2" aria-label="Brouillon ${i + 1}">${e(x.texte)}</textarea><button class="mini discret" data-pa="retirer-brouillon" data-i="${i}">Supprimer</button></div>`).join('')}
       ${ia.inconnues.length ? `<h3>Lignes non reconnues</h3><ul class="simples">${ia.inconnues.map((l) => `<li><code>${e(l)}</code></li>`).join('')}</ul>` : ''}
       ${ia.ignorees ? `<p class="note">${ia.ignorees} ligne${ia.ignorees > 1 ? 's' : ''} sans @ ignorée${ia.ignorees > 1 ? 's' : ''}.</p>` : ''}
-      ${ia.brouillons.length ? `<p class="note">L’élève verra la mention « préparé avec l’aide d’une IA, relu par ton prof ».</p><button class="principal" data-pa="envoyer-ia">Envoyer ${ia.brouillons.length} retour${ia.brouillons.length > 1 ? 's' : ''}</button>` : ''}</section>` : ''}`;
+      ${ia.brouillons.length ? `<p class="note">L’élève verra la mention « préparé avec l’aide d’une IA, relu par ton enseignant·e ».</p><button class="principal" data-pa="envoyer-ia">Envoyer ${ia.brouillons.length} retour${ia.brouillons.length > 1 ? 's' : ''}</button>` : ''}</section>` : ''}`;
   }
 
   // ---------- Les retours : enregistrés sur la version connue ; en cas de conflit, refaits sur la version reçue ----------

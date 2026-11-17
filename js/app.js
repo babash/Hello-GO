@@ -203,9 +203,9 @@
   const aide = (texte) => '<details class="aide"><summary aria-label="Aide">?</summary><p>' + texte + '</p></details>';
   const exemple = '<a class="lien-exemple" href="#/aide/exemple">Voir un exemple</a>';
   // Un retour de l'enseignant·e : tout texte venu de la base est échappé ; la mention de l'IA quand le retour la porte.
-  const mentionIA = (x) => x.ia ? '<span class="mention-ia">Préparé avec l’aide d’une IA, relu par ton prof</span>' : '';
+  const mentionIA = (x) => x.ia ? '<span class="mention-ia">Préparé avec l’aide d’une IA, relu par ton enseignant·e</span>' : '';
   const nouveauRetour = (x) => ((d.suivi || {}).lus || {})[x.id] ? '' : '<span class="nouveau">Nouveau</span>';
-  const unRetour = (x) => `<div class="retour-prof"><p><b>Ton prof</b> ${nouveauRetour(x)}</p><p>${e(x.texte)}</p>${mentionIA(x)}</div>`;
+  const unRetour = (x) => `<div class="retour-prof"><p><b>Ton enseignant·e</b> ${nouveauRetour(x)}</p><p>${e(x.texte)}</p>${mentionIA(x)}</div>`;
   const retoursSur = (type, id) => R.pour(retoursProf, type, id).map(unRetour).join('');
   const enLigne = () => !!EL.session();
 
@@ -231,7 +231,7 @@
     </section>`;
   function blocRejoindre() {
     return `<section class="carte rejoindre"><h2>Rejoindre ma classe</h2>
-      <p>Ton prof t’a donné un lien ou un code de classe (4 lettres) : ton dossier sera gardé en ligne, et tu le retrouveras sur ton téléphone comme au lycée.</p>
+      <p>Ton enseignant·e t’a donné un lien ou un code de classe (4 lettres) : ton dossier sera gardé en ligne, et tu le retrouveras sur ton téléphone comme au lycée.</p>
       <div class="ligne-champ"><input type="text" id="code-classe" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Code de classe" aria-label="Code de classe"><button data-a="aller-classe">Rejoindre</button></div>
       <p><a class="bouton" href="#/entrer">J’ai déjà un code</a></p></section>`;
   }
@@ -247,21 +247,21 @@
       : `<p class="sur-titre">Classe ${e(c.classe)} · ${e(c.enseignant)}</p>
       ${c.ouverte ? `<label>Ton prénom et l’initiale de ton nom
         <input type="text" id="pseudo" maxlength="24" autocomplete="off" placeholder="Par exemple : Inès B." value="${e(d.profil.prenom)}"></label>
-      <p class="note">Jamais ton nom complet. Ton prof te reconnaîtra avec ton prénom et ton initiale.</p>
+      <p class="note">Jamais ton nom complet. Ton enseignant·e te reconnaîtra avec ton prénom et ton initiale.</p>
       ${dossierRempli() ? '<label class="coche"><input type="checkbox" id="envoyer-local" checked> Envoyer le dossier déjà commencé sur cet appareil</label>' : ''}
-      <button class="principal" data-a="inscription">M’inscrire</button>` : '<p class="erreur">Les inscriptions de cette classe sont fermées : demande à ton prof de les ouvrir.</p>'}`}</section>
+      <button class="principal" data-a="inscription">M’inscrire</button>` : '<p class="erreur">Les inscriptions de cette classe sont fermées : demande à ton enseignant·e de les ouvrir.</p>'}`}</section>
     <p><a href="#/entrer">J’ai déjà un code</a></p>`;
   };
   vues.entrer = () => `<h1>J’ai déjà un code</h1>
     <section class="carte"><label>Ton code (2 mots et 3 chiffres)
       <input type="text" id="code-eleve" maxlength="40" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Par exemple : MICRO-DECOR-123"></label>
-      <p class="note">Majuscules ou minuscules, avec ou sans tirets : peu importe. Tu l’as perdu ? Ton prof le retrouve.</p>
+      <p class="note">Majuscules ou minuscules, avec ou sans tirets : peu importe. Tu l’as perdu ? Ton enseignant·e le retrouve.</p>
       ${!EL.session() && dossierRempli() ? '<label class="coche"><input type="checkbox" id="envoyer-local" checked> Si mon compte est encore vide, y envoyer le dossier commencé sur cet appareil</label>' : ''}
       <button class="principal" data-a="connexion">Entrer</button></section>
     ${d.profil.vu ? '' : '<p><a href="#/">Revenir à l’accueil</a></p>'}`;
   vues.tonCode = () => { const s = EL.session(); if (!s) return vues.entrer(); return `<h1>Ton code</h1>
     <section class="carte action"><p class="sur-titre">Note-le maintenant</p><p class="code-eleve">${e(s.code)}</p>
-      <p>Avec ce code, tu retrouves ton dossier depuis n’importe quel appareil : ton téléphone, l’ordinateur du lycée, celui de chez toi. Note-le dans ton agenda ou ton carnet. Si tu le perds, ton prof le retrouve.</p>
+      <p>Avec ce code, tu retrouves ton dossier depuis n’importe quel appareil : ton téléphone, l’ordinateur du lycée, celui de chez toi. Note-le dans ton agenda ou ton carnet. Si tu le perds, ton enseignant·e le retrouve.</p>
       <p><a class="bouton principal" href="#/">Je l’ai noté</a></p></section>`; };
 
   vues.accueil = () => {
@@ -279,7 +279,7 @@
     <h1>Salut${d.profil.prenom ? ' ' + e(d.profil.prenom) : ''} !</h1>
     ${s ? `<p class="compte">Classe ${e(s.classe)} · ${e(s.enseignant)} · <a href="#/reglages">Ce n’est pas toi ?</a></p>` : ''}
     ${s && sessionExpiree ? '<section class="carte alerte"><p>Ta session a expiré sur cet appareil : ton travail reste ici, et part dès que tu entres de nouveau ton code.</p><p><a class="bouton principal" href="#/entrer">Entrer mon code</a></p></section>' : ''}
-    ${n ? `<a class="carte lien-carte nouveautes" href="#/retours"><span class="pastille">${n}</span> ${n > 1 ? 'nouveautés' : 'nouveauté'} de ton prof</a>` : ''}
+    ${n ? `<a class="carte lien-carte nouveautes" href="#/retours"><span class="pastille">${n}</span> ${n > 1 ? 'nouveautés' : 'nouveauté'} de ton enseignant·e</a>` : ''}
     ${localStorage.getItem(CLE_APART) ? '<p class="note"><a href="#/a-part">Relire ma saisie mise de côté</a></p>' : ''}
     <section class="carte action">
       <p class="sur-titre">Ta prochaine étape · ${e(pa.duree)}</p>
@@ -297,7 +297,7 @@
       <a href="#/sources"><b>${d.sources.length}</b> ${d.sources.length > 1 ? 'sources' : 'source'}</a>
       <a href="#/hauts-faits"><b>${nHf}</b> ${nHf > 1 ? 'hauts faits' : 'haut fait'}</a>
     </section>
-    ${s ? (retoursProf.items.length ? '<p class="bas"><a href="#/retours">Tous les retours de ton prof</a></p>' : '') : `<section class="carte invitation"><h2>Retrouve ton dossier partout</h2><p>Pour le moment, ton dossier reste sur cet appareil. Rejoins ta classe avec le lien ou le code de ton prof : ton dossier te suit, et ton prof peut te faire des retours.</p><p><a class="bouton" href="#/rejoindre">Rejoindre ma classe</a></p></section>`}
+    ${s ? (retoursProf.items.length ? '<p class="bas"><a href="#/retours">Tous les retours de ton enseignant·e</a></p>' : '') : `<section class="carte invitation"><h2>Retrouve ton dossier partout</h2><p>Pour le moment, ton dossier reste sur cet appareil. Rejoins ta classe avec le lien ou le code de ton enseignant·e : ton dossier te suit, et ton enseignant·e peut te faire des retours.</p><p><a class="bouton" href="#/rejoindre">Rejoindre ma classe</a></p></section>`}
     ${debut.every((x) => x[1]) ? '' : `<section class="carte"><h2>Par où commencer</h2><ul class="coches">${debut.map((x) => `<li class="${x[1] ? 'fait' : ''}"><a href="${x[2]}">${e(x[0])}</a></li>`).join('')}</ul></section>`}`;
   };
 
@@ -381,7 +381,7 @@
       <p class="bas"><button class="discret danger" data-a="suppr-piste" data-p="${p.id}">Supprimer cette piste</button></p>
     </section>`).join('')}`;
 
-  const STATUTS = { brouillon: 'Brouillon', proposee: 'Proposée à ton prof', validee: 'Validée par ton prof' };
+  const STATUTS = { brouillon: 'Brouillon', proposee: 'Proposée à ton enseignant·e', validee: 'Validée par ton enseignant·e' };
   vues.questions = () => `
     <h1>Mes questions</h1>
     <p class="chapo">Tu peux préparer une ou deux questions qui touchent la NSI. Le jour J, le jury en choisit une.</p>
@@ -412,10 +412,10 @@
     const entete = `<p class="retour"><a href="#/questions">← Mes questions</a></p>
       ${zoneTexte('q.' + q.id + '.titre', q.titre, 'class="titre-question" placeholder="Ma question" aria-label="Ma question"')}
       <div class="statut"><span class="badge ${q.statut}">${STATUTS[q.statut]}</span>
-        ${q.statut === 'brouillon' ? `<button class="mini" data-a="statut" data-q="${q.id}" data-s="proposee">Je la propose à mon prof</button>` : ''}
-        ${q.statut === 'proposee' && !enLigne() ? `<button class="mini" data-a="statut" data-q="${q.id}" data-s="validee">Mon prof l’a validée</button>` : ''}
-        ${aide(enLigne() ? 'Propose ta question : ton prof la valide depuis son espace, ou te demande de la retravailler.' : 'Montre ta question à ton prof en classe. Quand il ou elle est d’accord, indique-le ici.')}</div>
-      ${(() => { const v = R.validation(retoursProf, q.id); return v ? `<div class="retour-prof ${v.etat}"><p><b>${v.etat === 'validee' ? 'Ton prof a validé ta question' : 'Ton prof te demande de retravailler ta question'}</b> ${nouveauRetour(v)}</p>${v.texte ? '<p>' + e(v.texte) + '</p>' : ''}${mentionIA(v)}</div>` : ''; })()}
+        ${q.statut === 'brouillon' ? `<button class="mini" data-a="statut" data-q="${q.id}" data-s="proposee">Je la propose à mon enseignant·e</button>` : ''}
+        ${q.statut === 'proposee' && !enLigne() ? `<button class="mini" data-a="statut" data-q="${q.id}" data-s="validee">Mon enseignant·e l’a validée</button>` : ''}
+        ${aide(enLigne() ? 'Propose ta question : ton enseignant·e la valide depuis son espace, ou te demande de la retravailler.' : 'Montre ta question à ton enseignant·e en classe. Quand il ou elle est d’accord, indique-le ici.')}</div>
+      ${(() => { const v = R.validation(retoursProf, q.id); return v ? `<div class="retour-prof ${v.etat}"><p><b>${v.etat === 'validee' ? 'Ton enseignant·e a validé ta question' : 'Ton enseignant·e te demande de retravailler ta question'}</b> ${nouveauRetour(v)}</p>${v.texte ? '<p>' + e(v.texte) + '</p>' : ''}${mentionIA(v)}</div>` : ''; })()}
       ${retoursSur('question', q.id)}
       <nav class="onglets" aria-label="Ma question"><a href="#/question/${q.id}"${sous ? '' : ' aria-current="page"'}>Plan</a>
         <a href="#/question/${q.id}/echange"${sous === 'echange' ? ' aria-current="page"' : ''}>Échange (${(q.echange || []).length})</a></nav>`;
@@ -426,7 +426,7 @@
         <button class="croix" data-a="suppr-ech" data-q="${q.id}" data-e="${x.id}" aria-label="Supprimer la question">✕</button></div>
         ${zoneTexte('ech.' + q.id + '.' + x.id + '.reponse', x.reponse, 'placeholder="Mes idées de réponse, en quelques mots-clés" aria-label="Ma réponse"')}${retoursSur('echange', x.id)}</section>`).join('')}
       ${(() => { const deja = new Set((q.echange || []).map((x) => x.question.trim())); const l = retoursProf.items.filter((x) => x.type === 'question' && (!x.qid || x.qid === q.id) && !deja.has(x.texte.trim()));
-        return l.length ? `<section class="carte"><h2>Proposées par ton prof</h2><ul class="simples">${l.map((x) => `<li><span>${e(x.texte)} ${mentionIA(x)}</span><button data-a="garder-ech" data-q="${q.id}" data-t="${e(x.texte)}">Garder</button></li>`).join('')}</ul></section>` : ''; })()}
+        return l.length ? `<section class="carte"><h2>Proposées par ton enseignant·e</h2><ul class="simples">${l.map((x) => `<li><span>${e(x.texte)} ${mentionIA(x)}</span><button data-a="garder-ech" data-q="${q.id}" data-t="${e(x.texte)}">Garder</button></li>`).join('')}</ul></section>` : ''; })()}
       <section class="carte"><input type="text" id="ech-libre" placeholder="Une question que le jury pourrait poser" aria-label="Nouvelle question du jury"><button data-a="plus-ech" data-q="${q.id}">Ajouter</button></section>
       ${prob.length ? `<section class="carte"><h2>Des questions probables</h2><p class="note">Proposées d’après ton plan et tes mots.</p><ul class="simples">${prob.map((t) => `<li><span>${e(t)}</span><button data-a="garder-ech" data-q="${q.id}" data-t="${e(t)}">Garder</button></li>`).join('')}</ul></section>` : ''}`;
     }
@@ -451,7 +451,7 @@
       <div class="tete">${champ('mots.' + m.id + '.mot', m.mot, 'class="titre" placeholder="Le mot" aria-label="Le mot"')}
         <span class="badge ${A.motComplet(m) ? 'validee' : 'brouillon'}" data-zone="etat-mot" data-m="${m.id}">${A.motComplet(m) ? 'Complet' : 'À compléter'}</span>
         <button class="croix" data-a="suppr-mot" data-m="${m.id}" aria-label="Supprimer le mot">✕</button></div>
-      ${demandes.has(m.id) ? '<p><span class="badge prof">Demandé par ton prof</span></p>' : ''}
+      ${demandes.has(m.id) ? '<p><span class="badge prof">Demandé par ton enseignant·e</span></p>' : ''}
       <label>Définition d’une source ${zoneTexte('mots.' + m.id + '.defSource', m.defSource, 'placeholder="La définition exacte, recopiée"')}</label>
       <label>D’où vient-elle ? ${champ('mots.' + m.id + '.sourceTexte', m.sourceTexte, 'placeholder="Un dictionnaire, un cours, un site officiel…"')}</label>
       <label>Avec mes mots ${zoneTexte('mots.' + m.id + '.defMoi', m.defMoi, 'placeholder="Comme je l’expliquerais à un·e camarade"')}</label>
@@ -477,7 +477,7 @@
 
   vues.oraux = () => `
     <h1>Mes oraux</h1>
-    <p class="chapo">Après chaque oral blanc ou chaque vidéo, évalue-toi. Ton prof te donne ensuite son évaluation : compare.</p>
+    <p class="chapo">Après chaque oral blanc ou chaque vidéo, évalue-toi. Ton enseignant·e te donne ensuite son évaluation : compare.</p>
     <section class="carte"><h2>S’entraîner comme le jour J</h2><ol class="etapes"><li>Tire au sort une de tes questions.</li><li>20 minutes : refais ton plan <b>sur papier</b>, sans regarder l’écran.</li>
       <li>10 minutes : présente debout, à voix haute, avec un chronomètre.</li><li>Demande à quelqu’un de te poser trois questions.</li></ol></section>
     ${d.oraux.map((o) => { const n = Object.keys(o.auto || {}).length, note = Object.values(o.auto || {}).reduce((a, b) => a + b, 0); return `<section class="carte oral">
@@ -502,10 +502,10 @@
   // L'évaluation de l'enseignant·e se montre après l'auto-évaluation complète : l'élève se juge d'abord, puis compare.
   function blocEvaluation(o, n) {
     const ev = R.evaluation(retoursProf, o.id); if (!ev) return '';
-    if (n < 5) return '<p class="note">Ton prof a évalué cet oral : termine ton auto-évaluation pour voir son avis.</p>';
+    if (n < 5) return '<p class="note">Ton enseignant·e a évalué cet oral : termine ton auto-évaluation pour voir son avis.</p>';
     const total = Object.values(ev.notes).reduce((a, b) => a + b, 0), complet = Object.keys(ev.notes).length === 5;
-    return `<div class="retour-prof"><p><b>L’évaluation de ton prof</b>${complet ? ' · ' + total + ' / 20' : ''} ${nouveauRetour(ev)}</p>
-      <ul class="comparaison">${D.GRILLE.map((c) => `<li>${e(c.titre)} : toi <b>${(o.auto || {})[c.id] || '–'}</b>, ton prof <b>${ev.notes[c.id] || '–'}</b></li>`).join('')}</ul>
+    return `<div class="retour-prof"><p><b>L’évaluation de ton enseignant·e</b>${complet ? ' · ' + total + ' / 20' : ''} ${nouveauRetour(ev)}</p>
+      <ul class="comparaison">${D.GRILLE.map((c) => `<li>${e(c.titre)} : toi <b>${(o.auto || {})[c.id] || '–'}</b>, ton enseignant·e <b>${ev.notes[c.id] || '–'}</b></li>`).join('')}</ul>
       ${ev.texte ? '<p>' + e(ev.texte) + '</p>' : ''}${mentionIA(ev)}</div>`;
   }
   // Les ressources suggérées : « Ajouter à mes sources » ou « Plus tard ». Le lien ne s'ouvre que s'il est en http(s).
@@ -513,7 +513,7 @@
     const etat = (d.suivi || {}).ressources || {};
     const l = retoursProf.items.filter((x) => x.type === 'ressource' && (tout || etat[x.id] !== 'ajoutee'));
     if (!l.length) return '';
-    return `<section class="carte"><h2>Proposées par ton prof</h2>${l.map((x) => `<div class="retour-prof"><p><b>${e(x.titre || x.url)}</b> ${nouveauRetour(x)}</p>
+    return `<section class="carte"><h2>Proposées par ton enseignant·e</h2>${l.map((x) => `<div class="retour-prof"><p><b>${e(x.titre || x.url)}</b> ${nouveauRetour(x)}</p>
       ${R.lienSur(x.url) ? `<p><a href="${e(x.url)}" target="_blank" rel="noopener noreferrer">${e(x.url)}</a></p>` : ''}${x.texte ? '<p>' + e(x.texte) + '</p>' : ''}
       ${x.verifier ? '<p class="note">Lien à vérifier avant de t’en servir.</p>' : ''}${mentionIA(x)}
       ${etat[x.id] === 'ajoutee' ? '<p class="fait-texte">Dans tes sources</p>' : `<p><button data-a="ressource-ajouter" data-r="${x.id}">Ajouter à mes sources</button>${etat[x.id] === 'plus-tard' ? '' : ` <button class="discret" data-a="ressource-plus-tard" data-r="${x.id}">Plus tard</button>`}</p>`}</div>`).join('')}</section>`;
@@ -542,8 +542,8 @@
       if (x.type === 'evaluation') { const o = d.oraux.find((y) => y.id === x.oral); return `<p class="sur-titre">L’évaluation d’un oral</p><p>${e(o ? o.nom : 'Un oral')}</p><p><a href="#/oraux">Comparer avec mon auto-évaluation</a></p>`; }
       return '';
     };
-    return `<h1>Les retours de ton prof</h1>
-    ${l.length ? l.map((x) => `<section class="carte retour-carte">${lus[x.id] ? '' : '<span class="nouveau">Nouveau</span>'}${quoi(x)}${mentionIA(x)}</section>`).join('') : '<p class="vide">Pas encore de retour. Ton prof les écrit depuis son espace : ils apparaîtront ici et à côté de ton travail.</p>'}`;
+    return `<h1>Les retours de ton enseignant·e</h1>
+    ${l.length ? l.map((x) => `<section class="carte retour-carte">${lus[x.id] ? '' : '<span class="nouveau">Nouveau</span>'}${quoi(x)}${mentionIA(x)}</section>`).join('') : '<p class="vide">Pas encore de retour. Ton enseignant·e les écrit depuis son espace : ils apparaîtront ici et à côté de ton travail.</p>'}`;
   };
   vues.aPart = () => { let a = null; try { a = JSON.parse(localStorage.getItem(CLE_APART)); } catch (x) { /* illisible */ }
     return `<h1>Ma saisie mise de côté</h1>
@@ -556,17 +556,17 @@
     <a href="#/hauts-faits">Mes hauts faits<span>${Object.keys(d.hf).length} sur ${A.HAUTS_FAITS.length}</span></a>
     <a href="#/aide">Aide et méthode<span>Comprendre l’épreuve, fiches de méthode</span></a>
     <a href="#/aide/exemple">Voir un exemple<span>Un plan complet sur les biais algorithmiques</span></a>
-    ${enLigne() ? `<a href="#/retours">Les retours de mon prof<span>${retoursProf.items.length} retour${retoursProf.items.length > 1 ? 's' : ''}</span></a>` : ''}
+    ${enLigne() ? `<a href="#/retours">Les retours de mon enseignant·e<span>${retoursProf.items.length} retour${retoursProf.items.length > 1 ? 's' : ''}</span></a>` : ''}
     <a href="#/reglages">Réglages<span>${enLigne() ? 'Mon code, quitter cet appareil, télécharger mon dossier' : 'Rejoindre ma classe, télécharger, importer ou effacer mon dossier'}</span></a></nav>`;
 
   const fiche = (titre, corps, attr) => `<details class="carte fiche" ${attr || ''}><summary>${titre}</summary>${corps}</details>`;
   vues.aide = () => `<h1>Aide et méthode</h1>
     <section class="carte"><h2>Comprendre l’épreuve (session 2027)</h2><ul>
-      <li><b>Avant :</b> tu prépares deux questions avec tes profs. Elles ne portent pas sur la même spécialité ; une question peut être transversale.</li>
+      <li><b>Avant :</b> tu prépares deux questions avec tes enseignant·e·s. Elles ne portent pas sur la même spécialité ; une question peut être transversale.</li>
       <li><b>Préparation, 20 min :</b> le jury choisit une question. Tu prépares tes notes sur papier. Aucun support numérique.</li>
       <li><b>Exposé, 10 min :</b> debout, sans lire. Tu peux garder ta feuille et la montrer au jury.</li>
       <li><b>Échange, 10 min :</b> le jury te questionne sur ton sujet et sur le programme de la spécialité.</li>
-      <li><b>Jury :</b> deux profs, dont un·e n’est pas spécialiste de NSI.</li>
+      <li><b>Jury :</b> deux enseignant·e·s, dont un·e n’est pas spécialiste de NSI.</li>
       <li><b>Coefficient 8.</b> La question n’est pas notée : ce sont ton argumentation et ton oral qui comptent.</li></ul>
       <p class="note">Source : note de service du 10 septembre 2026, Bulletin officiel spécial n° 4 du 17 septembre 2026.</p></section>
     <h2>Fiches de méthode</h2>
@@ -580,7 +580,7 @@
     <p><a class="bouton" href="#/aide/exemple">Voir un exemple de dossier</a></p>`;
 
   vues.exemple = () => { const x = D.EXEMPLE; return `<p class="retour"><a href="#/aide">← Aide et méthode</a></p><h1>Un exemple</h1>
-    <p class="chapo">Le plan de ton prof sur les biais algorithmiques. Il est là pour te montrer la forme : ne le recopie pas.</p>
+    <p class="chapo">Le plan de ton enseignant·e sur les biais algorithmiques. Il est là pour te montrer la forme : ne le recopie pas.</p>
     <p class="titre-question lecture">${e(x.titre)}</p>
     ${x.parties.map((p) => `<section class="partie"><div class="tete"><b class="titre-partie">${e(p.titre)}</b><span class="note">≈ ${p.minutes} min</span></div>
       <ul class="points lecture">${p.points.map((pt) => `<li class="pt"><div class="corps"><p>${e(pt[1])}</p><span class="etq">${e((D.ETIQUETTES.find((t) => t[0] === pt[0]) || ['', ''])[1])}</span></div></li>`).join('')}</ul></section>`).join('')}
@@ -589,7 +589,7 @@
   vues.reglages = () => { const s = EL.session(); return `<h1>Réglages</h1>
     ${s ? `<section class="carte"><h2>Mon compte</h2><p><b>${e(s.pseudo)}</b>, classe ${e(s.classe)} (${e(s.enseignant)}).</p>
       <p>Mon code : <span class="code-eleve petit" id="mon-code" hidden>${e(s.code)}</span> <button class="mini" data-a="voir-code" aria-controls="mon-code">Voir mon code</button></p>
-      <p class="note">Ton prénom ou ton initiale est faux ? Demande à ton prof de les corriger.</p></section>
+      <p class="note">Ton prénom ou ton initiale est faux ? Demande à ton enseignant·e de les corriger.</p></section>
     <section class="carte"><h2>Quitter cet appareil</h2><p>Sur un ordinateur partagé du lycée, quitte l’appareil en partant : la personne suivante ne verra pas ton dossier. Il reste en ligne : tu le retrouves avec ton code.</p>
       <button data-a="deconnexion">Quitter cet appareil</button></section>`
     : `<section class="carte"><h2>Mon prénom</h2>${champ('profil.prenom', d.profil.prenom, 'maxlength="24" aria-label="Mon prénom"')}</section>${blocRejoindre()}`}
@@ -636,7 +636,7 @@
     const code = lireCodeClasse(brut);
     if (EL.session() || (infoClasse && infoClasse.code === code)) return;
     infoClasse = { code: code, attente: true };
-    if (code.length !== 4) { infoClasse = { code: code, erreur: 'Ce code de classe n’existe pas : il a 4 lettres. Vérifie le lien donné par ton prof.' }; return; }
+    if (code.length !== 4) { infoClasse = { code: code, erreur: 'Ce code de classe n’existe pas : il a 4 lettres. Vérifie le lien donné par ton enseignant·e.' }; return; }
     EL.rpc('go_classe_par_code', { p_code_classe: code }).then((r) => {
       infoClasse = r && r.ok ? { code: code, classe: r.classe, enseignant: r.enseignant, ouverte: r.ouverte } : { code: code, erreur: (r && r.message) || 'Ce code de classe n’existe pas.' };
     }, (x) => { infoClasse = { code: code, erreur: x.reseau ? 'Pas de réseau : reconnecte-toi, puis recharge la page.' : 'La classe n’a pas pu être trouvée. Réessaie dans un moment.' }; })
@@ -775,7 +775,7 @@
     exporter() { ecrire(); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(d, null, 1)], { type: 'application/json' }));
       a.download = 'hello-go-' + nomDeFichier(d.profil.prenom || 'dossier') + '-' + new Date().toISOString().slice(0, 10) + '.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); },
     effacer() { if ($('#confirmer').value.trim() !== 'EFFACER') return toast('Écris EFFACER dans la case pour confirmer.'); d = dossierNeuf(); ecrire(); location.hash = '#/'; rendre(false); },
-    'aller-classe'() { const c = lireCodeClasse($('#code-classe').value); if (!c) return toast('Écris le code de classe donné par ton prof.'); location.hash = '#/classe/' + c; },
+    'aller-classe'() { const c = lireCodeClasse($('#code-classe').value); if (!c) return toast('Écris le code de classe donné par ton enseignant·e.'); location.hash = '#/classe/' + c; },
     inscription(b) {
       const pseudo = ($('#pseudo').value || '').trim().replace(/\s+/g, ' '), envoyerLocal = !!($('#envoyer-local') && $('#envoyer-local').checked), c = infoClasse;
       if (pseudo.length < 2) return toast('Écris ton prénom et l’initiale de ton nom, par exemple « Inès B. ».');
