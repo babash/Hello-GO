@@ -6,6 +6,7 @@
 const VERSIONS = [
   { v: '1.0.0', commit: 'da25fa5' }, { v: '1.1.0', commit: '6b45cf1' }, { v: '1.2.0', commit: 'd654f95' },
   { v: '1.3.0', commit: 'ffdbd76' }, { v: '1.3.1', commit: 'df87f84' }, { v: '1.3.2', commit: 'ef8b049' }, { v: '1.4.0 (branche)', commit: '66dce00' }, { v: '1.4.0', commit: '5c92a5d' },
+  { v: '1.5.0', commit: '4af835c' },
 ];
 
 const point = (id, texte, etiquette, mots, sources) => ({ id: id, texte: texte, etiquette: etiquette || '', mots: mots || [], sources: sources || [] });
@@ -30,5 +31,15 @@ function v130() { const d = v120(); d.suivi = { lus: { r1: 1 }, faits: { r2: 1 }
 // 1.4.0 : les quiz « Vérifie que tu as compris » (10 questions par quiz, toujours les mêmes).
 function v140() { const d = v130(); d.comprendre = { epreuve: { meilleur: 8, dernier: 8, le: '2026-11-17', essais: 1, rates: ['e3', 'e6'] }, plan: { meilleur: 10, dernier: 10, le: '2026-11-17', essais: 2, rates: [] } }; d.hf.accroc = '2026-11-17'; return d; }
 
-const DOSSIERS = { '1.0.0': v100, '1.1.0': v110, '1.2.0': v120, '1.3.0': v130, '1.3.1': v130, '1.3.2': v130, '1.4.0': v140 };
+// 1.5.0 : les jours de visite (visites), et, par quiz, les questions vues et ratées d'une salve à l'autre (banque) ;
+// « rates_toutes » cite toutes les questions ratées de la dernière salve, « rates » seulement les 10 premières (comme la 1.4.0).
+function v150() {
+  const d = v140(); d.visites = { '2026-11-16': 1, '2026-11-17': 1 };
+  d.comprendre.epreuve = { meilleur: 9, dernier: 9, le: '2026-11-17', essais: 2, rates: [], rates_toutes: ['e16'] };
+  d.banque = { epreuve: { le: '2026-11-17', vues: { e1: 2, e2: 1, e3: 2, e5: 1, e6: 2, e11: 1, e14: 1, e16: 1, e17: 1, e20: 1 }, ratees: { e16: 1 } },
+    plan: { le: '2026-11-17', vues: { p1: 2, p2: 1, p3: 1 }, ratees: {} } };
+  return d;
+}
+
+const DOSSIERS = { '1.0.0': v100, '1.1.0': v110, '1.2.0': v120, '1.3.0': v130, '1.3.1': v130, '1.3.2': v130, '1.4.0': v140, '1.5.0': v150 };
 module.exports = { VERSIONS, DOSSIERS };

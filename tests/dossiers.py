@@ -24,7 +24,8 @@ TYPES = os.path.join(RACINE, 'tests', 'dossiers')
 # Les versions publiées sur main, de la plus ancienne à la plus récente ; en_ligne : la version peut recevoir un dossier
 # de la base (un onglet resté ouvert le reprend), donc doit accepter celui des versions suivantes.
 PUBLIEES = [('1.0.0', 'da25fa5', False), ('1.1.0', '6b45cf1', False), ('1.2.0', 'd654f95', False),
-            ('1.3.0', 'ffdbd76', True), ('1.3.1', 'df87f84', True), ('1.3.2', 'ef8b049', True), ('1.4.0', '5c92a5d', True)]
+            ('1.3.0', 'ffdbd76', True), ('1.3.1', 'df87f84', True), ('1.3.2', 'ef8b049', True), ('1.4.0', '5c92a5d', True),
+            ('1.5.0', '4af835c', True)]
 PAGES = ['#/', '#/explorer/decouvrir', '#/explorer/quiz', '#/explorer/sujets', '#/explorer/pistes', '#/questions', '#/question/{q}',
          '#/question/{q}/echange', '#/mots', '#/sources', '#/oraux', '#/hauts-faits', '#/plus', '#/aide', '#/aide/exemple',
          '#/comprendre', '#/comprendre/epreuve', '#/reglages', '#/a-part']
@@ -43,11 +44,13 @@ def version_cle(v): return tuple(int(x) for x in v.split('.'))
 
 # ---------- Ce qui compte comme une perte ----------
 # Peuvent changer sans perte : les compteurs et, pour chaque quiz, le meilleur score et le nombre d'essais (qui ne font que
-# monter), le dernier essai (score, date, questions ratées), « vus » (le jour, l'à-savoir montré), le prénom et profil.vu
-# (le pseudo de la classe remplace le prénom en ligne). Les hauts faits ne font que s'ajouter.
+# monter), le dernier essai (score, date, questions ratées, rates_toutes), « vus » (le jour, l'à-savoir montré), le prénom et
+# profil.vu (le pseudo de la classe remplace le prénom en ligne). Les hauts faits et les jours de visite ne font que
+# s'ajouter. Dans « banque » (1.5.0), la date et les questions ratées changent ; les questions vues ne font que monter.
 def pertes(avant, apres, chemin=''):
-    if chemin in ('vus', 'profil.prenom', 'profil.vu') or re.match(r'^comprendre\.[^.]+\.(dernier|le|rates)$', chemin): return []
-    if chemin.startswith('compteurs.') or re.match(r'^comprendre\.[^.]+\.(meilleur|essais)$', chemin):
+    if chemin in ('vus', 'profil.prenom', 'profil.vu') or re.match(r'^comprendre\.[^.]+\.(dernier|le|rates|rates_toutes)$', chemin) \
+            or re.match(r'^banque\.[^.]+\.(le|ratees)$', chemin): return []
+    if chemin.startswith('compteurs.') or re.match(r'^comprendre\.[^.]+\.(meilleur|essais)$', chemin) or re.match(r'^banque\.[^.]+\.vues\.[^.]+$', chemin):
         return [] if isinstance(apres, int) and apres >= avant else ['%s : %r devenu %r' % (chemin, avant, apres)]
     if isinstance(avant, dict):
         if not isinstance(apres, dict): return ['%s : n’est plus un objet' % chemin]

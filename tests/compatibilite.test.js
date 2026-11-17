@@ -1,6 +1,6 @@
 // Non-régression des dossiers : node tests/compatibilite.test.js (depuis un clone du dépôt, avec son historique Git).
 // Règle de l'enseignant (17/11) : les données des élèves déjà inscrit·e·s sont conservées, sans rupture. Donc :
-// 1. un dossier de chaque version publiée (1.0.0 à 1.4.0) est accepté par la version actuelle ;
+// 1. un dossier de chaque version publiée (1.0.0 à 1.5.0) est accepté par la version actuelle ;
 // 2. ouvert, utilisé (visite, quiz, haut fait), résumé, exporté et fusionné par la version actuelle, il ne perd rien,
 //    et aucun champ existant ne change de forme ;
 // 3. le dossier qui en sort est encore accepté par le dossierValide de CHAQUE version publiée (pris dans l'historique
@@ -28,7 +28,7 @@ const anciens = VERSIONS.map((ver) => {
   assert.strictEqual(typeof M.dossierValide, 'function', ver.v + ' : dossierValide absent');
   return { v: ver.v, valide: M.dossierValide };
 });
-ok(anciens.length === 8, 'sept versions publiées, et la 1.4.0 avant sa pré-validation');
+ok(anciens.length === 9, 'huit versions publiées (1.0.0 à 1.5.0), et la 1.4.0 avant sa pré-validation');
 
 // Ce que fait la version actuelle à l'ouverture (app.js : Object.assign(dossierNeuf(), dossier)), puis à l'usage.
 const neuf = () => ({ v: 1, profil: { prenom: '', vu: false }, quiz: { reponses: {}, fait: false }, interets: ['', '', ''], ponts: [''], pistes: [], questions: [],
@@ -49,19 +49,22 @@ Object.keys(DOSSIERS).forEach((v) => {
   // 2. utilisé sans perte
   const d = utiliser(F);
   ok(A.dossierValide(d), v + ' : le dossier utilisé est refusé par la version actuelle');
-  Object.keys(F).filter((k) => !['comprendre', 'hf'].includes(k)).forEach((k) => assert.deepStrictEqual(d[k], F[k], v + ' : le champ « ' + k + ' » a changé'));
+  Object.keys(F).filter((k) => !['comprendre', 'hf', 'visites', 'banque'].includes(k)).forEach((k) => assert.deepStrictEqual(d[k], F[k], v + ' : le champ « ' + k + ' » a changé'));
+  // 1.5.0 et suivantes : les jours de visite et les questions vues ne font que s'ajouter.
+  Object.keys(F.visites || {}).forEach((j) => ok(d.visites[j] === F.visites[j], v + ' : jour de visite ' + j + ' perdu'));
+  Object.keys(F.banque || {}).forEach((k) => Object.keys(F.banque[k].vues || {}).forEach((q) => ok(d.banque[k].vues[q] >= F.banque[k].vues[q], v + ' : question vue ' + q + ' perdue')));
   Object.keys(F.hf).forEach((k) => ok(d.hf[k] === F.hf[k], v + ' : haut fait ' + k + ' perdu ou redaté'));
   Object.keys(F.comprendre || {}).forEach((k) => { const a = F.comprendre[k], b = d.comprendre[k];
     ok(b.essais === a.essais + 1 && b.meilleur >= a.meilleur && b.meilleur <= 10 && b.dernier <= 10, v + ' : résultat du quiz ' + k + ' mal repris');
     ok(b.rates.every((q) => D.COMPRENDRE.find((z) => z.id === k).questions.slice(0, 10).some((x) => x.id === q)), v + ' : « rates » cite une question inconnue de la 1.4.0'); });
-  ok(Object.keys(d.visites).length === 2 && d.banque.epreuve && d.banque.plan, v + ' : visites ou banque absentes');
+  ok(Object.keys(d.visites).length >= 2 && d.banque.epreuve && d.banque.plan, v + ' : visites ou banque absentes');
   // résumé et export : sans erreur, et le résumé reste sous les 4 000 caractères
   const r = R.resume(d); ok(JSON.stringify(r).length <= 4000 && r.hauts_faits === Object.keys(d.hf).length, v + ' : résumé');
   ok(X.dossier(d).length > 200 && X.dossier(F).length > 200, v + ' : export Markdown');
   // 3. accepté par chaque version publiée
   anciens.forEach((x) => ok(x.valide(d), v + ' utilisé en 1.5.0 : refusé par la version ' + x.v));
   // la fusion à trois (deux appareils) garde les visites des deux côtés
-  const autre = copie(F); autre.visites = { '2026-11-19': 1 };
+  const autre = copie(F); autre.visites = Object.assign({}, F.visites || {}, { '2026-11-19': 1 }); // un autre appareil ajoute son jour
   const f = R.fusionner(copie(F), d, autre);
   ok(!f.conflit && f.resultat.visites['2026-11-17'] && f.resultat.visites['2026-11-19'] && A.dossierValide(f.resultat), v + ' : fusion des visites');
   anciens.forEach((x) => ok(x.valide(f.resultat), v + ' fusionné : refusé par la version ' + x.v));
