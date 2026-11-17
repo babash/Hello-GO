@@ -909,8 +909,11 @@
   // Une nouvelle page commence en haut, et le focus va à son contenu (clavier, lecteurs d'écran).
   window.addEventListener('hashchange', () => { rendre(false); window.scrollTo(0, 0); $('#vue').focus({ preventScroll: true }); });
   // Un jour de travail de plus (sans jamais rien retirer : pas de série à tenir).
-  (function () { const jour = Math.floor(Date.now() / 864e5); if (d.vus.jour !== jour) { d.vus.jour = jour; d.compteurs.jours = (d.compteurs.jours || 0) + 1; } })();
-  A.majHautsFaits(d); rendre(false);
+  // Un haut fait gagné au chargement (« Nage droit devant », au 5e jour) est annoncé comme les autres, et enregistré.
+  const nouveauJour = (function () { const jour = Math.floor(Date.now() / 864e5); if (d.vus.jour !== jour) { d.vus.jour = jour; d.compteurs.jours = (d.compteurs.jours || 0) + 1; return true; } return false; })();
+  const gagnes = A.majHautsFaits(d); rendre(false);
+  if (d.profil.vu && (nouveauJour || gagnes.length)) ecrire();
+  if (d.profil.vu) gagnes.forEach((h) => toast('Haut fait débloqué : ' + h.titre, '#/hauts-faits', 'Voir'));
   if (EL.session()) { if (EL.session().attente) montrerEtat('attente'); reprendre().then(interroger); }
   if (!memoireOk) toast('Ce navigateur ne garde pas ton dossier.');
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});

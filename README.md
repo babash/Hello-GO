@@ -6,7 +6,7 @@
 
 ## 👉 [Essayer maintenant : babash.github.io/Hello-GO](https://babash.github.io/Hello-GO/)
 
-**Gratuit · sans compte · rien à installer · sur téléphone et sur ordinateur · marche sans réseau · le dossier reste sur l'appareil de l'élève**
+**Gratuit · rien à installer · sur téléphone et sur ordinateur · le dossier en ligne, retrouvé partout avec un code · l'enseignant·e suit sa classe et fait ses retours**
 
 Hello GO fait partie des [Ressources NSI et SNT](https://babash.github.io/Babash-NSI-SNT/).
 
@@ -29,22 +29,60 @@ Hello GO fait partie des [Ressources NSI et SNT](https://babash.github.io/Babash
 - **Un exemple** complet (les biais algorithmiques) et des fiches de méthode.
 - **52 hauts faits**, qui récompensent les bonnes habitudes, pas la quantité.
 
+## Pour les enseignant·e·s
+
+Une seule version, **en ligne**, sur téléphone comme sur ordinateur.
+
+1. **Créez votre espace** sur [babash.github.io/Hello-GO/#/prof](https://babash.github.io/Hello-GO/#/prof) : un code de 3 mots et 4 chiffres, montré une seule fois (aucun courriel, aucun mot de passe). Il n'est gardé que le temps de la séance, sauf si vous cochez « Rester connecté·e sur cet appareil ».
+2. **Créez une classe** : vous obtenez son lien et son QR code. Chaque élève s'inscrit avec son prénom et l'initiale de son nom, et reçoit un code de 2 mots et 3 chiffres (comme `MICRO-DECOR-123`) qui suffit pour retrouver son dossier depuis n'importe quel appareil. Aucun plafond du nombre d'élèves.
+3. **Le tableau de la classe** : une ligne par élève (question, points, mots, sources, oraux évalués, dernière visite, nouveau travail depuis votre dernière visite) et tous les codes, masqués par défaut, à révéler ou à imprimer.
+4. **Le dossier d'un·e élève** : son plan, ses mots, ses sources, ses pistes et ses oraux, avec vos outils : commenter un point, un mot, une source, une piste ou une question ; demander une définition ; suggérer une ressource ou une question pour l'échange ; valider une question ou demander de la retravailler ; évaluer un oral blanc ou une vidéo sur la grille ; corriger un texte (rare, sans annonce) ; télécharger son PDF.
+5. **Avec une IA de votre choix** (facultatif) : « Copier pour l'IA » donne le dossier en texte simple, sans prénom ni code, avec des repères stables (`P3` un point, `M1` un mot, `S2` une source, `Q1` une question de l'échange), des consignes au début et le format de réponse à la fin. Collez sa réponse : chaque ligne `@…` devient un brouillon que vous relisez avant de l'envoyer ; l'élève voit « préparé avec l'aide d'une IA, relu par ton prof ».
+
+Sans code ni lien de classe, l'application reste utilisable en **mode découverte** : le dossier reste sur l'appareil, et part dans la base quand l'élève rejoint sa classe.
+
+En fin d'année : exportez votre espace (JSON), puis supprimez vos classes. Rien n'est effacé automatiquement.
+
 ## Où en est le projet
 
-Cette version (1.2.0) garde tout **sur l'appareil de l'élève** : aucun compte, rien n'est envoyé.
+Version 1.3.0 : la version en ligne (élève et enseignant·e), sur la base appliquée le 17/11/2026 (dossier [`supabase/`](supabase/LISEZMOI.md)).
 
-La base de données est en place (dossier [`supabase/`](supabase/LISEZMOI.md)) : sa migration a été appliquée le 17/11/2026, après l'accord de l'enseignant. L'application ne s'en sert pas encore.
-
-À venir :
-- le dossier en ligne, avec un code élève en mots et chiffres, pour reprendre sur un autre appareil ;
-- l'espace de l'enseignant·e : suivre la classe, commenter un point, demander une définition, suggérer une ressource ou une question, valider les questions ;
-- un export en texte simple, à coller dans une IA de son choix, et la lecture de son retour ;
-- un correcteur de grammaire sans serveur (Grammalecte).
+À venir : un correcteur de grammaire sans serveur (Grammalecte).
 
 ## Données
 
-- Le dossier (prénom ou pseudo, avis sur les cartes, réponses au questionnaire « Mes goûts », dont la deuxième spécialité et l'après-bac, pistes, plans, mots, sources, auto-évaluations, hauts faits et leurs compteurs, dont le nombre de jours de travail) est gardé dans le navigateur de l'élève, sur son appareil. Rien n'est envoyé, aucun service extérieur n'est appelé.
-- « Plus », puis « Réglages » : télécharger son dossier, l'importer sur un autre appareil, ou tout effacer.
+**Données d'élèves : prénom et initiale du nom, code, dossier, retours.** Elles sont gardées dans la base Supabase partagée des applications du site (projet « Babash - applications », schéma `grand_oral`), et sur l'appareil de l'élève (copie de travail, pour continuer hors ligne).
+
+- **Le compte** : le prénom et l'initiale du nom (jamais le nom complet), le code, la classe. Sur l'appareil, un jeton (pas le code) ; « Quitter cet appareil » l'efface, avec la copie du dossier.
+- **Le dossier** : avis sur les cartes, réponses au questionnaire « Mes goûts » (dont la deuxième spécialité et l'après-bac), pistes, plans, mots, sources, oraux et auto-évaluations, hauts faits **et leurs compteurs** (jours de travail, annulations, déplacements…), qui partent dans la base avec le dossier ; et un **résumé** chiffré pour le tableau de la classe.
+- **Les retours** de l'enseignant·e (forme ci-dessous).
+- L'élève n'a pas de bouton d'effacement de son compte : seul·e l'enseignant·e supprime un·e élève, une classe ou son espace. Aucun effacement automatique.
+- Le code de l'enseignant·e n'est jamais gardé en clair dans la base (empreinte seulement).
+- En mode découverte (sans compte), rien n'est envoyé : « Plus », puis « Réglages » permet de télécharger son dossier, de l'importer ou de tout effacer.
+- La page n'appelle que les fonctions `go_…` de la base, en POST, avec la clé publique (« publishable ») du projet. Tout texte venu de la base est échappé avant affichage ; un lien suggéré ne s'ouvre que s'il commence par `http://` ou `https://`.
+
+### Les retours (`retours`, en JSON)
+
+```json
+{ "v": 1, "items": [
+  { "id": "k3x9a1b2", "type": "commentaire", "cible": { "type": "point", "id": "p8f2…" }, "texte": "Ajoute la date.", "le": "2026-11-17T08:00:00.000Z" },
+  { "id": "…", "type": "definir", "mot": "Apprentissage automatique", "texte": "pourquoi" },
+  { "id": "…", "type": "ressource", "url": "https://…", "titre": "…", "texte": "ce qu'elle apporte", "verifier": true, "ia": true },
+  { "id": "…", "type": "question", "texte": "Une question pour l'échange", "qid": "id de la question" },
+  { "id": "…", "type": "validation", "qid": "id de la question", "etat": "validee", "texte": "" },
+  { "id": "…", "type": "evaluation", "oral": "id de l'oral", "notes": { "oral": 3, "continu": 2 }, "texte": "" }
+] }
+```
+
+- `id` : 1 à 40 caractères `A-Z a-z 0-9 _ -`. `le` : la date. `ia: true` : préparé avec l'aide d'une IA, relu par l'enseignant·e. `verifier: true` : lien proposé par une IA, à vérifier.
+- `cible.type` : `point`, `mot`, `source`, `piste`, `question`, `echange` (une question préparée pour l'échange), `oral` ou `bilan` (sans `id`).
+- `validation.etat` : `validee` ou `retravailler` ; la plus récente compte. `evaluation.notes` : les critères de `GRILLE` (`js/donnees.js`), de 1 à 4 ; une évaluation par oral.
+- Tout retour qui n'a pas cette forme est écarté par la page (`HGRetours.nettoyer`).
+- Les identifiants des points, mots, sources, questions, pistes et oraux sont ceux du dossier : ils existent depuis la version 1.0.0 et `dossierValide` les exige, donc aucun dossier n'est à migrer. Ce que l'élève fait des retours (lus, mots créés, ressources gardées ou « plus tard », validations appliquées) est noté dans le dossier, sous `suivi`.
+
+### L'enregistrement
+
+Le dossier part dans la base 3 secondes après la dernière frappe, quand la page passe en arrière-plan, à la fermeture et au retour du réseau, avec sa version connue. Si la base a changé entre-temps (un autre appareil, ou une correction de l'enseignant·e), la page fusionne : ce qui n'a changé que d'un côté est gardé ; un même texte changé des deux côtés prend la version de la base, et la saisie de l'appareil est gardée à part (« Ma saisie mise de côté »), jamais perdue en silence. Les retours sont relus à l'ouverture, puis toutes les 20 secondes quand la page est visible.
 
 ## Pour vérifier
 
@@ -52,7 +90,11 @@ La base de données est en place (dossier [`supabase/`](supabase/LISEZMOI.md)) :
 node tests/analyse.test.js     # les analyses (coach, questionnaire, hauts faits, fichiers importés)
 python3 tests/parcours.py      # le parcours complet dans un navigateur, à 4 largeurs d'écran
 python3 tests/robustesse.py    # deux onglets, fichiers abîmés ou piégés, clavier, longues adresses à 320 px, dossier de la version 1.0.0
+node tests/retours.test.js     # retours, résumé, fusion à trois, format pour l'IA et lecture tolérante de sa réponse, code
+python3 tests/en_ligne.py      # élève et enseignant·e en ligne, contre une reproduction locale de la base (PostgreSQL 16)
 ```
+
+`tests/en_ligne.py` n'appelle jamais la base en ligne : la page y est configurée vers une adresse inexistante, servie par un PostgreSQL local neuf (`tests/base_locale.py`, qui applique le socle commun du site, `HG_SOCLE`, puis `supabase/0001-dossiers.sql`), avec des données inventées.
 
 ## Sources
 
@@ -70,6 +112,6 @@ Conçu par **Babash - NSI Tani Malandi**, avec l'aide de l'IA.
 
 - Le code est sous licence [MIT](LICENSE).
 - Les textes (sujets, questionnaire, questions des cartes, conseils, fiches de méthode, exemple) sont sous licence [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.fr).
-- Bibliothèques incluses : SortableJS et pdfmake (MIT), voir `vendor/LICENCES-BIBLIOTHEQUES.txt` ; polices sous licence SIL OFL, voir `css/LICENCE-POLICES.txt`.
+- Bibliothèques incluses : SortableJS, pdfmake et qrcode-generator (MIT), voir `vendor/LICENCES-BIBLIOTHEQUES.txt` ; polices sous licence SIL OFL, voir `css/LICENCE-POLICES.txt`.
 
 Tu peux réutiliser et adapter Hello GO en mentionnant Babash - NSI Tani Malandi et la licence. Merci de préciser si tu utilises l'IA pour le modifier.
