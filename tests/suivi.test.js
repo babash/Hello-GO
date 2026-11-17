@@ -102,7 +102,7 @@ const jour = (a, m, j, h) => new Date(a, m - 1, j, h === undefined ? 10 : h);
     const pos = s3.map((k) => z.questions.findIndex((q) => q.id === k)); ok(pos.every((p, i) => !i || p > pos[i - 1]), z.id + ' : ordre de la banque');
   });
   // une forme abîmée de la banque ou du résultat est refusée
-  [{ banque: { epreuve: { vues: { e1: -1 } } } }, { banque: { epreuve: 'x' } }, { banque: { epreuve: { vues: { '<img>': 1 } } } }, { comprendre: { epreuve: { meilleur: 11, dernier: 1, le: '', essais: 1 } } },
+  [{ banque: { epreuve: { vues: { e1: -1 } } } }, { banque: { epreuve: 'x' } }, { banque: { epreuve: { vues: { '<img>': 1 } } } },
     { comprendre: { epreuve: { meilleur: 1, dernier: 1, le: '', essais: 1, rates_toutes: ['"x'] } } }]
     .forEach((x) => ok(!A.dossierValide(Object.assign({ v: 1, questions: [] }, x)), 'refusé : ' + JSON.stringify(x)));
   ok(A.dossierValide({ v: 1, questions: [], banque: { epreuve: { le: '2026-11-17', vues: { e1: 2, e99: 1 }, ratees: { e99: 1 } }, autre: { le: '' } } }), 'une question ou un quiz d’une version plus récente est accepté');

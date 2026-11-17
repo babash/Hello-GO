@@ -49,7 +49,7 @@
       questions: qs.map((q) => ({ titre: court(q.titre, 120), statut: q.statut, points: A.tousLesPoints(q).length, echange: (q.echange || []).length })),
       points: tous, mots: (d.mots || []).length, mots_complets: (d.mots || []).filter(A.motComplet).length, sources: (d.sources || []).length,
       oraux: (d.oraux || []).map((o) => { const n = Object.keys(o.auto || {}).length; return { nom: court(o.nom, 40), criteres: n, note: n === 5 ? Object.values(o.auto).reduce((a, b) => a + b, 0) : null, video: !!o.video }; }),
-      hauts_faits: Object.keys(d.hf || {}).length };
+      hauts_faits: A.hautsFaitsDates(d).length };
     // Les quiz « Vérifie que tu as compris » : seulement ceux qui ont été essayés (meilleur et dernier score, essais).
     const cq = {};
     (D ? D.COMPRENDRE : []).forEach((z) => { const x = (d.comprendre || {})[z.id]; if (x && x.essais) cq[z.id] = { meilleur: x.meilleur, dernier: x.dernier, essais: x.essais, sur: A.surSalve(z), vues: A.suiviQuiz(d, z).nVues }; });

@@ -91,7 +91,7 @@
   const e = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
   const pluriel = (n, mot) => n + ' ' + mot + (n > 1 ? 's' : '');
-  const nomDeFichier = (s) => String(s).toLowerCase().normalize('NFD').replace(/\p{M}/gu, '').replace(/[^a-z0-9]+/g, '-'); // « Zoé » donne « zoe »
+  const nomDeFichier = (s) => String(s).toLowerCase().normalize('NFD').replace(/\p{M}/gu, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); // « Zoé » donne « zoe », « Inès B. » « ines-b »
 
   // ---------- Le dossier ----------
   function dossierNeuf() {
@@ -355,7 +355,7 @@
     const jour = Math.floor(Date.now() / 864e5) + (d.vus.decalage || 0);
     const savoir = liste[jour % liste.length];
     const nPoints = d.questions.reduce((t, q) => t + A.tousLesPoints(q).length, 0);
-    const nHf = Object.keys(d.hf).length;
+    const nHf = A.hautsFaitsDates(d).length;
     const debut = [['Découvrir 10 cartes', Object.keys(d.decouverte.reactions).length >= 10, '#/explorer/decouvrir'], ['Dire ce que j’aime', d.quiz.fait, '#/explorer/quiz'], ['Garder une piste', d.pistes.length > 0 || d.questions.length > 0, '#/explorer/sujets'],
       ['Choisir ma question', d.questions.length > 0, '#/explorer/pistes'], ['Écrire 5 points', nPoints >= 5, '#/questions'],
       ['Définir 3 mots', d.mots.filter(A.motComplet).length >= 3, '#/mots'], ['Ajouter 2 sources', d.sources.length >= 2, '#/sources']];
@@ -579,7 +579,7 @@
     <button class="ajouter" data-a="plus-oral">+ Ajouter une vidéo ou un entraînement</button>`;
 
   vues.hf = () => {
-    const groupes = [...new Set(A.HAUTS_FAITS.map((h) => h.g))], n = Object.keys(d.hf).length;
+    const groupes = [...new Set(A.HAUTS_FAITS.map((h) => h.g))], n = A.hautsFaitsDates(d).length; // seulement les hauts faits que connaît cette version
     return `<h1>Mes hauts faits</h1><p class="chapo">${n} sur ${A.HAUTS_FAITS.length}. Ils récompensent les bonnes habitudes, pas la quantité.</p>
     ${groupes.map((g) => `<h2>${e(g)}</h2><ul class="hf">${A.HAUTS_FAITS.filter((h) => h.g === g).map((h) => { const ok = d.hf[h.id];
       return `<li class="${ok ? 'gagne' : ''}"><span class="medaille" aria-hidden="true">${ok ? '★' : h.cache ? '?' : '☆'}</span><div><b>${ok || !h.cache ? e(h.titre) : '???'}</b>
@@ -643,7 +643,7 @@
 
   vues.plus = () => `<h1>Plus</h1><nav class="menu">
     <a href="#/oraux">Mes oraux<span>Oraux blancs, vidéos, auto-évaluation</span></a>
-    <a href="#/hauts-faits">Mes hauts faits<span>${Object.keys(d.hf).length} sur ${A.HAUTS_FAITS.length}</span></a>
+    <a href="#/hauts-faits">Mes hauts faits<span>${A.hautsFaitsDates(d).length} sur ${A.HAUTS_FAITS.length}</span></a>
     <a href="#/aide">Aide et méthode<span>Comprendre l’épreuve, fiches de méthode</span></a>
     <a href="#/comprendre">Vérifier que j’ai compris<span>Deux quiz : l’épreuve, la méthode du plan</span></a>
     <a href="#/aide/exemple">Voir un exemple<span>Un plan complet sur les biais algorithmiques</span></a>
@@ -663,8 +663,8 @@
   vues.aide = (cible) => `<h1>Aide et méthode</h1>
     <section class="carte" id="epreuve"${cible === 'epreuve' ? ' data-cible' : ''}><h2>Comprendre l’épreuve (session 2027)</h2><ul>
       <li><b>Avant :</b> tu prépares deux questions avec tes enseignant·e·s. Elles ne portent pas sur la même spécialité ; une question peut être transversale.</li>
-      <li><b>Préparation, 20 min :</b> le jury choisit une question. Tu prépares tes notes sur papier. Aucun support numérique.</li>
-      <li><b>Exposé, 10 min :</b> debout, sans lire. Tu peux garder ta feuille et la montrer au jury, mais il ne la note pas.</li>
+      <li><b>Préparation, 20 min :</b> le jury choisit une question. Tu prépares tes notes sur papier, avec un schéma si tu veux. Aucun autre support, rien de numérique.</li>
+      <li><b>Exposé, 10 min :</b> debout, sans lire. Tu n’as que les notes écrites pendant la préparation : garde ta feuille, et montre au jury le schéma que tu y as fait, s’il l’aide à suivre. Le jury ne note pas ta feuille.</li>
       <li><b>Échange, 10 min :</b> le jury te questionne sur ton sujet et sur tout le programme des spécialités concernées.</li>
       <li><b>Jury :</b> deux enseignant·e·s, dont un·e n’est pas spécialiste de NSI.</li>
       <li><b>Coefficient 8</b> en voie générale. La question n’est pas notée : ce sont ton argumentation et ton oral qui comptent.</li>

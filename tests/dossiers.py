@@ -24,7 +24,7 @@ TYPES = os.path.join(RACINE, 'tests', 'dossiers')
 # Les versions publiées sur main, de la plus ancienne à la plus récente ; en_ligne : la version peut recevoir un dossier
 # de la base (un onglet resté ouvert le reprend), donc doit accepter celui des versions suivantes.
 PUBLIEES = [('1.0.0', 'da25fa5', False), ('1.1.0', '6b45cf1', False), ('1.2.0', 'd654f95', False),
-            ('1.3.0', 'ffdbd76', True), ('1.3.1', 'df87f84', True), ('1.3.2', 'ef8b049', True)]
+            ('1.3.0', 'ffdbd76', True), ('1.3.1', 'df87f84', True), ('1.3.2', 'ef8b049', True), ('1.4.0', '5c92a5d', True)]
 PAGES = ['#/', '#/explorer/decouvrir', '#/explorer/quiz', '#/explorer/sujets', '#/explorer/pistes', '#/questions', '#/question/{q}',
          '#/question/{q}/echange', '#/mots', '#/sources', '#/oraux', '#/hauts-faits', '#/plus', '#/aide', '#/aide/exemple',
          '#/comprendre', '#/comprendre/epreuve', '#/reglages', '#/a-part']
@@ -149,13 +149,17 @@ def ajouter(p, ou, dossier, texte):
 
 def nouveautes(p):
     """Ce que cette version ajoute au dossier, fait avec l'interface. À chaque version : y ajouter ses nouveautés.
-    1.4.0 : les quiz « Vérifie que tu as compris » (l'un sans faute, l'autre avec deux erreurs), et leurs hauts faits."""
+    1.4.0 : les quiz « Vérifie que tu as compris » (l'un sans faute, l'autre avec deux erreurs), et leurs hauts faits.
+    1.5.0 : les jours de visite (visites, notés à l'ouverture), et, par quiz, une salve de 10 questions tirées parmi 20
+    (banque, rates_toutes) : deux salves pour le second quiz, pour que des questions 11 à 20 soient ratées."""
     if not p.evaluate("!!(window.HGDonnees && HGDonnees.COMPRENDRE)"): return
-    for i, z in enumerate(p.evaluate("HGDonnees.COMPRENDRE.map((z) => ({ id: z.id, b: z.questions.map((q) => q.b) }))")):
-        p.goto(HOTE + 'neuf/index.html#/comprendre/' + z['id']); p.wait_for_selector('[data-a=quiz-commencer]'); p.click('[data-a=quiz-commencer]')
-        for k, b in enumerate(z['b']):
-            p.locator('label.option:has([value="%d"])' % ((b + 1) % 4 if i and k in (2, 5) else b)).click(); p.click('[data-a=quiz-valider]'); p.click('[data-a=quiz-suivant]')
-        p.wait_for_selector('.score')
+    for i, z in enumerate(p.evaluate("HGDonnees.COMPRENDRE.map((z) => ({ id: z.id, b: Object.fromEntries(z.questions.map((q) => [q.id, q.b])), n: Math.min(10, z.questions.length) }))")):
+        for _ in range(2 if i and len(z['b']) > 10 else 1):
+            p.goto(HOTE + 'neuf/index.html#/comprendre/' + z['id']); p.wait_for_selector('[data-a=quiz-commencer]'); p.click('[data-a=quiz-commencer]')
+            for k in range(z['n']):
+                qid = p.get_attribute('.quiz-q', 'data-qid'); b = z['b'][qid] if qid else list(z['b'].values())[k]
+                p.locator('label.option:has([value="%d"])' % ((b + 1) % 4 if i and k in (2, 5) else b)).click(); p.click('[data-a=quiz-valider]'); p.click('[data-a=quiz-suivant]')
+            p.wait_for_selector('.score')
 
 
 def journal(p, nom):

@@ -5,7 +5,7 @@
 // accepte un dossier écrit par la nouvelle.
 const VERSIONS = [
   { v: '1.0.0', commit: 'da25fa5' }, { v: '1.1.0', commit: '6b45cf1' }, { v: '1.2.0', commit: 'd654f95' },
-  { v: '1.3.0', commit: 'ffdbd76' }, { v: '1.3.1', commit: 'df87f84' }, { v: '1.3.2', commit: 'ef8b049' }, { v: '1.4.0', commit: '66dce00' },
+  { v: '1.3.0', commit: 'ffdbd76' }, { v: '1.3.1', commit: 'df87f84' }, { v: '1.3.2', commit: 'ef8b049' }, { v: '1.4.0 (branche)', commit: '66dce00' }, { v: '1.4.0', commit: '5c92a5d' },
 ];
 
 const point = (id, texte, etiquette, mots, sources) => ({ id: id, texte: texte, etiquette: etiquette || '', mots: mots || [], sources: sources || [] });

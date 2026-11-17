@@ -28,7 +28,7 @@ const anciens = VERSIONS.map((ver) => {
   assert.strictEqual(typeof M.dossierValide, 'function', ver.v + ' : dossierValide absent');
   return { v: ver.v, valide: M.dossierValide };
 });
-ok(anciens.length === 7, 'sept versions publiées');
+ok(anciens.length === 8, 'sept versions publiées, et la 1.4.0 avant sa pré-validation');
 
 // Ce que fait la version actuelle à l'ouverture (app.js : Object.assign(dossierNeuf(), dossier)), puis à l'usage.
 const neuf = () => ({ v: 1, profil: { prenom: '', vu: false }, quiz: { reponses: {}, fait: false }, interets: ['', '', ''], ponts: [''], pistes: [], questions: [],
@@ -45,7 +45,7 @@ Object.keys(DOSSIERS).forEach((v) => {
   const F = DOSSIERS[v]();
   // 1. accepté tel quel
   ok(A.dossierValide(F), v + ' : refusé par la version actuelle');
-  anciens.filter((x) => x.v >= v || x.v === v).forEach((x) => { if (x.v === v) ok(x.valide(F), v + ' : le dossier type n’est pas accepté par sa propre version'); });
+  anciens.forEach((x) => { if (x.v === v) ok(x.valide(F), v + ' : le dossier type n’est pas accepté par sa propre version'); });
   // 2. utilisé sans perte
   const d = utiliser(F);
   ok(A.dossierValide(d), v + ' : le dossier utilisé est refusé par la version actuelle');

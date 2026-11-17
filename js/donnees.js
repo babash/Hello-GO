@@ -164,8 +164,8 @@
     { p: 1, t: 'Faire moins, mais mieux : un exemple précis vaut plus que trois généralités.' },
     { p: 1, t: 'Définis chaque mot important deux fois : avec une source, puis avec tes mots.' },
     { p: 1, t: 'Organise tes axes : avantages et limites, constat et solutions, hier et aujourd’hui…' },
-    { p: 2, t: 'Tu as 20 minutes de préparation, avec du papier seulement. Entraîne-toi à refaire ton plan à la main.' },
-    { p: 2, t: 'Aucun support numérique le jour J. Tu peux montrer ta feuille au jury, mais il ne la note pas.' },
+    { p: 2, t: '20 minutes de préparation, sur papier seulement : tes notes, et un schéma si tu veux. Entraîne-toi à refaire ton plan à la main.' },
+    { p: 2, t: 'À l’exposé, tu n’as que tes notes de préparation, rien de numérique. Un schéma fait pendant ces 20 minutes peut aider le jury.' },
     { p: 2, t: 'Tu présentes debout, sans lire tes notes. Regarde les deux membres du jury, chacun son tour.' },
     { p: 2, t: 'Vise 100 à 125 mots par minute. Trop vite, le jury perd le fil.' },
     { p: 2, t: 'L’échange dure 10 minutes, autant que l’exposé : prépare-le autant.' },
@@ -287,11 +287,11 @@
       { id: 'e3', th: 'deroule', q: 'Tu as 20 minutes de préparation. Avec quoi prépares-tu tes notes ?', b: 0, r: REVOIR_EPREUVE, o: [
         ['Du papier, pour refaire ton plan à la main.', 'Oui : du papier seulement. Entraîne-toi à refaire ton plan à la main en 20 minutes.'],
         ['Ton ordinateur, pour relire ton diaporama.', 'Aucun support numérique le jour J : ni ordinateur, ni diaporama.'],
-        ['Ton téléphone, pour relire tes notes.', 'Pas de téléphone : aucun support numérique. Tes notes, tu les refais sur papier.'],
-        ['Rien : tu dois tout garder en tête.', 'Tu as du papier pour préparer tes notes, et tu peux garder ta feuille pendant l’exposé.']] },
+        ['Ton téléphone, pour relire tes notes.', 'Aucun support numérique, téléphone compris : tes notes, tu les refais sur papier.'],
+        ['Rien : tu dois tout garder en tête.', 'Tu as du papier pour préparer tes notes (et un schéma si tu veux), et tu gardes ta feuille pendant l’exposé.']] },
       { id: 'e4', th: 'deroule', q: 'Comment se passe ton exposé ?', b: 3, r: REVOIR_EPREUVE, o: [
         ['10 minutes, assis·e, en lisant ton texte.', 'Tu présentes debout, et sans lire : parle à partir de tes points.'],
-        ['5 minutes, debout, sans notes.', 'L’exposé dure 10 minutes. Et tu peux garder ta feuille.'],
+        ['5 minutes, debout, sans notes.', 'L’exposé dure 10 minutes. Et tu peux garder les notes écrites pendant ta préparation, sans les lire.'],
         ['20 minutes, debout : c’est la moitié de l’épreuve.', '20 minutes, c’est la préparation. L’exposé, lui, dure 10 minutes.'],
         ['10 minutes, debout, sans lire tes notes.', 'Oui : 10 minutes, debout, sans lire. Tu peux garder ta feuille et la montrer au jury.']] },
       { id: 'e5', th: 'echange', q: 'Que se passe-t-il juste après ton exposé ?', b: 1, r: REVOIR_EPREUVE, o: [
@@ -311,7 +311,7 @@
         ['Seulement si elle est transversale.', 'Transversale ou non, la question n’est pas notée : ton argumentation et ton oral, si.']] },
       { id: 'e8', th: 'echange', q: 'Pendant l’échange, sur quoi le jury peut-il t’interroger ?', b: 3, r: REVOIR_EPREUVE, o: [
         ['Seulement sur ce que tu as dit dans ton exposé.', 'Plus large : le jury peut aussi t’interroger sur le programme des spécialités concernées. Révise les chapitres liés à ton sujet.'],
-        ['Sur toutes les matières du bac.', 'Pas toutes : sur ton sujet, et sur le programme des spécialités concernées par ta question.'],
+        ['Sur toutes les matières du bac.', 'Le jury t’interroge sur ton sujet, et sur le programme des spécialités concernées par ta question.'],
         ['Seulement sur tes sources.', 'Le jury peut parler de tes sources, mais il t’interroge sur ton sujet et sur le programme des spécialités concernées.'],
         ['Sur ton sujet, et sur tout le programme des spécialités concernées.', 'Oui : révise les chapitres liés à ton sujet, en NSI, et dans ton autre spécialité pour une question transversale.']] },
       { id: 'e9', th: 'echange', q: 'Qui compose le jury ?', b: 1, r: REVOIR_EPREUVE, o: [
@@ -345,11 +345,11 @@
         ['Juste avant tes 20 minutes de préparation.', 'Oui : le jury choisit une de tes deux questions, puis tu as 20 minutes pour préparer tes notes.'],
         ['À la fin de ton exposé, pour lancer l’échange.', 'Ton exposé porte déjà sur la question choisie : le jury la choisit avant tes 20 minutes de préparation.'],
         ['Jamais : tu présentes tes deux questions l’une après l’autre.', 'Tu ne présentes qu’une de tes deux questions : celle que choisit le jury, avant la préparation.']] },
-      { id: 'e15', th: 'deroule', q: 'Pendant ton exposé, que fais-tu de ta feuille de notes ?', b: 2, r: REVOIR_EPREUVE, o: [
-        ['Tu la rends au jury avant de commencer.', 'Tu peux la garder pendant ton exposé.'],
-        ['Tu la lis : c’est fait pour ça.', 'Tu présentes sans lire : ta feuille t’aide à retrouver tes points, pas à lire un texte.'],
-        ['Tu peux la garder et la montrer au jury, sans la lire.', 'Oui : tu peux la garder et la montrer au jury. Il ne la note pas.'],
-        ['Tu la donnes au jury pour qu’il la note.', 'Tu peux la montrer au jury, mais il ne la note pas.']] },
+      { id: 'e15', th: 'deroule', q: 'Pendant tes 20 minutes de préparation, tu dessines un schéma qui résume ton idée. Qu’en fais-tu pendant l’exposé ?', b: 2, r: REVOIR_EPREUVE, o: [
+        ['Rien : un schéma n’a pas sa place au Grand oral.', 'Au contraire : un schéma fait pendant la préparation peut être intéressant à présenter au jury.'],
+        ['Tu le recopies sur ton téléphone pour le projeter.', 'Rien de numérique : tu le montres sur ta feuille.'],
+        ['Tu peux le montrer au jury : un schéma préparé pendant ces 20 minutes peut l’aider à suivre.', 'Oui : tu n’as que les notes écrites pendant la préparation, et un schéma en fait partie. Le jury ne note pas ta feuille.'],
+        ['Tu le remplaces par un schéma plus beau, préparé chez toi.', 'Pendant l’exposé, tu n’as que ce que tu as écrit pendant les 20 minutes de préparation.']] },
       { id: 'e16', th: 'deroule', q: 'À l’entraînement, ton exposé ne dure que 6 minutes. Qu’en penses-tu ?', b: 0, r: REVOIR_EPREUVE, o: [
         ['C’est trop court : un exposé trop court fait perdre des points. Entraîne-toi à tenir les 10 minutes.', 'Oui : l’exposé dure 10 minutes. Entraîne-toi à les tenir, avec un chronomètre.'],
         ['C’est parfait : le jury préfère les exposés courts.', 'Un exposé trop court fait perdre des points : vise les 10 minutes.'],
