@@ -1,0 +1,660 @@
+{
+  "genere_le": "2026-11-17",
+  "methode": "Chaque conseil s'appuie sur une page ouverte le 2026-11-17. Le champ « lu_par » de la source dit ce qui a été réellement lu : le résumé de l'article, ou une page d'encyclopédie qui le résume. « solidite » : bien établi, plusieurs études, une étude, retour de jurys, plus une valeur ajoutée, « repère de manuel », pour le débit de parole (Wong, 2014).",
+  "a_signaler": [
+    "La page éduscol (avril 2024) indique que la ou le candidat peut s'appuyer pendant l'exposé sur le support papier préparé pendant les vingt minutes : à rapprocher du cours de l'enseignant, qui rappelle l'absence de support visuel.",
+    "Plusieurs résultats portent sur des listes de mots, des visages ou des sensations, pas sur des exposés : le champ « pourquoi » le dit à chaque fois."
+  ],
+  "compte": {
+    "total": 40,
+    "par_phase": {
+      "0": 7,
+      "1": 11,
+      "2": 22
+    }
+  },
+  "conseils": [
+    {
+      "id": "question-a-toi",
+      "phase": 0,
+      "titre": "Choisis une question à toi",
+      "conseil": "Prends une question que tu as vraiment envie de défendre, pas celle qui « fait sérieux ». Demande-toi : est-ce que j'en parlerais dix minutes à un·e ami·e ?",
+      "pourquoi": "La charte remise aux jurys de l'académie de Versailles demande d'évaluer la capacité à défendre des idées « de manière personnelle et convaincante » et l'engagement dans la parole.",
+      "source": {
+        "auteurs": "Inspection pédagogique régionale, académie de Versailles",
+        "annee": "2023",
+        "titre": "Grand Oral 2023 – Charte des examinateurs et des examinatrices",
+        "url": "https://educamus.ac-versailles.fr/IMG/pdf/grand-oral_bac_charte_examinateurs_2023.pdf",
+        "lu_par": "document ouvert"
+      },
+      "solidite": "retour de jurys"
+    },
+    {
+      "id": "relier-specialites",
+      "phase": 0,
+      "titre": "Relie tes deux spécialités",
+      "conseil": "Vérifie dès le début que ta question te permet d'utiliser des connaissances précises de NSI. Note trois notions du programme que tu pourras expliquer.",
+      "pourquoi": "La page officielle du Grand oral indique que le jury valorise la « solidité des connaissances » et la « capacité à argumenter et à relier les savoirs ».",
+      "source": {
+        "auteurs": "Ministère de l'Éducation nationale (éduscol)",
+        "annee": "2024",
+        "titre": "Présentation du Grand oral (mise à jour d'avril 2024)",
+        "url": "https://eduscol.education.fr/729/presentation-du-grand-oral",
+        "lu_par": "page officielle ouverte"
+      },
+      "solidite": "retour de jurys"
+    },
+    {
+      "id": "commence-tot",
+      "phase": 0,
+      "titre": "Commence plus tôt que prévu",
+      "conseil": "Fixe ta date de fin, puis avance-la franchement : tu mettras plus de temps que tu ne le crois. Décide aujourd'hui de la première petite étape.",
+      "pourquoi": "Dans une étude sur 37 étudiant·e·s, le mémoire devait prendre 33,9 jours en moyenne selon leurs prévisions ; il en a pris 55,5, et environ 30 % ont tenu leur délai.",
+      "source": {
+        "auteurs": "Buehler, R., Griffin, D. et Ross, M.",
+        "annee": "1994",
+        "titre": "Exploring the \"planning fallacy\": why people underestimate their task completion times",
+        "url": "https://en.wikipedia.org/wiki/Planning_fallacy",
+        "lu_par": "page Wikipédia ouverte, qui résume et cite l'étude (l'article d'origine n'a pas été ouvert)"
+      },
+      "solidite": "une étude"
+    },
+    {
+      "id": "si-alors",
+      "phase": 0,
+      "titre": "Planifie en « si… alors »",
+      "conseil": "Écris une phrase du type : « Si c'est mercredi 14 h, alors je cherche deux sources pour mon sujet. » Un moment précis et une action précise.",
+      "pourquoi": "Cette forme de plan, étudiée par le psychologue Peter Gollwitzer depuis 1999, sert à passer de l'intention à l'action ; la page consultée ne donne pas la taille de l'effet.",
+      "source": {
+        "auteurs": "Gollwitzer, P. M.",
+        "annee": "1999",
+        "titre": "Implementation intentions: strong effects of simple plans",
+        "url": "https://en.wikipedia.org/wiki/Implementation_intention",
+        "lu_par": "page Wikipédia ouverte, qui résume et cite l'étude (l'article d'origine n'a pas été ouvert)"
+      },
+      "solidite": "plusieurs études"
+    },
+    {
+      "id": "pourquoi-pourquoi",
+      "phase": 0,
+      "titre": "Demande-toi « pourquoi ? »",
+      "conseil": "Pour chaque fait que tu trouves, écris pourquoi il est vrai et pourquoi il compte pour ta question. Si tu ne sais pas répondre, tu as trouvé ce qu'il te reste à chercher.",
+      "pourquoi": "Se demander pourquoi un fait est vrai aide à le relier à ce qu'on sait déjà et à le retenir, d'après les travaux résumés sous le nom d'« interrogation élaborative ».",
+      "source": {
+        "auteurs": "Wikipédia (en)",
+        "annee": "consulté en 2026",
+        "titre": "Elaborative interrogation",
+        "url": "https://en.wikipedia.org/wiki/Elaborative_interrogation",
+        "lu_par": "page d'encyclopédie ouverte"
+      },
+      "solidite": "plusieurs études"
+    },
+    {
+      "id": "explique-a-quelquun",
+      "phase": 0,
+      "titre": "Prépare-toi à l'expliquer",
+      "conseil": "Lis tes sources comme si tu devais les expliquer demain à un·e camarade. Puis fais-le vraiment, en deux minutes.",
+      "pourquoi": "Dans une étude, les personnes qui s'attendaient à enseigner un texte en ont restitué un rappel plus complet et mieux organisé que celles qui s'attendaient à un contrôle, surtout sur les idées principales.",
+      "source": {
+        "auteurs": "Nestojko, J. F., Bui, D. C., Kornell, N. et Bjork, E. L.",
+        "annee": "2014",
+        "titre": "Expecting to teach enhances learning and organization of knowledge in free recall of text passages. Memory & Cognition, 42(7), 1038-1048. doi:10.3758/s13421-014-0416-z",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/24845756/",
+        "lu_par": "résumé ouvert par Europe PMC"
+      },
+      "solidite": "une étude"
+    },
+    {
+      "id": "styles-apprentissage",
+      "phase": 0,
+      "titre": "Oublie ton « profil d'apprentissage »",
+      "conseil": "Ne choisis pas ta méthode parce que tu serais « visuel·le » ou « auditif·ve ». Choisis celle qui te fait retrouver les idées sans tes notes.",
+      "pourquoi": "Une revue de 2008 n'a trouvé pratiquement aucune preuve qu'enseigner selon le « style » de chacun·e améliore l'apprentissage.",
+      "source": {
+        "auteurs": "Pashler, H., McDaniel, M., Rohrer, D. et Bjork, R.",
+        "annee": "2008",
+        "titre": "Learning styles: concepts and evidence. Psychological Science in the Public Interest, 9(3), 105-119",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/26162104/",
+        "lu_par": "résumé de l'article ouvert"
+      },
+      "solidite": "plusieurs études"
+    },
+    {
+      "id": "premiere-phrase",
+      "phase": 1,
+      "titre": "Soigne ta première phrase",
+      "conseil": "Écris ta première phrase mot à mot et apprends-la : c'est la seule partie à savoir par cœur. Elle doit donner envie d'entendre la suite.",
+      "pourquoi": "Dans une étude sur des visages, un dixième de seconde suffisait pour se former une première impression, et ces impressions ont tendance à rester stables. C'est un résultat sur les visages, pas sur les exposés.",
+      "source": {
+        "auteurs": "Willis, J. et Todorov, A.",
+        "annee": "2006",
+        "titre": "First impressions: making up your mind after a 100-ms exposure to a face",
+        "url": "https://en.wikipedia.org/wiki/First_impression_(psychology)",
+        "lu_par": "page Wikipédia ouverte, qui résume et cite l'étude (l'article d'origine n'a pas été ouvert)"
+      },
+      "solidite": "une étude"
+    },
+    {
+      "id": "debut-et-fin",
+      "phase": 1,
+      "titre": "Mets l'essentiel aux extrémités",
+      "conseil": "Place ta problématique au début et ta réponse à la fin, pas au milieu. Le milieu sert aux explications.",
+      "pourquoi": "Quand on écoute une suite d'éléments, on retient mieux les premiers et les derniers que ceux du milieu : c'est l'effet de position sérielle, observé sur des listes de mots depuis les années 1960.",
+      "source": {
+        "auteurs": "Murdock, B. B.",
+        "annee": "1962",
+        "titre": "The serial position effect of free recall. Journal of Experimental Psychology, 64(5), 482-488",
+        "url": "https://en.wikipedia.org/wiki/Serial-position_effect",
+        "lu_par": "page Wikipédia ouverte, qui résume et cite l'étude (l'article d'origine n'a pas été ouvert)"
+      },
+      "solidite": "bien établi"
+    },
+    {
+      "id": "derniere-phrase",
+      "phase": 1,
+      "titre": "Écris ta dernière phrase",
+      "conseil": "Prépare une phrase de fin nette, qui répond à ta question, et annonce-la : « pour conclure… ». Ne finis jamais par « voilà ».",
+      "pourquoi": "Dans l'étude de Fredrickson et Kahneman (1993), le souvenir d'un film dépendait surtout de certains moments, très peu de sa durée ; ces travaux ont donné la règle de l'apogée et de la fin.",
+      "source": {
+        "auteurs": "Fredrickson, B. L. et Kahneman, D.",
+        "annee": "1993",
+        "titre": "Duration neglect in retrospective evaluations of affective episodes. Journal of Personality and Social Psychology, 65(1), 45-55. doi:10.1037/0022-3514.65.1.45",
+        "url": "https://psycnet.apa.org/doiLanding?doi=10.1037%2F0022-3514.65.1.45",
+        "lu_par": "référence de l'enseignant ; résumé ouvert par Europe PMC (PMID 8355141)"
+      },
+      "solidite": "plusieurs études"
+    },
+    {
+      "id": "un-temps-fort",
+      "phase": 1,
+      "titre": "Prévois un temps fort",
+      "conseil": "Choisis le moment le plus marquant de ton exposé (un exemple, un chiffre sourcé, une démonstration) et ne le place pas trop tôt. Ralentis quand tu y arrives.",
+      "pourquoi": "Dans une expérience de 1993, la plupart des personnes préféraient refaire l'essai le plus long, parce qu'il finissait moins mal : on juge une expérience à son pic et à sa fin. La règle ne prédit pas tout, et elle a été établie sur des sensations, pas sur des exposés.",
+      "source": {
+        "auteurs": "Kahneman, D., Fredrickson, B. L., Schreiber, C. A. et Redelmeier, D. A.",
+        "annee": "1993",
+        "titre": "When more pain is preferred to less: adding a better end",
+        "url": "https://en.wikipedia.org/wiki/Peak%E2%80%93end_rule",
+        "lu_par": "page Wikipédia ouverte, qui résume et cite l'étude (l'article d'origine n'a pas été ouvert)"
+      },
+      "solidite": "plusieurs études"
+    },
+    {
+      "id": "trois-axes",
+      "phase": 1,
+      "titre": "Deux ou trois axes",
+      "conseil": "Limite-toi à deux ou trois grandes parties, et à trois ou quatre idées par partie. Si tu en as plus, regroupe.",
+      "pourquoi": "Une synthèse de 2001 estime qu'on garde en tête environ quatre éléments à la fois, et que le célèbre « sept » n'était qu'une approximation.",
+      "source": {
+        "auteurs": "Cowan, N.",
+        "annee": "2001",
+        "titre": "The magical number 4 in short-term memory: a reconsideration of mental storage capacity. Behavioral and Brain Sciences, 24(1), 87-114",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/11515286/",
+        "lu_par": "résumé ouvert par Europe PMC"
+      },
+      "solidite": "plusieurs études"
+    },
+    {
+      "id": "tes-propres-mots",
+      "phase": 1,
+      "titre": "Écris avec tes mots",
+      "conseil": "Rédige chaque point du plan toi-même, sans copier une phrase d'une source. Si tu n'y arrives pas, c'est que le point n'est pas encore compris.",
+      "pourquoi": "On retient en général mieux ce qu'on a produit soi-même que ce qu'on a seulement lu (effet de génération), même si l'effet est plus faible sur un contenu tout nouveau.",
+      "source": {
+        "auteurs": "Wikipédia (en)",
+        "annee": "consulté en 2026",
+        "titre": "Generation effect",
+        "url": "https://en.wikipedia.org/wiki/Generation_effect",
+        "lu_par": "page d'encyclopédie ouverte"
+      },
+      "solidite": "plusieurs études"
+    },
+    {
+      "id": "mots-techniques",
+      "phase": 1,
+      "titre": "Explique chaque mot technique",
+      "conseil": "Fais lire ton plan à quelqu'un qui ne fait pas NSI et souligne chaque mot qu'il ou elle ne comprend pas. Prévois une définition d'une phrase pour chacun.",
+      "pourquoi": "Dans une expérience, des personnes tapotaient le rythme d'une chanson connue : elles surestimaient toujours le nombre de chansons que les autres reconnaîtraient. Quand on sait, on oublie ce que c'est de ne pas savoir.",
+      "source": {
+        "auteurs": "Newton, E. L.",
+        "annee": "1990",
+        "titre": "The rocky road from actions to intentions (expérience des chansons tapotées)",
+        "url": "https://en.wikipedia.org/wiki/Curse_of_knowledge",
+        "lu_par": "page Wikipédia ouverte, qui résume et cite l'étude (l'article d'origine n'a pas été ouvert)"
+      },
+      "solidite": "une étude"
+    },
+    {
+      "id": "compte-tes-mots",
+      "phase": 1,
+      "titre": "Compte tes mots",
+      "conseil": "Vise 100 à 125 mots par minute, soit environ 1 000 à 1 250 mots pour dix minutes. Si ton texte en fait le double, coupe au lieu d'accélérer.",
+      "pourquoi": "C'est le débit confortable indiqué par le manuel de Linda Wong (2014) pour une présentation ; c'est un repère de manuel, pas le résultat d'une expérience.",
+      "source": {
+        "auteurs": "Wong, L.",
+        "annee": "2014",
+        "titre": "Essential Study Skills. Cengage Learning. ISBN 978-1285965628, p. 348",
+        "url": "https://books.google.fr/books?id=yL2iAgAAQBAJ&q=conversation+words+per+minute&pg=PA348&redir_esc=y",
+        "lu_par": "référence de l'enseignant (faire-un-plan.tex) ; Google Livres refuse l'ouverture automatique ; le chiffre a été relu sur la page Wikipédia « Words per minute », qui cite ce livre : https://en.wikipedia.org/wiki/Words_per_minute"
+      },
+      "solidite": "repère de manuel"
+    },
+    {
+      "id": "plan-pas-texte",
+      "phase": 1,
+      "titre": "Un plan, pas un texte",
+      "conseil": "Prépare des mots-clés et des points courts, pas des phrases à lire. Entraîne-toi à refaire ce support en vingt minutes.",
+      "pourquoi": "D'après la page officielle, tu disposes de vingt minutes de préparation et tu peux t'appuyer sur un support papier (notes, plan, mots-clés) ; le jury attend une parole personnelle, pas une lecture.",
+      "source": {
+        "auteurs": "Ministère de l'Éducation nationale (éduscol)",
+        "annee": "2024",
+        "titre": "Présentation du Grand oral (mise à jour d'avril 2024)",
+        "url": "https://eduscol.education.fr/729/presentation-du-grand-oral",
+        "lu_par": "page officielle ouverte"
+      },
+      "solidite": "retour de jurys"
+    },
+    {
+      "id": "arguments-sources",
+      "phase": 1,
+      "titre": "Donne tes sources",
+      "conseil": "Pour chaque argument, note d'où il vient : une étude, une loi, un fait daté. Dis-le en une demi-phrase à l'oral.",
+      "pourquoi": "La grille indicative des jurys décrit une argumentation satisfaisante comme une démonstration construite, appuyée sur des arguments précis et pertinents.",
+      "source": {
+        "auteurs": "Inspection pédagogique régionale, académie de Versailles",
+        "annee": "2023",
+        "titre": "Grand Oral 2023 – Charte des examinateurs et des examinatrices",
+        "url": "https://educamus.ac-versailles.fr/IMG/pdf/grand-oral_bac_charte_examinateurs_2023.pdf",
+        "lu_par": "document ouvert"
+      },
+      "solidite": "retour de jurys"
+    },
+    {
+      "id": "reponds-a-la-question",
+      "phase": 1,
+      "titre": "Réponds à ta question",
+      "conseil": "Vérifie que ta conclusion contient une réponse claire à la question posée, avec ses mots. Quelqu'un qui n'aurait entendu que ta conclusion doit connaître ta position.",
+      "pourquoi": "La définition officielle de l'épreuve est simple : pendant dix minutes, la ou le candidat « présente la question choisie et y répond ».",
+      "source": {
+        "auteurs": "Ministère de l'Éducation nationale (éduscol)",
+        "annee": "2024",
+        "titre": "Présentation du Grand oral (mise à jour d'avril 2024)",
+        "url": "https://eduscol.education.fr/729/presentation-du-grand-oral",
+        "lu_par": "page officielle ouverte"
+      },
+      "solidite": "retour de jurys"
+    },
+    {
+      "id": "teste-toi",
+      "phase": 2,
+      "titre": "Teste-toi au lieu de relire",
+      "conseil": "Ferme tes notes et récite ton exposé de mémoire, puis vérifie ce que tu as oublié. Fais-le même si c'est inconfortable.",
+      "pourquoi": "Dans l'étude de Roediger et Karpicke (2006), relire donnait un meilleur résultat cinq minutes après, mais se tester donnait un bien meilleur souvenir aux tests différés.",
+      "source": {
+        "auteurs": "Roediger, H. L. et Karpicke, J. D.",
+        "annee": "2006",
+        "titre": "Test-enhanced learning: taking memory tests improves long-term retention. Psychological Science, 17(3), 249-255",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/16507066/",
+        "lu_par": "résumé de l'article ouvert"
+      },
+      "solidite": "bien établi"
+    },
+    {
+      "id": "range-le-surligneur",
+      "phase": 2,
+      "titre": "Range le surligneur",
+      "conseil": "Remplace une séance de relecture surlignée par une séance de questions sans notes. Garde le surligneur pour repérer, pas pour apprendre.",
+      "pourquoi": "Une grande revue de 2013 classe la relecture et le surlignage parmi les techniques peu utiles, et le test et la pratique étalée parmi les plus utiles.",
+      "source": {
+        "auteurs": "Dunlosky, J., Rawson, K. A., Marsh, E. J., Nathan, M. J. et Willingham, D. T.",
+        "annee": "2013",
+        "titre": "Improving students' learning with effective learning techniques. Psychological Science in the Public Interest, 14(1), 4-58",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/26173288/",
+        "lu_par": "résumé ouvert par Europe PMC"
+      },
+      "solidite": "bien établi"
+    },
+    {
+      "id": "etale-tes-repetitions",
+      "phase": 2,
+      "titre": "Étale tes répétitions",
+      "conseil": "Répète un peu, plusieurs jours de suite, plutôt que tout la veille. Plus l'oral est loin, plus tu peux espacer les séances.",
+      "pourquoi": "Une synthèse de 317 expériences montre que l'espacement des séances améliore la mémorisation, et que le bon intervalle grandit avec le délai avant l'épreuve.",
+      "source": {
+        "auteurs": "Cepeda, N. J., Pashler, H., Vul, E., Wixted, J. T. et Rohrer, D.",
+        "annee": "2006",
+        "titre": "Distributed practice in verbal recall tasks: a review and quantitative synthesis. Psychological Bulletin, 132(3), 354-380",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/16719566/",
+        "lu_par": "résumé de l'article ouvert"
+      },
+      "solidite": "bien établi"
+    },
+    {
+      "id": "court-mais-souvent",
+      "phase": 2,
+      "titre": "Fais court, mais souvent",
+      "conseil": "Préfère quatre séances de quinze minutes à une séance d'une heure. Arrête-toi avant d'être lassé·e.",
+      "pourquoi": "Dans une étude de 1978, des postiers qui apprenaient à taper au clavier en séances courtes, réparties sur plus de jours, apprenaient mieux que ceux qui avaient de longues séances.",
+      "source": {
+        "auteurs": "Baddeley, A. D. et Longman, D. J. A.",
+        "annee": "1978",
+        "titre": "The influence of length and frequency of training session on the rate of learning to type",
+        "url": "https://en.wikipedia.org/wiki/Distributed_practice",
+        "lu_par": "page Wikipédia ouverte, qui résume et cite l'étude (l'article d'origine n'a pas été ouvert)"
+      },
+      "solidite": "une étude"
+    },
+    {
+      "id": "a-voix-haute",
+      "phase": 2,
+      "titre": "Répète à voix haute",
+      "conseil": "Dis ton exposé pour de vrai, à voix haute, au lieu de le repasser dans ta tête. Commence par les passages que tu maîtrises le moins.",
+      "pourquoi": "Dans une série d'expériences, des mots lus à voix haute étaient mieux retenus que des mots lus en silence dans la même liste ; l'effet a été montré sur des listes de mots, pas sur des exposés.",
+      "source": {
+        "auteurs": "MacLeod, C. M., Gopie, N., Hourihan, K. L., Neary, K. R. et Ozubko, J. D.",
+        "annee": "2010",
+        "titre": "The production effect: delineation of a phenomenon. Journal of Experimental Psychology: Learning, Memory, and Cognition, 36(3), 671-685",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/20438265/",
+        "lu_par": "résumé de l'article ouvert"
+      },
+      "solidite": "plusieurs études"
+    },
+    {
+      "id": "refais-ton-plan",
+      "phase": 2,
+      "titre": "Refais ton plan de mémoire",
+      "conseil": "Prends une feuille blanche, un minuteur de vingt minutes, et réécris ton plan sans modèle. Compare ensuite avec l'original.",
+      "pourquoi": "Retrouver une information de mémoire la consolide mieux que la revoir, et c'est exactement ce que tu feras pendant les vingt minutes de préparation de l'épreuve.",
+      "source": {
+        "auteurs": "Roediger, H. L. et Karpicke, J. D.",
+        "annee": "2006",
+        "titre": "Test-enhanced learning: taking memory tests improves long-term retention. Psychological Science, 17(3), 249-255",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/16507066/",
+        "lu_par": "résumé de l'article ouvert"
+      },
+      "solidite": "bien établi"
+    },
+    {
+      "id": "demande-un-retour",
+      "phase": 2,
+      "titre": "Demande un retour",
+      "conseil": "Après chaque essai devant quelqu'un, demande une chose réussie et une chose à changer. Note-les avant l'essai suivant.",
+      "pourquoi": "Se tester est plus efficace quand on reçoit ensuite un retour sur ses réponses, d'après les travaux sur l'effet de test.",
+      "source": {
+        "auteurs": "Wikipédia (en)",
+        "annee": "consulté en 2026",
+        "titre": "Testing effect",
+        "url": "https://en.wikipedia.org/wiki/Testing_effect",
+        "lu_par": "page d'encyclopédie ouverte"
+      },
+      "solidite": "plusieurs études"
+    },
+    {
+      "id": "grille-du-jury",
+      "phase": 2,
+      "titre": "Évalue-toi avec la grille",
+      "conseil": "Filme-toi ou fais-toi écouter, puis note-toi sur les cinq critères du jury au lieu de te fier à ton impression. Fais remplir la même grille par quelqu'un d'autre.",
+      "pourquoi": "Dans l'étude de Kruger et Dunning (1999), les personnes les moins bonnes à un test se situaient en moyenne au 62e centile alors qu'elles étaient au 12e ; s'entraîner les aidait à mieux se juger. La grille indicative des jurys a cinq critères : qualité orale, prise de parole en continu, connaissances, interaction, argumentation.",
+      "source": {
+        "auteurs": "Kruger, J. et Dunning, D.",
+        "annee": "1999",
+        "titre": "Unskilled and unaware of it. Journal of Personality and Social Psychology, 77(6), 1121-1134",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/10626367/",
+        "lu_par": "résumé ouvert par Europe PMC"
+      },
+      "solidite": "une étude"
+    },
+    {
+      "id": "conditions-reelles",
+      "phase": 2,
+      "titre": "Répète debout, comme le jour J",
+      "conseil": "Entraîne-toi debout, sans écran, avec seulement ta feuille, et si possible dans une salle de classe. Chronomètre-toi.",
+      "pourquoi": "Dans une expérience célèbre, des plongeurs retenaient mieux sous l'eau les mots appris sous l'eau, et sur terre ceux appris sur terre ; et le jour de l'épreuve, tu seras debout pendant ton exposé.",
+      "source": {
+        "auteurs": "Godden, D. R. et Baddeley, A. D.",
+        "annee": "1975",
+        "titre": "Context-dependent memory in two natural environments: on land and underwater",
+        "url": "https://en.wikipedia.org/wiki/Context-dependent_memory",
+        "lu_par": "page Wikipédia ouverte, qui résume et cite l'étude (l'article d'origine n'a pas été ouvert)"
+      },
+      "solidite": "une étude"
+    },
+    {
+      "id": "chronometre",
+      "phase": 2,
+      "titre": "Chronomètre chaque essai",
+      "conseil": "Lance un minuteur de dix minutes à chaque répétition et note où tu en es à cinq minutes. Ajuste le plan, pas ta vitesse.",
+      "pourquoi": "L'épreuve est cadrée à la minute : dix minutes d'exposé, puis dix minutes d'échange, après vingt minutes de préparation.",
+      "source": {
+        "auteurs": "Ministère de l'Éducation nationale (éduscol)",
+        "annee": "2024",
+        "titre": "Présentation du Grand oral (mise à jour d'avril 2024)",
+        "url": "https://eduscol.education.fr/729/presentation-du-grand-oral",
+        "lu_par": "page officielle ouverte"
+      },
+      "solidite": "retour de jurys"
+    },
+    {
+      "id": "trac-invisible",
+      "phase": 2,
+      "titre": "Ton trac se voit peu",
+      "conseil": "Quand tu sens ton cœur battre, rappelle-toi que le jury ne le voit pas. Continue ta phrase.",
+      "pourquoi": "Dans plusieurs expériences, les personnes surestimaient à quel point les autres devinaient ce qu'elles ressentaient : nos états intérieurs « fuient » moins qu'on ne le croit.",
+      "source": {
+        "auteurs": "Gilovich, T., Savitsky, K. et Medvec, V. H.",
+        "annee": "1998",
+        "titre": "The illusion of transparency: biased assessments of others' ability to read one's emotional states. Journal of Personality and Social Psychology, 75(2), 332-346",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/9731312/",
+        "lu_par": "résumé de l'article ouvert"
+      },
+      "solidite": "plusieurs études"
+    },
+    {
+      "id": "le-savoir-aide",
+      "phase": 2,
+      "titre": "Le savoir aide déjà",
+      "conseil": "Relis ce conseil juste avant d'entrer : ta nervosité est moins visible que tu ne le penses. Dis-le aussi à tes camarades.",
+      "pourquoi": "Dans une étude de 2003, les orateurs et oratrices croyaient leur nervosité plus visible qu'elle ne l'était, et le simple fait de connaître cette illusion pouvait améliorer la qualité de leur prestation.",
+      "source": {
+        "auteurs": "Savitsky, K. et Gilovich, T.",
+        "annee": "2003",
+        "titre": "The illusion of transparency and the alleviation of speech anxiety. Journal of Experimental Social Psychology, 39(6), 618-625",
+        "url": "https://www.sciencedirect.com/science/article/abs/pii/S0022103103000568",
+        "lu_par": "résumé de l'article ouvert"
+      },
+      "solidite": "une étude"
+    },
+    {
+      "id": "jai-hate",
+      "phase": 2,
+      "titre": "Dis « j'ai hâte »",
+      "conseil": "Avant d'entrer, dis-toi à voix basse « j'ai hâte » plutôt que « calme-toi ». Ton cœur bat vite : appelle ça de l'énergie.",
+      "pourquoi": "Dans l'étude d'Alison Brooks (2014), les personnes qui requalifiaient leur anxiété en excitation, par une simple phrase, se sentaient plus enthousiastes et réussissaient mieux que celles qui cherchaient à se calmer.",
+      "source": {
+        "auteurs": "Brooks, A. W.",
+        "annee": "2014",
+        "titre": "Get excited: reappraising pre-performance anxiety as excitement. Journal of Experimental Psychology: General, 143(3), 1144-1158",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/24364682/",
+        "lu_par": "résumé ouvert par Europe PMC"
+      },
+      "solidite": "une étude"
+    },
+    {
+      "id": "projecteur",
+      "phase": 2,
+      "titre": "On remarque moins tes ratés",
+      "conseil": "Si tu te trompes d'un mot, corrige en une seconde et avance. Ne t'excuse pas trois fois.",
+      "pourquoi": "Dans des expériences de 2000, les participant·e·s surestimaient le nombre de personnes qui remarquaient leur apparence ou leurs interventions : c'est l'effet projecteur.",
+      "source": {
+        "auteurs": "Gilovich, T., Medvec, V. H. et Savitsky, K.",
+        "annee": "2000",
+        "titre": "The spotlight effect in social judgment. Journal of Personality and Social Psychology, 78(2), 211-222",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/10707330/",
+        "lu_par": "résumé ouvert par Europe PMC"
+      },
+      "solidite": "plusieurs études"
+    },
+    {
+      "id": "ecris-tes-inquietudes",
+      "phase": 2,
+      "titre": "Écris tes inquiétudes",
+      "conseil": "Dix minutes avant, écris sur un papier ce qui t'inquiète pour cet oral, puis range-le. Ne le relis pas.",
+      "pourquoi": "Dans une étude publiée dans Science en 2011, des élèves qui écrivaient brièvement leurs inquiétudes juste avant un examen important obtenaient de meilleures notes, surtout les plus anxieux·ses.",
+      "source": {
+        "auteurs": "Ramirez, G. et Beilock, S. L.",
+        "annee": "2011",
+        "titre": "Writing about testing worries boosts exam performance in the classroom. Science, 331(6014), 211-213",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/21233387/",
+        "lu_par": "résumé de l'article ouvert"
+      },
+      "solidite": "une étude"
+    },
+    {
+      "id": "trac-normal",
+      "phase": 2,
+      "titre": "Le trac est la règle",
+      "conseil": "Ne lis pas ton trac comme le signe que tu n'es pas prêt·e : presque tout le monde l'a. Parle-en avec tes camarades.",
+      "pourquoi": "Dans une étude de 2017 sur des étudiant·e·s d'une université américaine, 64 % disaient avoir peur de parler en public.",
+      "source": {
+        "auteurs": "Ferreira Marinho, A. C. et coll.",
+        "annee": "2017",
+        "titre": "Fear of public speaking: perception of college students and correlates. Journal of Voice",
+        "url": "https://en.wikipedia.org/wiki/Glossophobia",
+        "lu_par": "page Wikipédia ouverte, qui résume et cite l'étude (l'article d'origine n'a pas été ouvert)"
+      },
+      "solidite": "une étude"
+    },
+    {
+      "id": "mythe-7-pourcent",
+      "phase": 2,
+      "titre": "Oublie le « 7 % des mots »",
+      "conseil": "Travaille d'abord ce que tu dis : le fond compte. La voix et les gestes servent tes idées, ils ne les remplacent pas.",
+      "pourquoi": "La règle « 7 % les mots, 38 % la voix, 55 % le corps » vient d'expériences sur des mots isolés exprimant un sentiment ; Mehrabian lui-même précise que ces chiffres ne s'appliquent pas hors de la communication de sentiments ou d'attitudes.",
+      "source": {
+        "auteurs": "Mehrabian, A.",
+        "annee": "1967",
+        "titre": "Travaux sur la communication des sentiments et des attitudes (règle dite « 7-38-55 »)",
+        "url": "https://en.wikipedia.org/wiki/Albert_Mehrabian",
+        "lu_par": "page Wikipédia ouverte, qui cite la mise au point de Mehrabian lui-même"
+      },
+      "solidite": "bien établi"
+    },
+    {
+      "id": "pose-de-pouvoir",
+      "phase": 2,
+      "titre": "Pas de pose magique",
+      "conseil": "Inutile de te tenir « en super-héros » deux minutes avant d'entrer. Utilise ce temps pour redire ta première phrase.",
+      "pourquoi": "Une réplication de 2015 sur un grand échantillon n'a trouvé aucun effet des « poses de pouvoir » sur les hormones ni sur la prise de risque, et l'une des autrices de l'étude d'origine a déclaré en 2016 ne plus croire à ces effets.",
+      "source": {
+        "auteurs": "Ranehill, E., Dreber, A., Johannesson, M., Leiberg, S., Sul, S. et Weber, R. A.",
+        "annee": "2015",
+        "titre": "Assessing the robustness of power posing: no effect on hormones and risk tolerance in a large sample of men and women. Psychological Science, 26(5), 653-656. doi:10.1177/0956797614553946",
+        "url": "https://en.wikipedia.org/wiki/Power_posing",
+        "lu_par": "référence ouverte par Europe PMC (sans résumé) ; résultat et déclaration de D. Carney lus sur la page Wikipédia"
+      },
+      "solidite": "plusieurs études"
+    },
+    {
+      "id": "quelques-euh",
+      "phase": 2,
+      "titre": "Ne panique pas pour un « euh »",
+      "conseil": "Ne cherche pas à supprimer tous tes « euh » : cherche à finir tes phrases. Si tu as besoin de réfléchir, dis-le (« je reformule… ») plutôt que de te taire longtemps.",
+      "pourquoi": "Les hésitations sont normales : elles peuvent représenter jusqu'à 20 % des « mots » d'une conversation, et peuvent même signaler à l'auditoire qu'une idée nouvelle ou complexe arrive.",
+      "source": {
+        "auteurs": "Wikipédia (en)",
+        "annee": "consulté en 2026",
+        "titre": "Speech disfluency",
+        "url": "https://en.wikipedia.org/wiki/Speech_disfluency",
+        "lu_par": "page d'encyclopédie ouverte"
+      },
+      "solidite": "plusieurs études"
+    },
+    {
+      "id": "dors",
+      "phase": 2,
+      "titre": "Dors la veille",
+      "conseil": "La veille, arrête de réviser à une heure fixe et dors une nuit complète. Une dernière répétition le matin suffit.",
+      "pourquoi": "Le sommeil stabilise et renforce les souvenirs, et le manque de sommeil peut dégrader la mémoire de travail, d'après les travaux résumés sur le sommeil et la mémoire.",
+      "source": {
+        "auteurs": "Wikipédia (en)",
+        "annee": "consulté en 2026",
+        "titre": "Sleep and memory",
+        "url": "https://en.wikipedia.org/wiki/Sleep_and_memory",
+        "lu_par": "page d'encyclopédie ouverte"
+      },
+      "solidite": "bien établi"
+    },
+    {
+      "id": "echange-pas-interro",
+      "phase": 2,
+      "titre": "L'échange n'est pas une interro",
+      "conseil": "Écoute la question jusqu'au bout, prends deux secondes, puis réponds en partant de ce que tu as dit. Tu as le droit de préciser ou de nuancer ta pensée.",
+      "pourquoi": "La charte des jurys demande des questions brèves, ancrées dans ton propos, à un rythme qui te laisse « le temps de réfléchir » ; l'entretien évalue ta capacité à écouter et à préciser ta pensée, ce n'est pas un contrôle de connaissances.",
+      "source": {
+        "auteurs": "Inspection pédagogique régionale, académie de Versailles",
+        "annee": "2023",
+        "titre": "Grand Oral 2023 – Charte des examinateurs et des examinatrices",
+        "url": "https://educamus.ac-versailles.fr/IMG/pdf/grand-oral_bac_charte_examinateurs_2023.pdf",
+        "lu_par": "document ouvert"
+      },
+      "solidite": "retour de jurys"
+    },
+    {
+      "id": "prepare-les-questions",
+      "phase": 2,
+      "titre": "Prépare dix questions",
+      "conseil": "Écris dix questions que ton exposé peut provoquer et réponds à chacune à voix haute en trente secondes. Demande à un·e camarade d'en inventer d'autres.",
+      "pourquoi": "Les questions du jury doivent partir de ce que tu as dit : en relisant ton plan, tu peux donc en deviner une bonne partie. Et s'entraîner à répondre de mémoire est plus efficace que relire.",
+      "source": {
+        "auteurs": "Inspection pédagogique régionale, académie de Versailles",
+        "annee": "2023",
+        "titre": "Grand Oral 2023 – Charte des examinateurs et des examinatrices",
+        "url": "https://educamus.ac-versailles.fr/IMG/pdf/grand-oral_bac_charte_examinateurs_2023.pdf",
+        "lu_par": "document ouvert"
+      },
+      "solidite": "retour de jurys"
+    }
+  ],
+  "ecartes": [
+    {
+      "sujet": "Gestes : « faire des gestes allège la mémoire » (Goldin-Meadow et coll., 2001)",
+      "pourquoi": "Résumé non ouvert (PubMed bloqué par un contrôle anti-robot, Europe PMC limité en débit)."
+    },
+    {
+      "sujet": "Regard et contact visuel avec le jury",
+      "pourquoi": "Aucune source ouverte ; les documents officiels consultés n'en parlent pas explicitement."
+    },
+    {
+      "sujet": "Silences et pauses : effet sur l'auditoire",
+      "pourquoi": "La seule page ouverte (Speech disfluency) ne compare pas les pauses silencieuses et les hésitations ; le conseil retenu se limite à ce qu'elle dit."
+    },
+    {
+      "sujet": "Charge cognitive et diaporama (effet de redondance)",
+      "pourquoi": "Non cherché en priorité : l'épreuve se passe sans diaporama."
+    },
+    {
+      "sujet": "Choisir soi-même son sujet augmente la motivation (Patall, Cooper et Robinson, 2008)",
+      "pourquoi": "Résumé non ouvert (limite de débit)."
+    },
+    {
+      "sujet": "Préparer et répéter devant un public améliore la note (Menzel et Carrell, 1994)",
+      "pourquoi": "Page de l'éditeur inaccessible."
+    },
+    {
+      "sujet": "Répétition mentale (Driskell, Copper et Moran, 1994)",
+      "pourquoi": "La page ouverte ne mentionne pas cette méta-analyse."
+    },
+    {
+      "sujet": "Effet de l'intention « si… alors » chiffré (méta-analyse de Gollwitzer et Sheeran, 2006)",
+      "pourquoi": "Chiffres absents de la page ouverte : le conseil est gardé sans chiffre."
+    },
+    {
+      "sujet": "Rapports de jurys nationaux du Grand oral (IGÉSR) : constats sur la récitation",
+      "pourquoi": "Le document de l'IGÉSR n'a pas pu être ouvert (seule sa page de présentation l'a été) ; la page du ministère education.gouv.fr est inaccessible. Les « retours de jurys » viennent donc de la page éduscol (avril 2024) et de la charte des examinateurs de l'académie de Versailles (session 2023), qui sont des consignes aux jurys, pas des bilans de session."
+    },
+    {
+      "sujet": "Wong (2014), page 348 lue directement",
+      "pourquoi": "Google Livres refuse l'ouverture automatique : le chiffre 100-125 mots par minute a été relu sur Wikipédia, qui cite ce livre pour les présentations avec diapositives."
+    }
+  ]
+}

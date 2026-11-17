@@ -9,9 +9,9 @@
   // worker et les caches de Hello GO effacés, puis la page rechargée à une adresse neuve), puis on explique, avec les détails
   // techniques à recopier. Le dossier de l'élève (localStorage) n'est jamais touché. Le même message est écrit dans
   // index.html (HG_PANNE), pour le cas où ce fichier-ci ne peut pas s'exécuter : les deux textes vont ensemble.
-  const VERSION_APP = '1.5.0'; // la même que HG_VERSION (index.html), sw.js et les ?v= de index.html (tests/versions.test.js)
+  const VERSION_APP = '1.6.0'; // la même que HG_VERSION (index.html), sw.js et les ?v= de index.html (tests/versions.test.js)
   window.HG_VERSION_APP = VERSION_APP;
-  const MODULES = [['HGDonnees', 'js/donnees.js'], ['HGDecouvertes', 'js/decouvertes.js'], ['HGAnalyse', 'js/coach.js'],
+  const MODULES = [['HGDonnees', 'js/donnees.js'], ['HGDecouvertes', 'js/decouvertes.js'], ['HGCulture', 'js/culture.js'], ['HGAnalyse', 'js/coach.js'],
     ['HGRetours', 'js/retours.js'], ['HGExport', 'js/export.js'], ['HGEnLigne', 'js/en-ligne.js'], ['HGProf', 'js/prof.js']];
   const CLE_REPARATION = 'hellogo:reparation', BASE = new URL('./', location.href).href;
   function oublierHelloGo() {
@@ -350,10 +350,7 @@
       <p><a class="bouton principal" href="#/">Je l’ai noté</a></p></section>`; };
 
   vues.accueil = () => {
-    const pa = A.prochaineAction(d), ph = A.phase(d);
-    const liste = D.A_SAVOIR.filter((x) => x.p === ph);
-    const jour = Math.floor(Date.now() / 864e5) + (d.vus.decalage || 0);
-    const savoir = liste[jour % liste.length];
+    const pa = A.prochaineAction(d);
     const nPoints = d.questions.reduce((t, q) => t + A.tousLesPoints(q).length, 0);
     const nHf = A.hautsFaitsDates(d).length;
     const debut = [['Découvrir 10 cartes', Object.keys(d.decouverte.reactions).length >= 10, '#/explorer/decouvrir'], ['Dire ce que j’aime', d.quiz.fait, '#/explorer/quiz'], ['Garder une piste', d.pistes.length > 0 || d.questions.length > 0, '#/explorer/sujets'],
@@ -371,11 +368,9 @@
       <p class="gros">${e(pa.texte)}</p>
       <a class="bouton principal" href="${pa.vers}">${e(pa.bouton)}</a>
     </section>
-    <section class="carte savoir">
-      <p class="sur-titre">À savoir aujourd’hui</p>
-      <p class="gros">${e(savoir.t)}</p>
-      <p><a href="#/aide">En savoir plus</a> · <button class="lien" data-a="autre-savoir">Un autre</button></p>
-    </section>
+    ${blocConseil()}
+    ${blocInfoxJour()}
+    ${blocVideoAccueil()}
     <section class="chiffres">
       <a href="#/questions"><b>${nPoints}</b> ${nPoints > 1 ? 'points' : 'point'}</a>
       <a href="#/mots"><b>${d.mots.length}</b> ${d.mots.length > 1 ? 'mots' : 'mot'}</a>
@@ -388,7 +383,7 @@
   };
 
   function ongletsExplorer(actif) {
-    return `<h1>Explorer</h1><nav class="onglets" aria-label="Explorer">${[['decouvrir', 'Découvrir'], ['quiz', 'Mes goûts'], ['sujets', 'Sujets'], ['pistes', 'Mes pistes' + (d.pistes.length ? ' (' + d.pistes.length + ')' : '')]]
+    return `<h1>Explorer</h1><nav class="onglets" aria-label="Explorer">${[['decouvrir', 'Découvrir'], ['infox', 'Info ou infox ?'], ['quiz', 'Mes goûts'], ['videos', 'Vidéos'], ['sujets', 'Sujets'], ['pistes', 'Mes pistes' + (d.pistes.length ? ' (' + d.pistes.length + ')' : '')]]
       .map((o) => `<a href="#/explorer/${o[0]}"${o[0] === actif ? ' aria-current="page"' : ''}>${o[1]}</a>`).join('')}</nav>`;
   }
   function carteSujet(s, raisons) {
@@ -435,7 +430,7 @@
       <input type="text" id="piste-libre" placeholder="Par exemple : une panne, une arnaque, une invention…" aria-label="Une actualité qui m’a marqué·e"><button data-a="piste-libre">Ajouter à mes pistes</button></section>
     <button class="principal" data-a="quiz-fini">Voir mes sujets</button>
     <div id="resultats">${d.quiz.fait ? `<h2>Des sujets pour toi</h2>${sug.length ? `<ul class="liste">${sug.map((x) => carteSujet(x.sujet, x.raisons)).join('')}</ul>` : '<p>Coche au moins une réponse pour avoir des propositions.</p>'}
-      <p><a href="#/explorer/sujets">Voir tous les sujets</a></p>` : ''}</div>`;
+      <p><a href="#/explorer/sujets">Voir tous les sujets</a></p>${troisVideos('Des vidéos pour toi')}` : ''}</div>`;
   };
   vues.sujets = (arg) => {
     const themes = [...new Set(D.SUJETS.map((s) => s.th))];
@@ -522,7 +517,8 @@
         <div class="tete">${champ('partie.' + q.id + '.' + p.id + '.titre', p.titre, 'class="titre-partie" aria-label="Titre de la partie"')}<span class="note">${p.minutes ? '≈ ' + p.minutes + ' min' : ''}</span></div>
         <ul class="points" data-points="${p.id}">${p.points.map((x) => htmlPoint(q, x)).join('')}</ul>
         ${p.points.length ? '' : `<p class="vide">Aucun point pour le moment. ${exemple}</p>`}
-        <button class="ajouter" data-a="plus-pt" data-q="${q.id}" data-partie="${p.id}">+ Ajouter un point</button></section>`).join('')}
+        <button class="ajouter" data-a="plus-pt" data-q="${q.id}" data-partie="${p.id}">+ Ajouter un point</button>
+        ${p === (q.parties.find((x) => /intro/i.test(x.titre)) || q.parties[0]) ? `<button class="ajouter discret" data-a="piocher" data-q="${q.id}">Piocher une accroche</button>` : ''}</section>`).join('')}
       <p class="bas"><button data-a="plus-axe" data-q="${q.id}">+ Ajouter un axe</button>
         <button class="principal" data-a="pdf" data-q="${q.id}">Télécharger en PDF</button></p>
       ${blocMarkdown()}
@@ -646,12 +642,16 @@
     <a href="#/hauts-faits">Mes hauts faits<span>${A.hautsFaitsDates(d).length} sur ${A.HAUTS_FAITS.length}</span></a>
     <a href="#/aide">Aide et méthode<span>Comprendre l’épreuve, fiches de méthode</span></a>
     <a href="#/comprendre">Vérifier que j’ai compris<span>Deux quiz : l’épreuve, la méthode du plan</span></a>
+    <a href="#/conseils">Les conseils, et pourquoi<span>${C.CONSEILS.length} conseils fondés sur des résultats observés</span></a>
+    <a href="#/explorer/infox">Info ou infox ?<span>Des faits de l’informatique, et mes accroches</span></a>
+    <a href="#/explorer/videos">Vidéos et chaînes<span>Pour nourrir ma culture scientifique</span></a>
     <a href="#/aide/exemple">Voir un exemple<span>Un plan complet sur les biais algorithmiques</span></a>
     ${enLigne() ? `<a href="#/retours">Les retours de mon enseignant·e<span>${retoursProf.items.length} retour${retoursProf.items.length > 1 ? 's' : ''}</span></a>` : ''}
     <a href="#/reglages">Réglages<span>${enLigne() ? 'Mon code, quitter cet appareil, télécharger mon dossier' : 'Rejoindre ma classe, télécharger, importer ou effacer mon dossier'}</span></a></nav>`;
 
   // Une fiche de méthode : #/aide/<id> l'ouvre et la montre (lien « Revoir » des quiz).
-  const fiche = (f, cible) => `<details class="carte fiche" id="fiche-${f.id}"${f.id === 'non-specialiste' ? ' data-fiche="canard"' : ''}${f.id === cible ? ' open data-cible' : ''}><summary>${e(f.titre)}</summary>${f.html}</details>`;
+  const fiche = (f, cible) => { const l = C.CONSEILS.filter((c) => (c.fiches || []).includes(f.id));
+    return `<details class="carte fiche" id="fiche-${f.id}"${f.id === 'non-specialiste' ? ' data-fiche="canard"' : ''}${f.id === cible ? ' open data-cible' : ''}><summary>${e(f.titre)}</summary>${f.html}${l.length ? `<p class="note">Pourquoi ça marche, d’après les études et les consignes aux jurys : ${l.map((c) => `<a href="#/conseils/${c.id}">${e(c.titre)}</a>`).join(' · ')}</p>` : ''}</details>`; };
   // La vidéo du ministère (2021) : un simple lien, sans lecteur intégré, et ce qui a changé pour la session 2027.
   const blocVideo = (ici) => { const v = D.VIDEO_EPREUVE; return `<div class="video-lien">
       <p><a href="${e(v.lien)}" target="_blank" rel="noopener noreferrer">Vidéo : « ${e(v.titre)} »</a> <span class="note">(${e(v.auteur)}, ${e(v.date)} ; sur YouTube, dans un nouvel onglet)</span></p>
@@ -674,6 +674,7 @@
       ${boutonQuiz('epreuve')}</section>
     <h2>Fiches de méthode</h2>
     ${boutonQuiz('plan')}
+    <p><a class="bouton" href="#/conseils">Les conseils, et pourquoi</a></p>
     ${D.FICHES.map((f) => fiche(f, cible)).join('')}
     <p><a class="bouton" href="#/aide/exemple">Voir un exemple de dossier</a></p>`;
 
@@ -759,6 +760,169 @@
       <input type="text" id="confirmer" aria-label="Écris EFFACER pour confirmer" autocomplete="off"><button class="danger" data-a="effacer">Effacer mon dossier</button></section>`}
     <p class="note">Hello GO, version ${window.HG_VERSION}.</p>`; };
 
+  // ---------- La culture (version 1.6.0) : vidéos conseillées, « Info ou infox ? », conseils fondés sur des résultats ----------
+  // Les vidéos sont de simples liens vers leur plateforme, dans un nouvel onglet, sans transmettre l'adresse de la page :
+  // aucun lecteur intégré, aucune miniature, rien n'est chargé d'un autre site.
+  const C = window.HGCulture, aujourdhui = () => A.jourLocal(new Date());
+  const cult = () => A.cultureDe(d);
+  const lienExterne = (url, html) => (R.lienSur(url) ? `<a href="${e(url)}" target="_blank" rel="noopener noreferrer">${html}</a>` : html);
+  let decalageVideo = 0, decalageTrois = 0, filtreVideos = '', salveInfox = null;
+  function apresVideo(v, s) {
+    const piste = s.piste && d.pistes.some((p) => p.id === s.piste), source = s.source && d.sources.some((x) => x.id === s.source);
+    return `<div class="apres-video"><p class="fait-texte">Regardée${/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(s.vue) ? ' le ' + e(dateLongue(s.vue)) : ''}</p>
+      <label>Ce que j’en retiens ${zoneTexte('cv.' + v.id + '.retiens', s.retiens, 'maxlength="400" placeholder="Une ou deux lignes, avec tes mots"')}</label>
+      <label>Ce qui m’a intrigué·e ${zoneTexte('cv.' + v.id + '.intrigue', s.intrigue, 'maxlength="400" placeholder="Une question, un détail, une surprise"')}</label>
+      <p class="note">Une question qu’elle peut ouvrir : « ${e(v.question)} »</p>
+      <p class="boutons">${piste ? '<span class="fait-texte">Dans tes pistes</span>' : `<button data-a="video-piste" data-v="${e(v.id)}">En faire une piste</button>`}
+        ${source ? '<span class="fait-texte">Dans tes sources</span>' : `<button data-a="video-source" data-v="${e(v.id)}">Ajouter à mes sources</button>`}</p></div>`;
+  }
+  // Une vidéo : sa chaîne, qui la conseille, sa langue, son lien, son accroche, pourquoi elle est proposée, puis la suite.
+  function carteVideo(x, tag) {
+    const v = x.video, s = ((d.culture || {}).videos || {})[v.id] || {}, t = tag || 'li';
+    const tete = [e(v.chaine), v.origine === 'enseignant' ? 'conseillée par ton enseignant·e' : 'en complément', v.langue !== 'fr' ? '<b>en anglais</b>' : ''].filter(Boolean).join(' · ');
+    return `<${t} class="carte video" id="video-${e(v.id)}"><p class="sur-titre">${tete}</p>
+      <p class="gros">${lienExterne(v.url, e(v.titre))} <span class="note">(${e(v.plateforme)}, dans un nouvel onglet)</span></p>
+      <p>${e(v.accroche)}</p>${x.pourquoi ? `<p class="note pourquoi-video">${e(x.pourquoi)}</p>` : ''}
+      ${s.vue ? apresVideo(v, s) : `<p class="boutons"><span>Tu l’as regardée ?</span> <button data-a="video-vue" data-v="${e(v.id)}">Oui, je l’ai regardée</button>
+        ${s.avis === -1 ? `<button class="discret" data-a="video-oui" data-v="${e(v.id)}">Remettre dans mes suggestions</button>` : `<button class="discret" data-a="video-non" data-v="${e(v.id)}">Pas pour moi</button>`}</p>`}</${t}>`;
+  }
+  const troisVideos = (titre) => { const l = A.videosPour(d, 3, decalageTrois * 3); return l.length ? `<h2>${titre}</h2><ul class="liste">${l.map((x) => carteVideo(x)).join('')}</ul>
+    <p class="bas"><button class="discret" data-a="videos-autres">Trois autres</button> <a href="#/explorer/videos">Toutes les vidéos</a></p>` : ''; };
+  function blocVideoAccueil() {
+    const x = A.videosPour(d, 1, decalageVideo)[0]; if (!x) return '';
+    const vide = !Object.keys((d.quiz || {}).reponses || {}).length && !Object.keys(d.decouverte.reactions).length;
+    return `<section class="video-accueil"><p class="sur-titre">Une vidéo pour toi</p>${carteVideo(x, 'div')}
+      <p class="note"><button class="lien" data-a="video-autre">Une autre</button> · <a href="#/explorer/videos">Toutes les vidéos</a>${vide ? ' · <a href="#/explorer/quiz">Dire ce que j’aime</a>' : ''}</p></section>`;
+  }
+  vues.videos = () => {
+    const tags = [['', 'Tous les thèmes']].concat(Object.keys(D.TAGS.i).map((k) => ['i.' + k, D.TAGS.i[k]]), Object.keys(D.TAGS.n).map((k) => ['n.' + k, D.TAGS.n[k]]));
+    const classe = A.classerVideos(d), pourquoi = {}; classe.forEach((x) => { pourquoi[x.video.id] = x.pourquoi; });
+    const f = filtreVideos.split('.'), l = C.VIDEOS.filter((v) => !filtreVideos || (f[0] === 'i' ? v.interets : v.notions).includes(f[1]));
+    const vues2 = A.chiffresCulture(d).videos;
+    return ongletsExplorer('videos') + `
+    <p class="chapo">Des vidéos choisies par ton enseignant·e, et quelques compléments, pour nourrir ta culture scientifique et trouver des idées. Après une vidéo, note ce que tu en retiens : elle peut devenir une piste ou une source.</p>
+    ${vues2 ? `<p class="note">Tu en as regardé ${vues2}.</p>` : ''}
+    ${troisVideos('Pour toi')}
+    <h2 id="toutes-videos">Toutes les vidéos</h2>
+    <label>Thème <select id="filtre-videos" aria-label="Filtrer les vidéos par thème">${options(tags, filtreVideos)}</select></label>
+    <p class="note">${pluriel(l.length, 'vidéo')}${filtreVideos ? ' sur ce thème' : ''}.</p>
+    <ul class="liste">${l.map((v) => carteVideo({ video: v, pourquoi: pourquoi[v.id] || '' })).join('')}</ul>
+    <section class="carte" id="chaines"><h2>Chaînes à découvrir</h2><p class="note">Pour continuer après les vidéos : des chaînes et un site sérieux, en français.</p>
+      <ul class="simples chaines">${C.CHAINES.map((c) => `<li><div><p><b>${lienExterne(c.url, e(c.nom))}</b> <span class="note">(${e(c.plateforme)})</span></p><p class="note">${e(c.phrase)}</p></div></li>`).join('')}</ul></section>
+    <p class="note">Liens vérifiés le ${e(dateLongue(C.VERIFIE.videos))} (titre et chaîne de chaque vidéo).</p>`;
+  };
+
+  // « Info ou infox ? » : une affirmation par écran, la réponse, l'explication, la source, et « Garder comme accroche ».
+  // Une affirmation fausse n'apparaît jamais sans son démenti juste après la réponse ; seule la formulation « accroche »
+  // (un fait vrai, ou le démenti) peut rejoindre « Mes accroches » et le plan.
+  const accrocheDe = (a) => String(a.accroche).replace(/^«\s*/, '').replace(/\s*»$/, '');
+  const sourceInfox = (a) => `<p class="note">Source : ${lienExterne(a.source.url, e(a.source.titre))}${(a.autres || []).map((s) => ' · ' + lienExterne(s.url, e(s.titre))).join('')}</p>`;
+  function verdictInfox(a, juste, id) {
+    const gardee = !!((d.culture || {}).accroches || {})[a.id];
+    return `<div class="carte retour-quiz ${juste ? 'juste' : 'faux'}"${id ? ' id="' + id + '" tabindex="-1"' : ''}>
+      <p><b>${juste ? 'Bien vu !' : 'Pas tout à fait.'}</b> C’est ${a.vrai ? 'une <b>info</b> : c’est vrai.' : 'une <b>infox</b> : c’est faux.'}</p>
+      <p>${e(a.explication)}</p><p class="accroche-texte"><span class="note">À retenir :</span> ${e(accrocheDe(a))}</p>${sourceInfox(a)}
+      <p>${gardee ? '<span class="fait-texte">Dans « Mes accroches »</span>' : `<button data-a="infox-garder" data-x="${e(a.id)}">Garder comme accroche</button>`}</p></div>`;
+  }
+  function blocInfoxJour() {
+    const j = A.infoxDuJour(d, aujourdhui()), a = j.a, c = cult();
+    if (j.neuf) c.jour = { j: aujourdhui(), id: a.id };
+    const s = c.infox[a.id], repondu = s && s.le === aujourdhui();
+    return `<section class="carte infox-jour"><p class="sur-titre">Info ou infox ? · l’affirmation du jour</p><p class="gros">${typo(a.affirmation)}</p>
+      ${repondu ? verdictInfox(a, s.d === 1) + '<p><a href="#/explorer/infox">Une salve de 7 affirmations</a></p>'
+        : `<div class="deux"><button data-a="infox-jour" data-r="0">Infox</button><button data-a="infox-jour" data-r="1">Info</button></div>`}</section>`;
+  }
+  function mesAccroches() {
+    const acc = (d.culture || {}).accroches || {}, l = C.INFOX.filter((a) => acc[a.id]).sort((x, y) => String(acc[y.id].le).localeCompare(String(acc[x.id].le)));
+    if (!l.length) return '<section class="carte" id="mes-accroches"><h2>Mes accroches</h2><p class="vide">Aucune pour le moment : après une réponse, « Garder comme accroche » met le fait de côté, pour l’introduction de ta question.</p></section>';
+    return `<section class="carte" id="mes-accroches"><h2>Mes accroches (${l.length})</h2><p class="note">Un fait vrai, daté et sourcé, pour ouvrir ton exposé. Ajouté à ta question, il devient le premier point de l’introduction, avec sa source : reformule-le à ta façon.</p>
+      <ul class="simples accroches">${l.map((a) => { const x = acc[a.id], q = x.q && laQuestion(x.q), dans = q && A.tousLesPoints(q).some((p) => p.id === x.p);
+        return `<li><div><p>${e(accrocheDe(a))}</p>${sourceInfox(a)}
+          ${dans ? `<p class="fait-texte">Dans ton plan : <a href="#/question/${q.id}">« ${e(q.titre || 'ta question')} »</a></p>`
+          : d.questions.length ? `<p class="boutons">${d.questions.map((q2) => `<button class="mini" data-a="accroche-ajouter" data-x="${e(a.id)}" data-q="${q2.id}">Ajouter à « ${e((q2.titre || 'ma question').slice(0, 50))} »</button>`).join(' ')}</p>`
+          : '<p class="note">Tu pourras l’ajouter à l’introduction de ta question dès que tu l’auras choisie.</p>'}
+          <p><button class="mini discret" data-a="accroche-retirer" data-x="${e(a.id)}">Retirer de mes accroches</button></p></div></li>`; }).join('')}</ul></section>`;
+  }
+  vues.infox = () => {
+    const S = salveInfox, ch = A.chiffresCulture(d), tete = ongletsExplorer('infox');
+    const intro = `<p class="chapo">Des faits marquants de l’informatique : vrai ou faux ? À chaque réponse, l’explication et la source. Ce n’est pas noté. Un fait qui te plaît peut devenir l’accroche de ton exposé.</p>`;
+    if (!S) return tete + intro + `<section class="carte"><p class="sur-titre">Tes résultats</p><p>${ch.infox ? `${pluriel(ch.infox, 'affirmation')} vue${ch.infox > 1 ? 's' : ''} sur ${C.INFOX.length}, dont ${ch.reussies} réussie${ch.reussies > 1 ? 's' : ''} la dernière fois.` : 'Pas encore joué.'}</p>
+        <p class="note">Chaque salve commence par les affirmations que tu n’as jamais vues, d’abord celles qui touchent à tes goûts et à ton sujet, puis d’autres pour découvrir autre chose.</p>
+        <p><button class="principal" data-a="infox-commencer">${ch.salves ? 'Encore une salve' : 'Commencer'} (${A.SALVE_INFOX} affirmations)</button></p></section>${mesAccroches()}`;
+    const n = S.ids.length;
+    if (S.fini) {
+      const justes = S.reponses.filter((r, i) => r === A.lInfox(S.ids[i]).vrai).length;
+      return tete + `<section class="carte action-infox" id="infox-fin"><p class="sur-titre">Ta salve</p><p class="score" tabindex="-1">${justes} sur ${n}</p>
+        <p>${justes === n ? 'Sans faute : ta culture informatique est solide !' : 'Chaque erreur est un fait de plus que tu connais maintenant. Les affirmations ratées reviendront dans une prochaine salve.'}</p></section>
+        <h2>Ce qu’il faut retenir</h2><ul class="liste">${S.ids.map((k, i) => { const a = A.lInfox(k), ok = S.reponses[i] === a.vrai;
+          return `<li class="carte"><p class="sur-titre">${ok ? 'Réussie' : 'Ratée'} · ${a.vrai ? 'info' : 'infox'}</p><p>${e(accrocheDe(a))}</p>${sourceInfox(a)}
+            <p>${((d.culture || {}).accroches || {})[a.id] ? '<span class="fait-texte">Dans « Mes accroches »</span>' : `<button class="mini" data-a="infox-garder" data-x="${e(a.id)}">Garder comme accroche</button>`}</p></li>`; }).join('')}</ul>
+        <p class="bas"><button class="principal" data-a="infox-commencer">Encore une salve</button> <button data-a="infox-quitter">Terminer</button></p>${mesAccroches()}`;
+    }
+    const a = A.lInfox(S.ids[S.i]), rep = S.reponses[S.i], valide = rep !== undefined;
+    return tete + `<p class="sur-titre">Affirmation ${S.i + 1} sur ${n}</p><div class="avance" aria-hidden="true"><span style="width:${Math.round(100 * (S.i + (valide ? 1 : 0)) / n)}%"></span></div>
+      <section class="carte infox-carte${valide ? '' : ' a-glisser'}" data-infox="${e(a.id)}"><p class="gros" id="infox-affirmation" tabindex="-1">${typo(a.affirmation)}</p>
+        ${valide ? '' : `<div class="deux grands"><button data-a="infox-repondre" data-r="0"><span aria-hidden="true">← </span>Infox</button><button class="principal" data-a="infox-repondre" data-r="1">Info<span aria-hidden="true"> →</span></button></div>
+        <p class="note">Au clavier : flèche gauche pour « Infox », flèche droite pour « Info ». Sur téléphone, tu peux aussi glisser la carte.</p>`}</section>
+      <div aria-live="polite">${valide ? verdictInfox(a, rep === a.vrai, 'infox-retour') : ''}</div>
+      <p class="bas"><button class="discret" data-a="infox-quitter">Arrêter la salve</button>${valide ? `<button class="principal" data-a="infox-suivante">${S.i + 1 < n ? 'Affirmation suivante' : 'Voir mon score'}</button>` : ''}</p>`;
+  };
+  function repondreInfox(vrai) {
+    const S = salveInfox; if (!S || S.fini || S.reponses[S.i] !== undefined) return;
+    const a = A.lInfox(S.ids[S.i]); S.reponses[S.i] = vrai; A.noterInfox(d, a.id, vrai === a.vrai);
+    enregistrer(true); rendre(false); focusQuiz('#infox-retour');
+  }
+  // Le point « accroche » au début de l'introduction de la question, avec sa source (reprise si elle y est déjà), reliée.
+  function ajouterAccroche(xid, qid) {
+    const a = A.lInfox(xid), q = laQuestion(qid); if (!a || !q) return;
+    const intro = q.parties.find((p) => /intro/i.test(p.titre)) || q.parties[0]; if (!intro) return;
+    let s = d.sources.find((x) => (x.lien || '').trim() === a.source.url);
+    if (!s) { s = { id: uid(), titre: a.source.titre, auteur: '', lien: a.source.url, type: /wikipedia\.org|britannica\.com/.test(a.source.url) ? 'encyclopedie' : '', date: '', retiens: '' }; d.sources.push(s); }
+    const pt = point(accrocheDe(a), 'accroche'); pt.sources = [s.id]; intro.points.unshift(pt);
+    A.garderAccroche(d, xid); Object.assign(cult().accroches[xid], { q: q.id, p: pt.id });
+    enregistrer(true); return pt;
+  }
+  function ouvrirPioche(qid) {
+    const q = laQuestion(qid), dlg = $('#dialogue'); if (!q) return;
+    const l = A.accrochesPour(d, q), acc = (d.culture || {}).accroches || {}, ids = new Set(A.tousLesPoints(q).map((p) => p.id));
+    const dans = (a) => acc[a.id] && acc[a.id].q === q.id && ids.has(acc[a.id].p);
+    const lies = l.filter((x) => x.rel > 0).slice(0, 8), gardees = l.filter((x) => x.gardee && lies.indexOf(x) < 0);
+    const item = (x) => `<li><div><p>${e(accrocheDe(x.a))}</p>${sourceInfox(x.a)}</div>${dans(x.a) ? '<span class="fait-texte">Dans ce plan</span>' : `<button class="mini" data-a="accroche-piocher" data-x="${e(x.a.id)}" data-q="${q.id}">Ajouter</button>`}</li>`;
+    dlg.innerHTML = `<form method="dialog"><h2 id="titre-dialogue">Piocher une accroche</h2>
+      <p class="note">Un fait vrai et sourcé de « Info ou infox ? ». Il devient le premier point de ton introduction, avec sa source : reformule-le à ta façon.</p>
+      ${lies.length ? `<h3>Liées à ton sujet</h3><ul class="simples accroches">${lies.map(item).join('')}</ul>` : '<p class="note">Aucun fait n’est encore relié à ton sujet.</p>'}
+      ${gardees.length ? `<h3>Mes accroches</h3><ul class="simples accroches">${gardees.map(item).join('')}</ul>` : ''}
+      <p><a href="#/explorer/infox">Jouer à « Info ou infox ? » pour en trouver d’autres</a></p>
+      <p class="bas"><button type="button" data-a="fermer-dialogue">Fermer</button></p></form>`;
+    dlg.onclose = null; dlg.returnValue = ''; dlg.setAttribute('aria-labelledby', 'titre-dialogue'); dlg.showModal();
+  }
+
+  // Les conseils fondés sur des résultats observés : le conseil, puis, repliable, « Pourquoi ? » (le résultat, sa solidité en
+  // clair, la source cliquable) ; auteur·e·s et titres tels que le fichier les donne.
+  const PHASES = ['Choisir ta question', 'Construire ton plan', 'Préparer l’oral et l’échange'];
+  function sourceConseil(c) {
+    const s = c.source, quoi = [s.auteurs ? e(s.auteurs) : '', s.annee ? '(' + e(s.annee) + ')' : ''].filter(Boolean).join(' ');
+    return `${quoi}${quoi ? ', ' : ''}${lienExterne(s.url, s.titre ? '« ' + e(s.titre) + ' »' : 'la source')}${s.lien ? ' <span class="note">(lien : ' + e(s.lien) + ')</span>' : ''}`;
+  }
+  const liensConseil = (c) => { const l = (c.fiches || []).map((f) => { const x = D.FICHES.find((y) => y.id === f); return x ? `<a href="#/aide/${x.id}">Fiche : ${e(x.titre)}</a>` : ''; }).filter(Boolean);
+    const z = c.quiz && D.COMPRENDRE.find((y) => y.id === c.quiz); if (z) l.push(`<a href="#/comprendre/${z.id}">Quiz : ${e(z.titre)}</a>`);
+    return l.length ? '<p class="note">' + l.join(' · ') + '</p>' : ''; };
+  const pourquoiConseil = (c, ouvert) => `<details class="pourquoi"${ouvert ? ' open' : ''}><summary>Pourquoi ?</summary><p>${e(c.pourquoi)}</p>
+    <p class="note">Solidité : <b>${e(c.solidite)}</b>. Source : ${sourceConseil(c)}</p>${liensConseil(c)}</details>`;
+  vues.conseils = (cible) => `<p class="retour"><a href="#/aide">← Aide et méthode</a></p><h1>Les conseils, et pourquoi</h1>
+    <p class="chapo">Chaque conseil s’appuie sur un résultat observé ou sur les consignes données aux jurys. « Pourquoi ? » dit d’où il vient et à quel point il est solide :</p>
+    <ul class="note"><li><b>bien établi</b> : un résultat retrouvé par de nombreuses études ;</li><li><b>plusieurs études</b> : des résultats concordants ;</li><li><b>une étude</b> : un seul travail, à prendre avec prudence ;</li><li><b>repère de manuel</b> : un ordre de grandeur, pas une expérience ;</li><li><b>consignes aux jurys</b> : ce que les textes officiels demandent d’évaluer.</li></ul>
+    <p class="note">Plusieurs résultats portent sur des listes de mots, des visages ou des sensations, pas sur des exposés : « Pourquoi ? » le dit à chaque fois. Sources ouvertes le ${e(dateLongue(C.VERIFIE.conseils))}.</p>
+    ${PHASES.map((t, ph) => `<h2>${e(t)}</h2>${C.CONSEILS.filter((c) => c.phase === ph).map((c) => `<section class="carte conseil" id="conseil-${e(c.id)}"${c.id === cible ? ' data-cible' : ''}><h3>${e(c.titre)}</h3><p>${e(c.conseil)}</p>${pourquoiConseil(c, c.id === cible)}</section>`).join('')}`).join('')}`;
+  function blocConseil() {
+    const liste = A.conseilsDuJour(d), jour = Math.floor(Date.now() / 864e5) + (d.vus.decalage || 0), x = liste[((jour % liste.length) + liste.length) % liste.length];
+    if (!x.conseil) return `<section class="carte savoir"><p class="sur-titre">À savoir aujourd’hui</p><p class="gros">${e(x.t)}</p>
+      <p><a href="#/aide">En savoir plus</a> · <a href="#/conseils">Tous les conseils</a> · <button class="lien" data-a="autre-savoir">Un autre</button></p></section>`;
+    const c = x.conseil;
+    return `<section class="carte savoir"><p class="sur-titre">Le conseil du jour</p><p class="gros"><b>${typo(c.titre)}.</b> ${typo(c.conseil)}</p>${pourquoiConseil(c)}
+      <p><a href="#/conseils">Tous les conseils</a> · <button class="lien" data-a="autre-savoir">Un autre</button></p></section>`;
+  }
+
   // ---------- Le routeur ----------
   const NAV = [['#/', 'Accueil', 'M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z'], ['#/explorer/decouvrir', 'Explorer', 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm3.5 6.5-2 5-5 2 2-5z'],
     ['#/questions', 'Questions', 'M4 5h16M4 10h16M4 15h10M4 20h7'], ['#/mots', 'Mots', 'M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3zM5 17a3 3 0 0 1 3-3h11'],
@@ -772,7 +936,7 @@
     if (!d.profil.vu) return ['bienvenue', '', vues.bienvenue()];
     switch (h[0]) {
       case '': return ['accueil', '#/', vues.accueil()];
-      case 'explorer': return [h[1] || 'decouvrir', '#/explorer/decouvrir', (vues[h[1]] && ['decouvrir', 'quiz', 'sujets', 'pistes'].includes(h[1]) ? vues[h[1]] : vues.decouvrir)()];
+      case 'explorer': return [h[1] || 'decouvrir', '#/explorer/decouvrir', (vues[h[1]] && ['decouvrir', 'quiz', 'sujets', 'pistes', 'videos', 'infox'].includes(h[1]) ? vues[h[1]] : vues.decouvrir)()];
       case 'questions': return ['questions', '#/questions', vues.questions()];
       case 'question': return ['question', '#/questions', vues.question(h[1], h[2])];
       case 'mots': return ['mots', '#/mots', vues.mots()];
@@ -781,6 +945,7 @@
       case 'hauts-faits': return ['hf', '#/plus', vues.hf()];
       case 'aide': return ['aide', '#/plus', h[1] === 'exemple' ? vues.exemple() : vues.aide(h[1])];
       case 'comprendre': return ['comprendre', '#/plus', vues.comprendre(h[1])];
+      case 'conseils': return ['conseils', '#/plus', vues.conseils(h[1])];
       case 'reglages': return ['reglages', '#/plus', vues.reglages()];
       case 'plus': return ['plus', '#/plus', vues.plus()];
       case 'ton-code': return ['ton-code', '#/', vues.tonCode()];
@@ -849,6 +1014,7 @@
       case 'pt': { const q = laQuestion(p[1]); return [q && lePoint(q, p[2]), p[3]]; }
       case 'ech': { const q = laQuestion(p[1]); return [q && q.echange.find((x) => x.id === p[2]), p[3]]; }
       case 'piste': { const x = d.pistes.find((y) => y.id === p[1]); return p.length === 4 ? [x && x[p[2]], +p[3]] : [x, p[2]]; }
+      case 'cv': { if (!A.laVideo(p[1]) || ['retiens', 'intrigue'].indexOf(p[2]) < 0) return [null, null]; const c = cult(); c.videos[p[1]] = c.videos[p[1]] || {}; return [c.videos[p[1]], p[2]]; }
     }
     return [null, null];
   }
@@ -870,6 +1036,7 @@
     if (t.name === 'quiz-rep' && quizEnCours) { quizEnCours.choix = +t.value; return; }
     if (t.dataset.grille) { const o = d.oraux.find((x) => x.id === t.dataset.grille); o.auto = o.auto || {}; o.auto[t.dataset.c] = +t.value; enregistrer(true); rendre(); return; }
     if (t.dataset.coche) { const c = cible(t.dataset.coche); c[0][c[1]] = t.checked; enregistrer(true); return; }
+    if (t.id === 'filtre-videos') { filtreVideos = t.value; rendre(); const f = $('#filtre-videos'); if (f) f.focus(); return; }
     if (t.id === 'import' && t.files[0]) { t.files[0].text().then((txt) => {
       // Rien ne change tant que le fichier n'est pas reconnu ; s'il ne s'affiche pas, l'ancien dossier revient.
       let n = null; try { n = JSON.parse(txt); } catch (x) { /* fichier illisible */ }
@@ -886,8 +1053,17 @@
       ev.preventDefault(); const p = t.dataset.f.split('.'), q = laQuestion(p[1]);
       for (const partie of q.parties) { const i = partie.points.findIndex((x) => x.id === p[2]); if (i >= 0) { const n = point(); partie.points.splice(i + 1, 0, n); enregistrer(true); rendre(); focusPoint(n.id); break; } }
     }
+    if (salveInfox && !salveInfox.fini && (ev.key === 'ArrowLeft' || ev.key === 'ArrowRight') && $('#vue').dataset.vue === 'infox' && !/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) && !$('#dialogue').open && !ev.altKey && !ev.ctrlKey && !ev.metaKey) {
+      if (salveInfox.reponses[salveInfox.i] === undefined) { ev.preventDefault(); repondreInfox(ev.key === 'ArrowRight'); }
+    }
     if (typeof ev.key === 'string') konami(ev.key); // la saisie automatique envoie des touches sans nom
   });
+  // Sur téléphone, « Info ou infox ? » se joue aussi en glissant la carte (à droite : info, à gauche : infox) ; jamais obligatoire.
+  let glisse = null;
+  document.addEventListener('touchstart', (ev) => { const c = ev.target.closest && ev.target.closest('.infox-carte.a-glisser');
+    glisse = c && ev.touches.length === 1 && !ev.target.closest('button') ? { x: ev.touches[0].clientX, y: ev.touches[0].clientY } : null; }, { passive: true });
+  document.addEventListener('touchend', (ev) => { if (!glisse) return; const t = ev.changedTouches[0], dx = t.clientX - glisse.x, dy = t.clientY - glisse.y; glisse = null;
+    if (Math.abs(dx) > 80 && Math.abs(dy) < 60) repondreInfox(dx > 0); }, { passive: true });
   function focusPoint(id) { const t = $('[data-id="' + id + '"] textarea'); if (t) t.focus(); }
   // La carte suivante (ou le bilan) remplace la précédente : le focus va à son titre, pour que le clavier reste dans la carte
   // et que les lecteurs d'écran la lisent (le bouton pressé n'existe plus).
@@ -1006,6 +1182,32 @@
       Q.fini = true;
       A.noterSalve(d, z, qs.map((q) => q.id), qs.map((q, i) => Q.reponses[i] === q.b));
       enregistrer(true); rendre(false); focusQuiz('#quiz-fin .score'); },
+    // La culture (version 1.6.0)
+    'video-vue'(b) { const c = cult(), id = b.dataset.v; if (!A.laVideo(id)) return; c.videos[id] = Object.assign({ retiens: '', intrigue: '' }, c.videos[id], { vue: aujourdhui() });
+      if (c.videos[id].avis === -1) c.videos[id].avis = 0; enregistrer(true); rendre(); const z = $('[data-f="cv.' + id + '.retiens"]'); if (z) z.focus(); },
+    'video-non'(b) { const c = cult(), id = b.dataset.v; if (!A.laVideo(id)) return; c.videos[id] = Object.assign({}, c.videos[id], { avis: -1 }); enregistrer(true); rendre();
+      toast('C’est noté : les suggestions s’en souviendront.'); },
+    'video-oui'(b) { const c = cult(), id = b.dataset.v; if (!c.videos[id]) return; c.videos[id].avis = 0; enregistrer(true); rendre(); },
+    'video-piste'(b) { const v = A.laVideo(b.dataset.v), c = cult(); if (!v) return; const s = c.videos[v.id] = c.videos[v.id] || {};
+      const pi = { id: uid(), titre: v.question, pourquoi: (s.intrigue || '').trim(), idees: [(s.retiens || '').trim()], candidates: [v.question] }; d.pistes.push(pi); s.piste = pi.id;
+      enregistrer(true); rendre(); toast('Ta piste est prête, avec la question que la vidéo inspire.', '#/explorer/pistes', 'Ouvrir'); },
+    'video-source'(b) { const v = A.laVideo(b.dataset.v), c = cult(); if (!v) return; const s = c.videos[v.id] = c.videos[v.id] || {};
+      const so = { id: uid(), titre: v.titre, auteur: v.chaine, lien: v.url, type: 'vulgarisee', date: '', retiens: (s.retiens || '').trim() }; d.sources.push(so); s.source = so.id;
+      enregistrer(true); rendre(); toast('Ajoutée à tes sources.', '#/sources', 'Ouvrir'); },
+    'video-autre'() { decalageVideo++; rendre(); const t = $('.video-accueil .gros a'); if (t) t.focus(); },
+    'videos-autres'() { decalageTrois++; rendre(); },
+    'infox-jour'(b) { const c = cult(), j = c.jour && A.lInfox(c.jour.id); if (!j) return; A.noterInfox(d, j.id, (b.dataset.r === '1') === j.vrai); enregistrer(true); rendre(); },
+    'infox-commencer'() { salveInfox = { ids: A.tirerInfox(d), i: 0, reponses: [], fini: false }; rendre(false); focusQuiz('#infox-affirmation'); },
+    'infox-repondre'(b) { repondreInfox(b.dataset.r === '1'); },
+    'infox-suivante'() { const S = salveInfox; if (!S) return; S.i++;
+      if (S.i < S.ids.length) { rendre(false); focusQuiz('#infox-affirmation'); return; }
+      S.fini = true; A.noterSalveInfox(d, S.reponses.filter((r, i) => r === A.lInfox(S.ids[i]).vrai).length, S.ids.length); enregistrer(true); rendre(false); focusQuiz('#infox-fin .score'); },
+    'infox-quitter'() { salveInfox = null; rendre(false); },
+    'infox-garder'(b) { if (A.garderAccroche(d, b.dataset.x)) { enregistrer(true); rendre(); toast('Gardée dans « Mes accroches ».', '#/explorer/infox', 'Voir'); } },
+    'accroche-retirer'(b) { const id = b.dataset.x; avecAnnulation('Retirée de tes accroches.', () => { delete cult().accroches[id]; }); },
+    'accroche-ajouter'(b) { const pt = ajouterAccroche(b.dataset.x, b.dataset.q); if (!pt) return; rendre(); toast('Ajoutée au début de ton introduction : reformule-la à ta façon.', '#/question/' + b.dataset.q, 'Voir'); },
+    piocher(b) { ouvrirPioche(b.dataset.q); },
+    'accroche-piocher'(b) { const pt = ajouterAccroche(b.dataset.x, b.dataset.q); $('#dialogue').close('annuler'); if (!pt) return; rendre(); focusPoint(pt.id); toast('Accroche ajoutée, avec sa source : reformule-la à ta façon.'); },
     logo() { const t = Date.now(); touches = t - dernier < 600 ? touches + 1 : 1; dernier = t; if (touches >= 7) { touches = 0; secret(); } },
   };
   // Après l'inscription ou l'entrée avec un code : la session de cet appareil. Le dossier déjà commencé ici part avec

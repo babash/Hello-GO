@@ -33,9 +33,9 @@ S.A_LA_DEMANDE.forEach((u) => ok(fs.existsSync(path.join(RACINE, u.replace('http
 // 4. Les modules vérifiés au démarrage sont ceux de la page, dans index.html comme dans js/app.js
 const modules = (t) => [...t.matchAll(/\['(HG\w+)', '(js\/[\w.-]+)'\]/g)].map((m) => m[1] + ' ' + m[2]);
 const mApp = modules(app), mIndex = modules(index);
-ok(mApp.length === 7 && JSON.stringify(mIndex) === JSON.stringify(mApp.concat(['HG_VERSION_APP js/app.js'])), 'les modules vérifiés diffèrent entre index.html et js/app.js');
+ok(mApp.length === 8 && JSON.stringify(mIndex) === JSON.stringify(mApp.concat(['HG_VERSION_APP js/app.js'])), 'les modules vérifiés diffèrent entre index.html et js/app.js');
 mIndex.forEach((m) => ok(versionnes.includes(m.split(' ')[1] + '?v=' + v), m + ' : absent de index.html'));
-[['HGDonnees', 'js/donnees.js'], ['HGDecouvertes', 'js/decouvertes.js'], ['HGAnalyse', 'js/coach.js'], ['HGRetours', 'js/retours.js'], ['HGExport', 'js/export.js'], ['HGEnLigne', 'js/en-ligne.js'], ['HGProf', 'js/prof.js']]
+[['HGDonnees', 'js/donnees.js'], ['HGDecouvertes', 'js/decouvertes.js'], ['HGCulture', 'js/culture.js'], ['HGAnalyse', 'js/coach.js'], ['HGRetours', 'js/retours.js'], ['HGExport', 'js/export.js'], ['HGEnLigne', 'js/en-ligne.js'], ['HGProf', 'js/prof.js']]
   .forEach((m) => ok(lire(m[1]).includes('racine.' + m[0] + ' ='), m[1] + ' ne définit pas ' + m[0]));
 ok(app.includes('window.HG_VERSION_APP = VERSION_APP;'), 'js/app.js ne définit pas HG_VERSION_APP');
 
