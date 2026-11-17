@@ -879,7 +879,7 @@
   function carteVideo(x, tag) {
     const v = x.video, s = ((d.culture || {}).videos || {})[v.id] || {}, t = tag || 'li';
     const tete = [e(v.chaine), v.origine === 'enseignant' ? 'conseillée par ton enseignant·e' : 'en complément', v.langue !== 'fr' ? '<b>en anglais</b>' : ''].filter(Boolean).join(' · ');
-    return `<${t} class="carte video" id="video-${e(v.id)}"><p class="sur-titre">${tete}</p>
+    return `<${t} class="carte video" id="video-${e(v.id)}"><p class="sur-titre">${picto('video')} ${tete}</p>
       <p class="gros">${lienExterne(v.url, e(v.titre))} <span class="note">(${e(v.plateforme)}, dans un nouvel onglet)</span></p>
       <p>${e(v.accroche)}</p>${x.pourquoi ? `<p class="note pourquoi-video">${e(x.pourquoi)}</p>` : ''}
       ${s.vue ? apresVideo(v, s) : `<p class="boutons"><span>Tu l’as regardée ?</span> <button data-a="video-vue" data-v="${e(v.id)}">Oui, je l’ai regardée</button>
