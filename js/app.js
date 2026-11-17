@@ -1083,6 +1083,8 @@
   }
   // « Ta dose du jour » : la diapo choisie est montrée (sans animation après un nouveau rendu), et le bouton qui lui
   // correspond suit le défilement au doigt.
+  // Un clic ou le focus dans une diapo en fait la diapo courante tout de suite (le rendu qui suit la garde à l'écran).
+  ['pointerdown', 'focusin'].forEach((t) => document.addEventListener(t, (ev) => { const x = ev.target.closest && ev.target.closest('.dose-diapo'); if (x) doseActive = +x.dataset.i; }, true));
   function montrerDose(anime) {
     const piste = $('.dose-piste'); if (!piste) return;
     const l = [...piste.children], marque = (i) => document.querySelectorAll('[data-a=dose]').forEach((b) => { if (+b.dataset.i === i) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current'); });
@@ -1090,6 +1092,9 @@
     piste.scrollTo({ left: x.offsetLeft - l[0].offsetLeft, behavior: anime && !bougeReduit() ? 'smooth' : 'auto' }); marque(doseActive);
     let minut = null;
     piste.onscroll = () => { clearTimeout(minut); minut = setTimeout(() => {
+      // La diapo courante reste courante tant qu'elle se voit en entier (sur ordinateur, deux diapos se voient à la fois).
+      const a = piste.getBoundingClientRect(), c = l[doseActive] && l[doseActive].getBoundingClientRect();
+      if (c && c.left >= a.left - 2 && c.right <= a.right + 2) return marque(doseActive);
       let i = 0, best = Infinity; l.forEach((y, k) => { const dist = Math.abs(y.offsetLeft - l[0].offsetLeft - piste.scrollLeft); if (dist < best) { best = dist; i = k; } });
       doseActive = i; marque(i); }, 90); };
   }
