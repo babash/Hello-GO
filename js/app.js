@@ -9,7 +9,7 @@
   // worker et les caches de Hello GO effacés, puis la page rechargée à une adresse neuve), puis on explique, avec les détails
   // techniques à recopier. Le dossier de l'élève (localStorage) n'est jamais touché. Le même message est écrit dans
   // index.html (HG_PANNE), pour le cas où ce fichier-ci ne peut pas s'exécuter : les deux textes vont ensemble.
-  const VERSION_APP = '1.3.2'; // la même que HG_VERSION (index.html), sw.js et les ?v= de index.html (tests/versions.test.js)
+  const VERSION_APP = '1.4.0'; // la même que HG_VERSION (index.html), sw.js et les ?v= de index.html (tests/versions.test.js)
   window.HG_VERSION_APP = VERSION_APP;
   const MODULES = [['HGDonnees', 'js/donnees.js'], ['HGDecouvertes', 'js/decouvertes.js'], ['HGAnalyse', 'js/coach.js'],
     ['HGRetours', 'js/retours.js'], ['HGEnLigne', 'js/en-ligne.js'], ['HGProf', 'js/prof.js']];
@@ -96,7 +96,7 @@
   // ---------- Le dossier ----------
   function dossierNeuf() {
     return { v: 1, profil: { prenom: '', vu: false }, quiz: { reponses: {}, fait: false }, interets: ['', '', ''], ponts: [''], pistes: [], questions: [],
-      decouverte: { reactions: {} }, mots: [], sources: [], oraux: [{ id: uid(), nom: 'Oral blanc 1', auto: {} }, { id: uid(), nom: 'Oral blanc 2', auto: {} }], hf: {}, compteurs: {}, vus: {} };
+      decouverte: { reactions: {} }, comprendre: {}, mots: [], sources: [], oraux: [{ id: uid(), nom: 'Oral blanc 1', auto: {} }, { id: uid(), nom: 'Oral blanc 2', auto: {} }], hf: {}, compteurs: {}, vus: {} };
   }
   function charger() {
     let t = null;
@@ -381,6 +381,7 @@
       <a href="#/sources"><b>${d.sources.length}</b> ${d.sources.length > 1 ? 'sources' : 'source'}</a>
       <a href="#/hauts-faits"><b>${nHf}</b> ${nHf > 1 ? 'hauts faits' : 'haut fait'}</a>
     </section>
+    ${blocComprendre()}
     ${s ? (retoursProf.items.length ? '<p class="bas"><a href="#/retours">Tous les retours de ton enseignant·e</a></p>' : '') : `<section class="carte invitation"><h2>Retrouve ton dossier partout</h2><p>Pour le moment, ton dossier reste sur cet appareil. Rejoins ta classe avec le lien ou le code de ton enseignant·e : ton dossier te suit, et ton enseignant·e peut te faire des retours.</p><p><a class="bouton" href="#/rejoindre">Rejoindre ma classe</a></p></section>`}
     ${debut.every((x) => x[1]) ? '' : `<section class="carte"><h2>Par où commencer</h2><ul class="coches">${debut.map((x) => `<li class="${x[1] ? 'fait' : ''}"><a href="${x[2]}">${e(x[0])}</a></li>`).join('')}</ul></section>`}`;
   };
@@ -639,29 +640,86 @@
     <a href="#/oraux">Mes oraux<span>Oraux blancs, vidéos, auto-évaluation</span></a>
     <a href="#/hauts-faits">Mes hauts faits<span>${Object.keys(d.hf).length} sur ${A.HAUTS_FAITS.length}</span></a>
     <a href="#/aide">Aide et méthode<span>Comprendre l’épreuve, fiches de méthode</span></a>
+    <a href="#/comprendre">Vérifier que j’ai compris<span>Deux quiz : l’épreuve, la méthode du plan</span></a>
     <a href="#/aide/exemple">Voir un exemple<span>Un plan complet sur les biais algorithmiques</span></a>
     ${enLigne() ? `<a href="#/retours">Les retours de mon enseignant·e<span>${retoursProf.items.length} retour${retoursProf.items.length > 1 ? 's' : ''}</span></a>` : ''}
     <a href="#/reglages">Réglages<span>${enLigne() ? 'Mon code, quitter cet appareil, télécharger mon dossier' : 'Rejoindre ma classe, télécharger, importer ou effacer mon dossier'}</span></a></nav>`;
 
-  const fiche = (titre, corps, attr) => `<details class="carte fiche" ${attr || ''}><summary>${titre}</summary>${corps}</details>`;
-  vues.aide = () => `<h1>Aide et méthode</h1>
-    <section class="carte"><h2>Comprendre l’épreuve (session 2027)</h2><ul>
+  // Une fiche de méthode : #/aide/<id> l'ouvre et la montre (lien « Revoir » des quiz).
+  const fiche = (f, cible) => `<details class="carte fiche" id="fiche-${f.id}"${f.id === 'non-specialiste' ? ' data-fiche="canard"' : ''}${f.id === cible ? ' open data-cible' : ''}><summary>${e(f.titre)}</summary>${f.html}</details>`;
+  // La vidéo du ministère (2021) : un simple lien, sans lecteur intégré, et ce qui a changé pour la session 2027.
+  const blocVideo = (ici) => { const v = D.VIDEO_EPREUVE; return `<div class="video-lien">
+      <p><a href="${e(v.lien)}" target="_blank" rel="noopener noreferrer">Vidéo : « ${e(v.titre)} »</a> <span class="note">(${e(v.auteur)}, ${e(v.date)} ; sur YouTube, dans un nouvel onglet)</span></p>
+      <div class="mise-en-garde"><p><b>Attention : cette vidéo date de 2021.</b> Elle donne les anciennes règles. Pour la session 2027 :</p>
+        <ul><li>coefficient 8, et non plus 10 ;</li><li>10 minutes d’exposé, puis 10 minutes d’échange ;</li><li>deux questions qui ne portent pas sur la même spécialité.</li></ul>
+        <p>En cas de différence, c’est ${ici ? 'cette page' : 'la page <a href="#/aide/epreuve">« Comprendre l’épreuve »</a>'} qui fait foi.</p></div></div>`; };
+  const boutonQuiz = (id) => { const z = D.COMPRENDRE.find((x) => x.id === id), r = (d.comprendre || {})[id];
+    return `<p><a class="bouton" href="#/comprendre/${id}">${e(z.titre)}</a> <span class="note">${quizEnCours && quizEnCours.id === id && !quizEnCours.fini ? 'en cours' : r && r.essais ? 'meilleur score : ' + r.meilleur + ' sur ' + z.questions.length : '10 questions'}</span></p>`; };
+  vues.aide = (cible) => `<h1>Aide et méthode</h1>
+    <section class="carte" id="epreuve"${cible === 'epreuve' ? ' data-cible' : ''}><h2>Comprendre l’épreuve (session 2027)</h2><ul>
       <li><b>Avant :</b> tu prépares deux questions avec tes enseignant·e·s. Elles ne portent pas sur la même spécialité ; une question peut être transversale.</li>
       <li><b>Préparation, 20 min :</b> le jury choisit une question. Tu prépares tes notes sur papier. Aucun support numérique.</li>
-      <li><b>Exposé, 10 min :</b> debout, sans lire. Tu peux garder ta feuille et la montrer au jury.</li>
-      <li><b>Échange, 10 min :</b> le jury te questionne sur ton sujet et sur le programme de la spécialité.</li>
+      <li><b>Exposé, 10 min :</b> debout, sans lire. Tu peux garder ta feuille et la montrer au jury, mais il ne la note pas.</li>
+      <li><b>Échange, 10 min :</b> le jury te questionne sur ton sujet et sur tout le programme des spécialités concernées.</li>
       <li><b>Jury :</b> deux enseignant·e·s, dont un·e n’est pas spécialiste de NSI.</li>
-      <li><b>Coefficient 8.</b> La question n’est pas notée : ce sont ton argumentation et ton oral qui comptent.</li></ul>
-      <p class="note">Source : note de service du 10 septembre 2026, Bulletin officiel spécial n° 4 du 17 septembre 2026.</p></section>
+      <li><b>Coefficient 8</b> en voie générale. La question n’est pas notée : ce sont ton argumentation et ton oral qui comptent.</li>
+      <li><b>La grille indicative</b> a 5 critères : qualité orale, prise de parole en continu, connaissances, interaction avec le jury, construction de l’argumentation.</li></ul>
+      <p class="note">Source : note de service du 10 septembre 2026, Bulletin officiel spécial n° 4 du 17 septembre 2026.</p>
+      ${blocVideo(true)}
+      ${boutonQuiz('epreuve')}</section>
     <h2>Fiches de méthode</h2>
-    ${fiche('Un bon point', '<p>1 à 3 lignes, en mots-clés : de quoi dire 3 à 5 phrases.</p><p class="oui">Oui : « IA de recrutement d’Amazon abandonnée : pénalisait les CV de femmes. »</p><p class="non">Non : un paragraphe rédigé que tu serais tenté·e de lire.</p>')}
-    ${fiche('Un bon plan', '<p>Introduction (2 min), deux axes (3 min chacun), conclusion (2 min). 30 à 50 points en tout.</p><p>Des plans possibles : avantages et limites ; constat et solutions ; hier, aujourd’hui, demain ; du général au particulier.</p>')}
-    ${fiche('Une bonne définition', '<p>Deux versions : celle d’une source sérieuse, recopiée et citée, puis la tienne.</p><p class="oui">Oui : « Algorithme : une liste d’étapes à suivre pour arriver à un résultat. »</p><p class="non">Non : la même phrase que la source avec deux mots changés.</p>')}
-    ${fiche('Expliquer à un non-spécialiste', '<p>Un des deux membres du jury ne connaît pas la NSI. Pour chaque mot technique, prépare une image : « un algorithme, c’est comme une recette de cuisine ».</p><p>Astuce de programmeur et de programmeuse : explique ton sujet à voix haute à un canard en plastique. Si tu bloques, c’est que ce n’est pas encore clair pour toi.</p>', 'data-fiche="canard"')}
-    ${fiche('Une bonne source', '<p>Demande-toi : qui parle ? Est-ce son métier ? De quand ça date ? Que disent les autres sites de cette source ?</p><p>Croise une source experte (rapport, livre, site officiel) et une source de vulgarisation (vidéo ou article de qualité).</p>')}
-    ${fiche('Les types d’arguments', '<ul><li>de droit : une loi, un règlement ;</li><li>de fait : un événement, une étude ;</li><li>scientifique : un résultat reconnu ;</li><li>logique : un raisonnement ;</li><li>d’autorité : une personne ou une institution reconnue ;</li><li>d’expérience : ce que tu as vécu.</li></ul><p>Mélange-les, et dis toujours d’où ils viennent.</p>')}
-    ${fiche('Répondre au jury', '<p>Écoute la question jusqu’au bout. Prends quelques secondes. Reformule si besoin : « Si je comprends bien, vous me demandez… ».</p><p>Tu ne sais pas ? « Je n’ai pas la donnée exacte, mais je peux expliquer le principe… »</p>')}
+    ${boutonQuiz('plan')}
+    ${D.FICHES.map((f) => fiche(f, cible)).join('')}
     <p><a class="bouton" href="#/aide/exemple">Voir un exemple de dossier</a></p>`;
+
+  // ---------- Les quiz « Vérifie que tu as compris » ----------
+  // Une question par écran, le retour juste après la réponse, puis le score et les points à revoir. L'essai en cours reste
+  // en mémoire de la page (un lien « Revoir » ne le perd pas) ; seul le résultat va dans le dossier.
+  let quizEnCours = null;
+  const leQuiz = (id) => D.COMPRENDRE.find((x) => x.id === id);
+  // Le retour de la bonne réponse, montré après une erreur : sans son « Oui : » du début.
+  const pourquoiJuste = (q) => { const t = q.o[q.b][1].replace(/^(Oui|Exact) : /, ''); return t.charAt(0).toUpperCase() + t.slice(1); };
+  // Échappé, avec une espace fine insécable avant « ? ! : ; » et après « (le signe ne part pas seul à la ligne).
+  const typo = (t) => e(t).replace(/ ([?!:;»])/g, '&#x202F;$1').replace(/« /g, '«&#x202F;');
+  function melanger(n) { const l = [...Array(n).keys()]; for (let i = n - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [l[i], l[j]] = [l[j], l[i]]; } return l; }
+  function etatQuiz(z) { const r = (d.comprendre || {})[z.id]; return r && r.essais ? `Meilleur score : ${r.meilleur} sur ${z.questions.length} · dernier : ${r.dernier} sur ${z.questions.length} · ${pluriel(r.essais, 'essai')}` : 'Pas encore fait'; }
+  function blocComprendre() {
+    if (D.COMPRENDRE.every((z) => A.quizEssaye(d, z.id))) return '';
+    return `<section class="carte"><h2>Vérifie que tu as compris</h2><p>Deux quiz de 10 questions, avec une explication après chaque réponse. Ce n’est pas noté.</p>
+      <ul class="coches">${D.COMPRENDRE.map((z) => `<li class="${A.quizEssaye(d, z.id) ? 'fait' : ''}"><a href="#/comprendre/${z.id}">${e(z.titre)}</a></li>`).join('')}</ul></section>`;
+  }
+  vues.comprendre = (id) => {
+    const z = leQuiz(id);
+    if (!z) return `<h1>Vérifie que tu as compris</h1><p class="chapo">Deux quiz de 10 questions. Après chaque réponse, une explication. Ce n’est pas noté : refais-les autant que tu veux.</p>
+      ${D.COMPRENDRE.map((x) => `<a class="carte lien-carte" href="#/comprendre/${x.id}"><p class="gros">${typo(x.titre)}</p><p class="note">${e(etatQuiz(x))}</p></a>`).join('')}`;
+    const tete = `<p class="retour"><a href="#/comprendre">← Les quiz</a></p><h1>${typo(z.titre)}</h1>`, n = z.questions.length, Q = quizEnCours;
+    if (!Q || Q.id !== id) return tete + `<p class="chapo">${e(z.chapo)}</p>${id === 'epreuve' ? blocVideo(false) : ''}
+      <section class="carte"><p class="sur-titre">Tes résultats</p><p>${e(etatQuiz(z))}</p></section>
+      <p><button class="principal" data-a="quiz-commencer" data-q="${id}">${A.quizEssaye(d, id) ? 'Refaire le quiz' : 'Commencer'}</button></p>`;
+    if (Q.fini) {
+      const juste = Q.reponses.filter((k, i) => k === z.questions[i].b).length, rates = z.questions.filter((q, i) => Q.reponses[i] !== q.b);
+      const mot = juste === n ? 'Sans faute : tu as tout compris. Bravo !' : juste >= 7 ? 'Presque tout est clair. Revois les points ci-dessous, puis refais le quiz quand tu veux.'
+        : 'Ce quiz sert à repérer ce qui reste flou : revois les points ci-dessous, puis refais-le quand tu veux.';
+      const autre = D.COMPRENDRE.find((x) => x.id !== id && !A.quizEssaye(d, x.id));
+      return tete + `<section class="carte action" id="quiz-fin"><p class="sur-titre">Ton résultat</p><p class="score" tabindex="-1">${juste} sur ${n}</p><p>${mot}</p></section>
+        ${rates.length ? `<h2>Les points à revoir</h2><ul class="liste">${rates.map((q) => `<li class="carte"><p><b>${e(q.q)}</b></p><p>La bonne réponse : ${e(q.o[q.b][0])}</p><p class="note">${e(pourquoiJuste(q))}</p><p><a href="${q.r[0]}">Revoir : ${e(q.r[1])}</a></p></li>`).join('')}</ul>` : ''}
+        <p class="bas"><button class="principal" data-a="quiz-commencer" data-q="${id}">Refaire le quiz</button>${autre ? `<a class="bouton" href="#/comprendre/${autre.id}">${e(autre.titre)}</a>` : '<a class="bouton" href="#/aide">Aide et méthode</a>'}</p>`;
+    }
+    const q = z.questions[Q.i], rep = Q.reponses[Q.i], valide = rep !== undefined, ordre = Q.ordres[Q.i];
+    const option = (k) => { const choisie = valide ? rep === k : Q.choix === k, bonne = k === q.b;
+      const etat = valide ? (bonne ? ' juste' : choisie ? ' faux' : '') : '';
+      const marque = valide && bonne ? '<b class="marque">Bonne réponse · </b>' : valide && choisie ? '<b class="marque">Ta réponse · </b>' : '';
+      return `<label class="niveau option${etat}"><input type="radio" name="quiz-rep" value="${k}"${choisie ? ' checked' : ''}${valide ? ' disabled' : ''}><span>${marque}${e(q.o[k][0])}</span></label>`; };
+    const retour = valide ? `<div class="carte retour-quiz ${rep === q.b ? 'juste' : 'faux'}" id="quiz-retour" tabindex="-1">
+        <p><b>${rep === q.b ? 'Bien vu.' : 'Pas tout à fait.'}</b> ${e(q.o[rep][1])}</p>
+        ${rep === q.b ? '' : `<p><b>La bonne réponse :</b> ${e(q.o[q.b][0])}</p><p>${e(pourquoiJuste(q))}</p>`}
+        <p><a href="${q.r[0]}">Revoir : ${e(q.r[1])}</a></p></div>` : '';
+    return tete + `<p class="sur-titre">Question ${Q.i + 1} sur ${n}</p><div class="avance" aria-hidden="true"><span style="width:${Math.round(100 * (Q.i + (valide ? 1 : 0)) / n)}%"></span></div>
+      <fieldset class="carte quiz-q"><legend id="quiz-question" tabindex="-1">${typo(q.q)}</legend>${ordre.map(option).join('')}</fieldset>
+      <div aria-live="polite">${retour}</div>
+      <p class="bas"><span></span>${valide ? `<button class="principal" data-a="quiz-suivant">${Q.i + 1 < n ? 'Question suivante' : 'Voir mon résultat'}</button>` : '<button class="principal" data-a="quiz-valider">Valider ma réponse</button>'}</p>`;
+  };
+  function focusQuiz(sel) { const t = $(sel); if (t) { t.focus({ preventScroll: true }); t.scrollIntoView({ block: 'nearest' }); } }
 
   vues.exemple = () => { const x = D.EXEMPLE; return `<p class="retour"><a href="#/aide">← Aide et méthode</a></p><h1>Un exemple</h1>
     <p class="chapo">Le plan de ton enseignant·e sur les biais algorithmiques. Il est là pour te montrer la forme : ne le recopie pas.</p>
@@ -704,7 +762,8 @@
       case 'sources': return ['sources', '#/sources', vues.sources()];
       case 'oraux': return ['oraux', '#/plus', vues.oraux()];
       case 'hauts-faits': return ['hf', '#/plus', vues.hf()];
-      case 'aide': return ['aide', '#/plus', h[1] === 'exemple' ? vues.exemple() : vues.aide()];
+      case 'aide': return ['aide', '#/plus', h[1] === 'exemple' ? vues.exemple() : vues.aide(h[1])];
+      case 'comprendre': return ['comprendre', '#/plus', vues.comprendre(h[1])];
       case 'reglages': return ['reglages', '#/plus', vues.reglages()];
       case 'plus': return ['plus', '#/plus', vues.plus()];
       case 'ton-code': return ['ton-code', '#/', vues.tonCode()];
@@ -791,6 +850,7 @@
       // choisie (les flèches parcourent toujours la liste ; pas de changement de contexte à la saisie).
       if (q.id === 'spe') { r.dansspe = []; enregistrer(true); rendre(); const s2 = [...document.querySelectorAll('[name="quiz-spe"]')].find((x) => x.value === t.value); if (s2) s2.focus(); return; }
       enregistrer(); return; }
+    if (t.name === 'quiz-rep' && quizEnCours) { quizEnCours.choix = +t.value; return; }
     if (t.dataset.grille) { const o = d.oraux.find((x) => x.id === t.dataset.grille); o.auto = o.auto || {}; o.auto[t.dataset.c] = +t.value; enregistrer(true); rendre(); return; }
     if (t.dataset.coche) { const c = cible(t.dataset.coche); c[0][c[1]] = t.checked; enregistrer(true); return; }
     if (t.id === 'import' && t.files[0]) { t.files[0].text().then((txt) => {
@@ -913,6 +973,19 @@
       const su = d.suivi = d.suivi || {}; su.ressources = su.ressources || {}; su.ressources[x.id] = 'ajoutee'; enregistrer(true); rendre(); toast('Ajoutée à tes sources : note ce que tu en retiens.'); },
     'ressource-plus-tard'(b) { const su = d.suivi = d.suivi || {}; su.ressources = su.ressources || {}; su.ressources[b.dataset.r] = 'plus-tard'; enregistrer(true); rendre(); },
     'effacer-a-part'() { try { localStorage.removeItem(CLE_APART); } catch (x) { /* rien */ } location.hash = '#/'; },
+    'quiz-commencer'(b) { const z = leQuiz(b.dataset.q); quizEnCours = { id: z.id, i: 0, choix: null, reponses: [], ordres: z.questions.map(() => melanger(4)), fini: false };
+      rendre(false); focusQuiz('#quiz-question'); },
+    'quiz-valider'() { const Q = quizEnCours; if (!Q) return; if (Q.choix === null) return toast('Choisis d’abord une réponse.');
+      Q.reponses[Q.i] = Q.choix; rendre(); focusQuiz('#quiz-retour'); },
+    'quiz-suivant'() { const Q = quizEnCours, z = Q && leQuiz(Q.id); if (!z) return;
+      Q.i++; Q.choix = null;
+      if (Q.i < z.questions.length) { rendre(false); focusQuiz('#quiz-question'); return; }
+      Q.fini = true;
+      const juste = Q.reponses.filter((k, i) => k === z.questions[i].b).length, avant = (d.comprendre || {})[z.id] || {};
+      d.comprendre = d.comprendre || {};
+      d.comprendre[z.id] = { meilleur: Math.max(avant.meilleur || 0, juste), dernier: juste, le: new Date().toISOString().slice(0, 10), essais: (avant.essais || 0) + 1,
+        rates: z.questions.filter((q, i) => Q.reponses[i] !== q.b).map((q) => q.id) };
+      enregistrer(true); rendre(false); focusQuiz('#quiz-fin .score'); },
     logo() { const t = Date.now(); touches = t - dernier < 600 ? touches + 1 : 1; dernier = t; if (touches >= 7) { touches = 0; secret(); } },
   };
   // Après l'inscription ou l'entrée avec un code : la session de cet appareil. Le dossier déjà commencé ici part avec
@@ -1018,7 +1091,9 @@
 
   // ---------- Démarrage ----------
   // Une nouvelle page commence en haut, et le focus va à son contenu (clavier, lecteurs d'écran).
-  window.addEventListener('hashchange', () => { rendre(false); window.scrollTo(0, 0); $('#vue').focus({ preventScroll: true }); });
+  // Une adresse vers une fiche ou une section (#/aide/<id>, liens « Revoir » des quiz) : elle est ouverte, montrée et prend le focus.
+  window.addEventListener('hashchange', () => { rendre(false); window.scrollTo(0, 0); $('#vue').focus({ preventScroll: true });
+    const c = $('#vue [data-cible]'); if (c) { const t = $('summary, h2', c); if (t) { t.tabIndex = t.tagName === 'SUMMARY' ? 0 : -1; t.focus({ preventScroll: true }); } c.scrollIntoView({ block: 'start' }); } });
   // Un jour de travail de plus (sans jamais rien retirer : pas de série à tenir).
   // Un haut fait gagné au chargement (« Nage droit devant », au 5e jour) est annoncé comme les autres, et enregistré.
   try {

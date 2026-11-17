@@ -148,3 +148,47 @@ const g5 = A.majHautsFaits(d5).map((h) => h.id);
 ['vingt', 'cape', 'tetris', 'arya', 'onze', 'hermione', 'enola', 'p404', 'leia', 'gear', 'shuri', 'volontaire'].forEach((x) => assert.ok(!g5.includes(x), x));
 assert.ok(A.HAUTS_FAITS.length >= 50);
 console.log('hauts faits : ' + A.HAUTS_FAITS.length);
+
+// ---------- Les quiz « Vérifie que tu as compris » (1.4.0) ----------
+assert.strictEqual(A.HAUTS_FAITS.length, 54, 'hauts faits : 52 + 2 pour les quiz');
+assert.deepStrictEqual(D.COMPRENDRE.map((z) => z.id), ['epreuve', 'plan']);
+const cibles = ['#/aide/epreuve', '#/aide/exemple'].concat(D.FICHES.map((f) => '#/aide/' + f.id));
+const idsQ = new Set();
+D.COMPRENDRE.forEach((z) => {
+  assert.ok(z.titre && z.court && z.chapo, z.id);
+  assert.strictEqual(z.questions.length, 10, z.id + ' : 10 questions');
+  const positions = new Set();
+  z.questions.forEach((q) => {
+    assert.ok(/^[a-z0-9]{1,8}$/.test(q.id) && !idsQ.has(q.id), 'identifiant ' + q.id); idsQ.add(q.id);
+    assert.ok(q.q.trim().length > 10, q.id + ' : question');
+    assert.strictEqual(q.o.length, 4, q.id + ' : 4 options');
+    assert.ok(Number.isInteger(q.b) && q.b >= 0 && q.b < 4, q.id + ' : une seule bonne réponse, b entre 0 et 3'); positions.add(q.b);
+    q.o.forEach((o, k) => { assert.ok(Array.isArray(o) && o.length === 2 && o[0].trim() && o[1].trim(), q.id + ' option ' + k + ' : texte et retour non vides');
+      assert.ok(!/\\u[0-9a-f]{4}/i.test(o.join('')), q.id + ' : pas de séquence \\u'); });
+    assert.strictEqual(new Set(q.o.map((o) => o[0])).size, 4, q.id + ' : 4 options différentes');
+    assert.ok(Array.isArray(q.r) && cibles.includes(q.r[0]) && q.r[1], q.id + ' : lien « Revoir » valide ' + q.r);
+  });
+  assert.ok(positions.size === 4, z.id + ' : la bonne réponse change de position');
+});
+assert.ok(/^https:\/\/www\.youtube\.com\/watch\?v=3mN9w6rpXgE$/.test(D.VIDEO_EPREUVE.lien));
+// le résultat dans le dossier : accepté s'il a la bonne forme, refusé sinon ; un ancien dossier reste valide
+const base = () => ({ v: 1, questions: [] });
+assert.ok(A.dossierValide(base()), 'ancien dossier, sans quiz');
+assert.ok(A.dossierValide(Object.assign(base(), { comprendre: { epreuve: { meilleur: 10, dernier: 8, le: '2026-11-17', essais: 2, rates: ['e3', 'e6'] } } })));
+[{ autre: { meilleur: 1, dernier: 1, le: '', essais: 1 } }, { plan: { meilleur: 11, dernier: 1, le: '', essais: 1 } }, { plan: { meilleur: 2, dernier: -1, le: '', essais: 1 } },
+  { plan: { meilleur: 2, dernier: 1, le: 3, essais: 1 } }, { plan: { meilleur: 2, dernier: 1, le: '', essais: 1, rates: ['e1'] } }, { plan: { meilleur: 2, dernier: 1, le: '', essais: 1, rates: ['<img>'] } }, []]
+  .forEach((c) => assert.ok(!A.dossierValide(Object.assign(base(), { comprendre: c })), JSON.stringify(c)));
+// hauts faits et prochaine étape
+const dq = dossier(question()); dq.comprendre = { epreuve: { meilleur: 9, dernier: 9, le: '2026-11-17', essais: 1, rates: ['e1'] } };
+assert.ok(!A.majHautsFaits(dq).some((h) => h.id === 'regles'));
+dq.comprendre.epreuve.meilleur = 10; dq.comprendre.plan = { meilleur: 10, dernier: 10, le: '2026-11-17', essais: 3, rates: [] };
+const gq = A.majHautsFaits(dq).map((h) => h.id); assert.ok(gq.includes('regles') && gq.includes('accroc'), gq);
+const dp = dossier(); dp.decouverte = { reactions: {} }; for (let i = 1; i <= 10; i++) dp.decouverte.reactions[i] = 1;
+dp.pistes = [{ id: 'x', titre: 'Une piste', candidates: [] }];
+assert.strictEqual(A.prochaineAction(dp).vers, '#/comprendre/epreuve', 'quiz proposé avant de choisir sa question');
+dp.comprendre = { epreuve: { meilleur: 3, dernier: 3, le: '', essais: 1, rates: [] } };
+assert.strictEqual(A.prochaineAction(dp).vers, '#/explorer/pistes', 'un essai suffit : la suite reprend, sans exiger de score');
+const dpl = dossier(question()); for (let i = 0; i < 9; i++) dpl.questions[0].parties[1].points.push(pt('point ' + i));
+dpl.comprendre = { epreuve: { meilleur: 3, dernier: 3, le: '', essais: 1, rates: [] } };
+assert.strictEqual(A.prochaineAction(dpl).vers, '#/comprendre/plan', 'quiz du plan quand le plan prend forme');
+console.log('quiz : 2 quiz de 10 questions, données, dossier, hauts faits et prochaine étape vérifiés');

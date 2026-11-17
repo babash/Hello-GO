@@ -1,7 +1,7 @@
 // Hello GO : le service worker garde l'application sur l'appareil, pour qu'elle s'ouvre sans réseau.
 // À chaque publication, changer V ici, HG_VERSION et les ?v= de index.html, et VERSION_APP dans js/app.js (le test
 // tests/versions.test.js le vérifie) : l'ancien cache est alors remplacé.
-const V = '1.3.2', VERSION = 'hello-go-' + V, Q = '?v=' + V;
+const V = '1.4.0', VERSION = 'hello-go-' + V, Q = '?v=' + V;
 // Un seul cache par version, rempli à l'installation avec exactement les adresses que demande index.html (avec leur ?v=) :
 // la page gardée ne va jamais avec des fichiers d'une autre version.
 const FICHIERS = ['index.html', 'css/polices.css' + Q, 'css/app.css' + Q, 'vendor/sortable.min.js' + Q, 'js/donnees.js' + Q, 'js/decouvertes.js' + Q,

@@ -137,3 +137,10 @@ essai('fusion à trois : l’ordre des clés rendu par la base ne compte pas (un
 });
 
 console.log('retours, résumé, fusion et format pour l’IA : ' + n + ' essais passés');
+
+// Les quiz dans le résumé (1.4.0) : seulement ceux qui ont été essayés, et le résumé reste court
+{ const RR = require('../js/retours.js');
+  const dd = { v: 1, questions: [], comprendre: { plan: { meilleur: 7, dernier: 6, le: '2026-11-17', essais: 2, rates: ['p1', 'p4', 'p9', 'p10'] } } };
+  const r = RR.resume(dd); assert.deepStrictEqual(r.comprendre, { plan: { meilleur: 7, dernier: 6, essais: 2, sur: 10 } });
+  assert.ok(!('comprendre' in RR.resume({ v: 1, questions: [] })));
+  console.log('résumé des quiz : essais passés'); }

@@ -50,6 +50,10 @@
       points: tous, mots: (d.mots || []).length, mots_complets: (d.mots || []).filter(A.motComplet).length, sources: (d.sources || []).length,
       oraux: (d.oraux || []).map((o) => { const n = Object.keys(o.auto || {}).length; return { nom: court(o.nom, 40), criteres: n, note: n === 5 ? Object.values(o.auto).reduce((a, b) => a + b, 0) : null, video: !!o.video }; }),
       hauts_faits: Object.keys(d.hf || {}).length };
+    // Les quiz « Vérifie que tu as compris » : seulement ceux qui ont été essayés (meilleur et dernier score, essais).
+    const cq = {};
+    (D ? D.COMPRENDRE : []).forEach((z) => { const x = (d.comprendre || {})[z.id]; if (x && x.essais) cq[z.id] = { meilleur: x.meilleur, dernier: x.dernier, essais: x.essais, sur: z.questions.length }; });
+    if (Object.keys(cq).length) r.comprendre = cq;
     // Trop long (beaucoup de réponses au questionnaire, de longs titres) : on retire le moins utile d'abord.
     if (JSON.stringify(r).length > 3900) r.gouts = Object.keys(r.gouts).reduce((o, k) => { o[k] = Array.isArray(r.gouts[k]) ? r.gouts[k].length : 1; return o; }, {});
     if (JSON.stringify(r).length > 3900) r.questions.forEach((q) => { q.titre = court(q.titre, 40); });

@@ -180,7 +180,12 @@
     return n >= 25 ? 2 : 1;
   }
 
-  // La prochaine action : une seule, choisie d'après l'état du dossier.
+  // Les quiz « Vérifie que tu as compris » : essayé au moins une fois, réussi sans faute.
+  function quizEssaye(d, id) { const r = (d.comprendre || {})[id]; return !!(r && r.essais); }
+  function quizSansFaute(d, id) { const r = (d.comprendre || {})[id], z = D.COMPRENDRE.find(function (x) { return x.id === id; }); return !!(r && z && r.meilleur === z.questions.length); }
+
+  // La prochaine action : une seule, choisie d'après l'état du dossier. Un quiz est proposé une fois, au bon moment
+  // (avant de choisir sa question, puis quand le plan prend forme) : dès qu'il est essayé, la suite reprend.
   function prochaineAction(d) {
     const qs = d.questions || [];
     const nCartes = Object.keys((d.decouverte || {}).reactions || {}).length;
@@ -189,12 +194,14 @@
     if (!qs.length) {
       const p = (d.pistes || [])[0];
       if (!p) return { texte: 'Choisis une piste parmi les sujets proposés.', bouton: 'Voir les sujets', vers: '#/explorer/sujets', duree: '5 min' };
+      if (!quizEssaye(d, 'epreuve')) return { texte: 'Avant de choisir ta question, vérifie que tu as compris les règles de l’épreuve : 10 questions, avec une explication après chaque réponse.', bouton: 'Faire le quiz', vers: '#/comprendre/epreuve', duree: '5 min' };
       if (!(p.candidates || []).length) return { texte: 'Transforme ta piste en question : écris une ou deux questions possibles.', bouton: 'Ouvrir mes pistes', vers: '#/explorer/pistes', duree: '5 min' };
       return { texte: 'Choisis ta question et commence ton plan.', bouton: 'Ouvrir mes pistes', vers: '#/explorer/pistes', duree: '2 min' };
     }
     const q = qs.slice().sort(function (a, b) { return tousLesPoints(a).length - tousLesPoints(b).length; })[0];
     const n = tousLesPoints(q).length;
     if (n < 8) return { texte: 'Ajoute des points à ton plan : commence par l’accroche et ta problématique.', bouton: 'Ouvrir mon plan', vers: '#/question/' + q.id, duree: '10 min' };
+    if (!quizEssaye(d, 'plan')) return { texte: 'Ton plan prend forme : vérifie que tu as compris la méthode du plan, en 10 situations.', bouton: 'Faire le quiz', vers: '#/comprendre/plan', duree: '5 min' };
     const incomplets = (d.mots || []).filter(function (m) { return !motComplet(m); }).length;
     if (incomplets) return { texte: incomplets + ' mot' + (incomplets > 1 ? 's' : '') + ' à compléter : une définition d’une source, une avec tes mots.', bouton: 'Ouvrir mes mots', vers: '#/mots', duree: '5 min' };
     if ((d.mots || []).length < 3) return { texte: 'Définis les mots importants de ton sujet.', bouton: 'Ouvrir mes mots', vers: '#/mots', duree: '5 min' };
@@ -221,6 +228,9 @@
     { id: 'volontaire', g: 'Explorer', titre: 'Je me porte volontaire !', cond: 'Proposer ta question à ton enseignant·e.', pourquoi: 'Comme Katniss : il faut oser s’avancer. Une question proposée tôt, c’est du temps gagné.', test: function (d) { return unPlan(d, function (q) { return q.statut === 'proposee' || q.statut === 'validee'; }); } },
     { id: 'dory', g: 'Explorer', titre: 'Nage droit devant', cond: 'Revenir travailler 5 jours différents.', pourquoi: 'Comme Dory : un peu, souvent. Dix minutes par jour valent mieux qu’une nuit la veille.', test: function (d) { return ((d.compteurs || {}).jours || 0) >= 5; } },
     { id: 'planb', g: 'Explorer', titre: 'Plan B', cond: 'Avoir deux questions.', pourquoi: 'Le jury choisit entre tes deux questions : il en faut deux.', test: function (d) { return (d.questions || []).length >= 2; } },
+
+    { id: 'regles', g: 'Comprendre', titre: 'Maître·sse du jeu', cond: 'Faire un sans-faute au quiz « Ai-je compris l’épreuve ? ».', pourquoi: 'Quand on connaît les règles du jeu, le jour J ne réserve plus de mauvaise surprise.', test: function (d) { return quizSansFaute(d, 'epreuve'); } },
+    { id: 'accroc', g: 'Comprendre', titre: 'Un plan sans accroc', cond: 'Faire un sans-faute au quiz « Ai-je compris la méthode du plan ? ».', pourquoi: 'Comme Hannibal Smith : j’adore quand un plan se déroule sans accroc. Tu sais comment construire le tien.', test: function (d) { return quizSansFaute(d, 'plan'); } },
 
     { id: 'hello', g: 'Le plan', titre: 'Hello, world', cond: 'Écrire ton premier point.', pourquoi: 'Tout programme commence par une première ligne.', test: function (d) { return tous(d).length >= 1; } },
     { id: 'accroche', g: 'Le plan', titre: 'Accroche-toi', cond: 'Avoir une accroche.', pourquoi: 'Le jury écoute mieux après un fait concret.', test: function (d) { return unPlan(d, function (q) { return aEtiquette(q, 'accroche'); }); } },
@@ -321,6 +331,13 @@
       && sinon(n.pistes, function (l) { return liste(l, piste); }) && sinon(n.mots, function (l) { return liste(l, mot); })
       && sinon(n.sources, function (l) { return liste(l, source); }) && sinon(n.oraux, function (l) { return liste(l, oral); })
       && sinon(n.decouverte, function (o) { return objet(o) && reactions(o.reactions); })
+      // Les quiz « Vérifie que tu as compris » : par quiz, meilleur et dernier score, date, essais, questions ratées au dernier essai.
+      && sinon(n.comprendre, function (o) { return objet(o) && Object.keys(o).every(function (k) {
+        const z = D.COMPRENDRE.find(function (x) { return x.id === k; }), r = o[k];
+        if (!z || !objet(r)) return false;
+        const score = function (x) { return entier(x) && x <= z.questions.length; };
+        return score(r.meilleur) && score(r.dernier) && entier(r.essais) && texte(r.le) && sinon(r.rates, function (l) { return liste(l, function (x) { return z.questions.some(function (q) { return q.id === x; }); }); });
+      }); })
       && sinon(n.hf, function (o) { return valeurs(o, function (v) { return typeof v === 'string'; }); })
       && sinon(n.compteurs, function (o) { return valeurs(o, entier); }) && sinon(n.vus, function (o) { return valeurs(o, entier); })
       // Ce que l'élève a fait des retours de son enseignant·e (version en ligne) : lus, mots créés, ressources gardées.
@@ -331,7 +348,7 @@
   }
 
   const api = { choixDe, profil, gouts, prochaineCarte, surprises, CARTES, coach, coachMot, motComplet, coachSources, suggestions, questionsProbables, phase, prochaineAction, HAUTS_FAITS, majHautsFaits,
-    tousLesPoints, ressemblance, contient, aChiffre, reference, dossierValide, SEC_PAR_POINT };
+    tousLesPoints, ressemblance, contient, aChiffre, reference, dossierValide, SEC_PAR_POINT, quizEssaye, quizSansFaute };
   racine.HGAnalyse = api;
   if (typeof module !== 'undefined') module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);

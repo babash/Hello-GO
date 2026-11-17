@@ -20,6 +20,7 @@ Hello GO fait partie des [Ressources NSI et SNT](https://babash.github.io/Babash
 4. **Préparer l'échange** : les questions que le jury pourrait poser, dont certaines proposées d'après le plan.
 5. **S'évaluer** après chaque oral blanc, sur les 5 critères de la grille nationale.
 6. **Télécharger son dossier en PDF** : le plan, puis le lexique, puis les sources.
+7. **Vérifier qu'il ou elle a compris** : deux quiz de 10 questions, « Ai-je compris l'épreuve ? » (les règles de la session 2027) et « Ai-je compris la méthode du plan ? » (des mises en situation). Une question par écran, une explication après chaque réponse, le score et les points à revoir à la fin, avec un lien vers la fiche concernée ; à refaire à volonté, sans note sanction. La page « Comprendre l'épreuve » donne aussi le lien vers la vidéo du ministère (2021), avec ce qui a changé pour 2027.
 
 ## Ce qui guide les élèves
 
@@ -27,7 +28,7 @@ Hello GO fait partie des [Ressources NSI et SNT](https://babash.github.io/Babash
 - **Un « à savoir » chaque jour** : une règle de l'épreuve ou un conseil, selon l'avancement.
 - **Un coach** dans le plan : nombre de points et durée estimée, équilibre des parties, chiffre sans source, mot technique à définir, définition recopiée.
 - **Un exemple** complet (les biais algorithmiques) et des fiches de méthode.
-- **52 hauts faits**, qui récompensent les bonnes habitudes, pas la quantité.
+- **54 hauts faits**, qui récompensent les bonnes habitudes, pas la quantité.
 
 ## Pour les enseignant·e·s
 
@@ -35,8 +36,8 @@ Une seule version, **en ligne**, sur téléphone comme sur ordinateur.
 
 1. **Créez votre espace** sur [babash.github.io/Hello-GO/#/prof](https://babash.github.io/Hello-GO/#/prof) : un code de 3 mots et 4 chiffres, montré une seule fois (aucun courriel, aucun mot de passe). Il n'est gardé que le temps de la séance, dans l'onglet, sauf si vous cochez « Rester connecté·e sur cet appareil », à réserver à un appareil personnel ; « Fermer mon espace sur cet appareil » l'efface.
 2. **Créez une classe** : vous obtenez son lien et son QR code. Chaque élève s'inscrit avec son prénom et l'initiale de son nom, et reçoit un code de 2 mots et 3 chiffres (comme `MICRO-DECOR-123`) qui suffit pour retrouver son dossier depuis n'importe quel appareil. Aucun plafond du nombre d'élèves.
-3. **Le tableau de la classe** : une ligne par élève (question, points, mots, sources, oraux évalués, dernière visite, nouveau travail depuis votre dernière visite) et tous les codes, masqués par défaut, à révéler ou à imprimer.
-4. **Le dossier d'un·e élève** : son plan, ses mots, ses sources, ses pistes et ses oraux, avec vos outils : commenter un point, un mot, une source, une piste ou une question ; demander une définition ; suggérer une ressource ou une question pour l'échange ; valider une question ou demander de la retravailler ; évaluer un oral blanc ou une vidéo sur la grille ; corriger un texte (rare, sans annonce) ; télécharger son PDF.
+3. **Le tableau de la classe** : une ligne par élève (question, points, mots, sources, oraux évalués, meilleur score à chaque quiz, dernière visite, nouveau travail depuis votre dernière visite) et tous les codes, masqués par défaut, à révéler ou à imprimer.
+4. **Le dossier d'un·e élève** : son plan, ses mots, ses sources, ses pistes, ses oraux et ses quiz (scores, essais, questions ratées au dernier essai), avec vos outils : commenter un point, un mot, une source, une piste ou une question ; demander une définition ; suggérer une ressource ou une question pour l'échange ; valider une question ou demander de la retravailler ; évaluer un oral blanc ou une vidéo sur la grille ; corriger un texte (rare, sans annonce) ; télécharger son PDF.
 5. **Avec une IA de votre choix** (facultatif) : « Copier pour l'IA » donne le dossier en texte simple, sans prénom ni code, avec des repères stables (`P3` un point, `M1` un mot, `S2` une source, `Q1` une question de l'échange), des consignes au début et le format de réponse à la fin. Collez sa réponse : chaque ligne `@…` devient un brouillon que vous relisez avant de l'envoyer ; l'élève voit « préparé avec l'aide d'une IA, relu par ton enseignant·e ».
 
 Sans code ni lien de classe, l'application reste utilisable en **mode découverte** : le dossier reste sur l'appareil, et part dans la base quand l'élève rejoint sa classe.
@@ -45,7 +46,7 @@ En fin d'année : exportez votre espace (JSON), puis supprimez vos classes. Rien
 
 ## Où en est le projet
 
-Version 1.3.2 : la version en ligne (élève et enseignant·e), sur la base appliquée le 17/11/2026 (dossier [`supabase/`](supabase/LISEZMOI.md)) ; depuis la 1.3.1, l'interface dit « ton enseignant·e » partout où elle disait « ton prof » ; la 1.3.2 répare le démarrage : `js/analyse.js` devient `js/coach.js` (les bloqueurs de contenu, avec la liste EasyPrivacy, bloquaient tout fichier nommé `analyse.js`), une page et ses fichiers sont toujours de la même version (`?v=`, un cache par version), et un message clair, avec les détails techniques, remplace la page vide si un fichier manque.
+Version 1.4.0 : les deux quiz « Vérifie que tu as compris » (l'épreuve, la méthode du plan), proposés sur l'accueil, dans l'aide et par la prochaine étape, leurs résultats dans le dossier, le résumé et l'espace de l'enseignant·e, deux hauts faits, et le lien vers la vidéo du ministère avec sa mise en garde. Avant elle : la version en ligne (élève et enseignant·e), sur la base appliquée le 17/11/2026 (dossier [`supabase/`](supabase/LISEZMOI.md)) ; depuis la 1.3.1, l'interface dit « ton enseignant·e » partout où elle disait « ton prof » ; la 1.3.2 répare le démarrage : `js/analyse.js` devient `js/coach.js` (les bloqueurs de contenu, avec la liste EasyPrivacy, bloquaient tout fichier nommé `analyse.js`), une page et ses fichiers sont toujours de la même version (`?v=`, un cache par version), et un message clair, avec les détails techniques, remplace la page vide si un fichier manque.
 
 À venir : un correcteur de grammaire sans serveur (Grammalecte).
 
@@ -54,7 +55,7 @@ Version 1.3.2 : la version en ligne (élève et enseignant·e), sur la base appl
 **Données d'élèves : prénom et initiale du nom, code, dossier, retours.** Elles sont gardées dans la base Supabase partagée des applications du site (projet « Babash - applications », schéma `grand_oral`), et sur l'appareil de l'élève (copie de travail, pour continuer hors ligne).
 
 - **Le compte** : le prénom et l'initiale du nom (jamais le nom complet), le code, la classe. Sur l'appareil, un jeton (un par appareil, 5 au plus, valable 30 jours sans usage) et le code, pour « Voir mon code » dans les réglages ; « Quitter cet appareil » efface l'un et l'autre, avec la copie du dossier. Sur un ordinateur partagé du lycée, l'élève quitte l'appareil en partant.
-- **Le dossier** : avis sur les cartes, réponses au questionnaire « Mes goûts » (dont la deuxième spécialité et l'après-bac), pistes, plans, mots, sources, oraux et auto-évaluations, hauts faits **et leurs compteurs** (jours de travail, annulations, déplacements…), qui partent dans la base avec le dossier ; et un **résumé** chiffré pour le tableau de la classe.
+- **Le dossier** : avis sur les cartes, réponses au questionnaire « Mes goûts » (dont la deuxième spécialité et l'après-bac), pistes, plans, mots, sources, oraux et auto-évaluations, hauts faits **et leurs compteurs** (jours de travail, annulations, déplacements…), résultats des quiz (meilleur et dernier score, date, essais, questions ratées au dernier essai), qui partent dans la base avec le dossier ; et un **résumé** chiffré pour le tableau de la classe.
 - **Les retours** de l'enseignant·e (forme ci-dessous).
 - L'élève n'a pas de bouton d'effacement de son compte : seul·e l'enseignant·e supprime un·e élève, une classe ou son espace. Aucun effacement automatique.
 - Le code de l'enseignant·e n'est jamais gardé en clair dans la base (empreinte seulement).
@@ -91,6 +92,7 @@ Le dossier part dans la base 3 secondes après la dernière frappe, quand la pag
 node tests/analyse.test.js     # les analyses de js/coach.js (coach, questionnaire, hauts faits, fichiers importés)
 node tests/versions.test.js    # une seule version partout (index.html, js/app.js, sw.js, ?v=), et aucun nom de fichier que bloquent les bloqueurs de contenu
 python3 tests/parcours.py      # le parcours complet dans un navigateur, à 4 largeurs d'écran
+python3 tests/comprendre.py    # les deux quiz « Vérifie que tu as compris » : retours, score, points à revoir, refaire, haut fait, vidéo en lien simple
 python3 tests/robustesse.py    # deux onglets, fichiers abîmés ou piégés, clavier, longues adresses à 320 px, dossier de la version 1.0.0
 node tests/retours.test.js     # retours, résumé, fusion à trois, format pour l'IA et lecture tolérante de sa réponse, code
 python3 tests/en_ligne.py      # élève et enseignant·e en ligne, contre une reproduction locale de la base (PostgreSQL 16)

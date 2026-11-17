@@ -146,7 +146,10 @@
     const liste = (x) => (Array.isArray(x) ? x.filter((y) => y && typeof y === 'object') : []);
     const q = liste(r.questions).map((x) => `${x.statut === 'validee' ? '✓ ' : ''}${e(typeof x.titre === 'string' && x.titre ? x.titre : 'sans titre')} (${n(x.points)} pts)`).join(' ; ');
     const oraux = liste(r.oraux).filter((o) => o.criteres === 5).length;
-    return `<span class="resume">${q || 'Pas encore de question'}<br>${n(r.mots_complets)}/${n(r.mots)} mots · ${n(r.sources)} sources · ${oraux} oral${oraux > 1 ? 's' : ''} évalué${oraux > 1 ? 's' : ''} · ${n(r.hauts_faits)} hauts faits</span>`;
+    // Les quiz : les noms viennent de la page (D.COMPRENDRE), les scores du résumé, relus comme des nombres.
+    const cq = r.comprendre && typeof r.comprendre === 'object' ? D.COMPRENDRE.filter((z) => r.comprendre[z.id] && typeof r.comprendre[z.id] === 'object')
+      .map((z) => `${e(z.court)} ${Math.min(n(r.comprendre[z.id].meilleur), z.questions.length)}/${z.questions.length}`) : [];
+    return `<span class="resume">${q || 'Pas encore de question'}<br>${n(r.mots_complets)}/${n(r.mots)} mots · ${n(r.sources)} sources · ${oraux} oral${oraux > 1 ? 's' : ''} évalué${oraux > 1 ? 's' : ''} · ${n(r.hauts_faits)} hauts faits<br>Quiz : ${cq.length ? cq.join(' · ') : 'pas encore faits'}</span>`;
   }
 
   // ---------- Le dossier d'un·e élève : lecture, retours, outils ----------
@@ -180,6 +183,7 @@
     const srcDe = (ids) => (ids || []).map((i) => d.sources.find((m) => m.id === i)).filter(Boolean);
     const bilan = R.pour(P.eleve.retours, 'bilan', '');
     return `<section class="carte"><h2>Bilan</h2>${bilan.map(unRetour).join('')}${outil('bilan', '', 'Écrire un bilan')}</section>
+    ${blocQuiz(d)}
     ${d.questions.length ? '' : '<p class="vide">Pas encore de question.</p>'}
     ${d.questions.map((q) => { const v = R.validation(P.eleve.retours, q.id); return `<section class="carte question-prof">
       <p class="sur-titre">Question · ${q.statut === 'validee' ? 'validée' : q.statut === 'proposee' ? 'proposée' : 'brouillon'}${v ? ' · votre avis : ' + (v.etat === 'validee' ? 'validée' : 'à retravailler') : ''}</p>
@@ -196,6 +200,15 @@
       <p><button class="mini" data-pa="suggerer-question" data-q="${e(q.id)}">Suggérer une question pour l’échange</button></p>
       ${P.eleve.retours.items.filter((x) => x.type === 'question' && (x.qid === q.id || !x.qid)).map((x) => `<div class="retour-prof"><p><b>Question suggérée :</b> ${e(x.texte)}</p><button class="mini discret" data-pa="retirer" data-r="${e(x.id)}">Retirer</button></div>`).join('')}
     </section>`; }).join('')}`;
+  }
+  // Les quiz « Vérifie que tu as compris » de l'élève (le dossier est déjà relu par dossierValide) : scores, date, essais,
+  // et les questions ratées au dernier essai, avec leur texte (celui de la page, jamais celui du dossier).
+  function blocQuiz(d) {
+    return `<section class="carte"><h2>Quiz de compréhension</h2>${D.COMPRENDRE.map((z) => { const r = (d.comprendre || {})[z.id], t = z.questions.length;
+      if (!r || !r.essais) return `<p><b>${e(z.titre)}</b> <span class="note">pas encore fait</span></p>`;
+      const rates = (r.rates || []).map((id) => z.questions.find((q) => q.id === id)).filter(Boolean);
+      return `<p><b>${e(z.titre)}</b> · meilleur score ${r.meilleur}/${t} · dernier ${r.dernier}/${t} · ${r.essais} essai${r.essais > 1 ? 's' : ''} · le ${e(r.le)}</p>
+        ${rates.length ? `<p class="note">Ratées au dernier essai :</p><ul class="quiz-rates">${rates.map((q) => `<li>${e(q.q)}</li>`).join('')}</ul>` : ''}`; }).join('')}</section>`;
   }
   function vueMotsSources(d) {
     const R0 = R.reperes(d), demandes = P.eleve.retours.items.filter((x) => x.type === 'definir');

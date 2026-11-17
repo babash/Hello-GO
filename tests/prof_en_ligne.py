@@ -43,12 +43,18 @@ def essais(nav, Appareil, ok, base, prof, URL, CODE_PROF_A, classe_A, erreurs):
     S.p.wait_for_selector('[data-a=plus-pt]'); S.p.locator('[data-a=plus-pt]').nth(1).click(); S.p.keyboard.type('Un centre de données consomme comme une ville')
     S.p.goto(URL + '#/mots'); S.p.click('[data-a=plus-mot]'); S.p.keyboard.type('Centre de données')
     S.p.goto(URL + '#/sources'); S.p.click('[data-a=plus-source]'); S.p.keyboard.type('Rapport ADEME')
+    # un quiz « Vérifie que tu as compris » : 2 erreurs (e3, e6), puis le résultat part avec le dossier et le résumé
+    S.p.goto(URL + '#/comprendre/epreuve'); S.p.click('[data-a=quiz-commencer]')
+    for i, b in enumerate(S.p.evaluate("HGDonnees.COMPRENDRE[0].questions.map((q) => q.b)")):
+        S.p.locator('label.option:has([value="%d"])' % ((b + 1) % 4 if i in (2, 5) else b)).click(); S.p.click('[data-a=quiz-valider]'); S.p.click('[data-a=quiz-suivant]')
+    S.p.wait_for_selector('.score')
     S.etat('Enregistré')
     # --- le tableau de la classe ---
     p.reload(); p.wait_for_selector('.tableau-classe')
     ligne = p.inner_text('.tableau-classe tbody')
     ok('tableau : l’élève, son résumé, nouveau travail', 'Inès B.' in ligne and 'Le cloud est-il écologique ?' in ligne and 'Nouveau travail' in ligne)
     ok('tableau : les codes sont masqués par défaut', code_eleve not in ligne)
+    ok('tableau : le score du quiz (résumé)', 'Quiz : Épreuve 8/10' in ligne, ligne)
     p.click('[data-pa=voir-code]')
     ok('tableau : un code révélé d’un clic', code_eleve in p.inner_text('.tableau-classe tbody'))
     p.click('[data-pa=voir-codes]')
@@ -56,6 +62,8 @@ def essais(nav, Appareil, ok, base, prof, URL, CODE_PROF_A, classe_A, erreurs):
     P.large('p2-tableau')
     # --- le dossier de l'élève et les retours ---
     p.click('.tableau-classe th a'); p.wait_for_selector('.question-prof')
+    qz = p.inner_text('#vue')
+    ok('dossier : les quiz, scores et questions ratées', 'Quiz de compréhension' in qz and 'meilleur score 8/10' in qz and 'Tu as 20 minutes de préparation' in qz and 'pas encore fait' in qz, qz[:400])
     ok('dossier : le plan, avec les repères', 'P1' in p.inner_text('.question-prof') and 'Un centre de données consomme' in p.inner_text('.question-prof'))
     p.locator('.pt [data-pa=commenter]').first.click(); ecrire('Donne un chiffre précis.'); attendre('Retour envoyé.', '#toasts')
     p.click('[data-pa=valider][data-v=validee]'); ecrire('Question claire.'); attendre('Retour envoyé.', '#toasts')
