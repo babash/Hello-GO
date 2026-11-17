@@ -10,7 +10,10 @@ Ce dossier contient la migration de la base de Hello GO. Avec elle, Hello GO n'a
 
 ## Où en est la base
 
-**Rien n'est appliqué.** La migration attend l'accord de l'enseignant sur le SQL exact (règle M4). Elle a seulement été essayée sur une reproduction locale, avec des données inventées (voir « L'essai local »). Tant qu'elle n'est pas appliquée, la page reste dans sa version actuelle, qui garde le dossier sur l'appareil (règle M7 : la page n'appelle que des fonctions qui existent).
+**La migration est appliquée**, après l'accord de l'enseignant sur le SQL exact (« Ok go », 17/11 à 00:13, heure de Mayotte ; règle M4) : `grand_oral_0001_dossiers`, le 17/11 à 05:19 (version 20261117021957), puis `base_unique_0006_registre_grand_oral` du site, à 05:20 (version 20261117022024).
+- Le texte enregistré a la même empreinte que `0001-dossiers.sql` (md5 sans commentaires, espaces ni `;` : `bfddf6cbd7e80d7a7faee1a95757c068`), et le corps des 34 fonctions en base est identique à celui du fichier.
+- Vérification par les métadonnées (Gardien, 17/11) : les 5 tables sous RLS, sans règle ni droit ; le schéma fermé à anon et à authenticated ; 10 fonctions internes appelables par personne ; 24 fonctions `go_` security definer, à `search_path` vide, appelables par anon seul ; 64 mots ; tables des comptes vides juste après l'application ; conseillers : seulement les avis attendus (0008 et 0028, voir « Vérifier »).
+- La page n'appelle pas encore la base : elle garde le dossier sur l'appareil jusqu'à sa version en ligne (règle M7 : la page n'appelle que des fonctions qui existent).
 
 ## Les fichiers
 

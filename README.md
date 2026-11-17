@@ -33,9 +33,9 @@ Hello GO fait partie des [Ressources NSI et SNT](https://babash.github.io/Babash
 
 Cette version (1.2.0) garde tout **sur l'appareil de l'élève** : aucun compte, rien n'est envoyé.
 
-La base de données est écrite et essayée en local (dossier [`supabase/`](supabase/LISEZMOI.md)) : elle n'est pas encore appliquée.
+La base de données est en place (dossier [`supabase/`](supabase/LISEZMOI.md)) : sa migration a été appliquée le 17/11/2026, après l'accord de l'enseignant. L'application ne s'en sert pas encore.
 
-À venir, après accord de l'enseignant sur la base de données :
+À venir :
 - le dossier en ligne, avec un code élève en mots et chiffres, pour reprendre sur un autre appareil ;
 - l'espace de l'enseignant·e : suivre la classe, commenter un point, demander une définition, suggérer une ressource ou une question, valider les questions ;
 - un export en texte simple, à coller dans une IA de son choix, et la lecture de son retour ;
