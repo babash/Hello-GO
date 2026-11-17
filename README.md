@@ -31,7 +31,7 @@ Hello GO fait partie des [Ressources NSI et SNT](https://babash.github.io/Babash
 
 ## Où en est le projet
 
-Cette version (1.1.0) garde tout **sur l'appareil de l'élève** : aucun compte, rien n'est envoyé.
+Cette version (1.2.0) garde tout **sur l'appareil de l'élève** : aucun compte, rien n'est envoyé.
 
 À venir, après accord de l'enseignant sur la base de données :
 - le dossier en ligne, avec un code élève en mots et chiffres, pour reprendre sur un autre appareil ;
@@ -41,7 +41,7 @@ Cette version (1.1.0) garde tout **sur l'appareil de l'élève** : aucun compte,
 
 ## Données
 
-- Le dossier (prénom ou pseudo, avis sur les cartes, réponses au questionnaire « Mes goûts », dont la deuxième spécialité et l'après-bac, pistes, plans, mots, sources, auto-évaluations) est gardé dans le navigateur de l'élève, sur son appareil. Rien n'est envoyé, aucun service extérieur n'est appelé.
+- Le dossier (prénom ou pseudo, avis sur les cartes, réponses au questionnaire « Mes goûts », dont la deuxième spécialité et l'après-bac, pistes, plans, mots, sources, auto-évaluations, hauts faits et leurs compteurs, dont le nombre de jours de travail) est gardé dans le navigateur de l'élève, sur son appareil. Rien n'est envoyé, aucun service extérieur n'est appelé.
 - « Plus », puis « Réglages » : télécharger son dossier, l'importer sur un autre appareil, ou tout effacer.
 
 ## Pour vérifier
