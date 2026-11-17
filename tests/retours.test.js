@@ -2,7 +2,7 @@
 'use strict';
 const assert = require('assert');
 global.HGDonnees = require('../js/donnees.js');
-global.HGAnalyse = require('../js/analyse.js');
+global.HGAnalyse = require('../js/coach.js');
 const R = require('../js/retours.js');
 const A = global.HGAnalyse;
 let n = 0;

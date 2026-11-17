@@ -1,7 +1,7 @@
-// Essais des analyses : node tests/analyse.test.js
+// Essais des analyses (js/coach.js) : node tests/analyse.test.js
 const assert = require('assert');
 const D = require('../js/donnees.js');
-const A = require('../js/analyse.js');
+const A = require('../js/coach.js');
 let id = 0; const pt = (texte, etiquette, sources) => ({ id: 'p' + (++id), texte, etiquette: etiquette || '', mots: [], sources: sources || [] });
 const question = (n) => ({ id: 'q1', titre: 'Q', statut: 'brouillon', echange: [], parties: [
   { id: 'a', titre: 'Introduction', minutes: 2, points: [] }, { id: 'b', titre: 'Axe 1', minutes: 3, points: [] },

@@ -3,6 +3,88 @@
 // découverte), rien n'est envoyé.
 (function () {
   'use strict';
+  // ---------- Le démarrage : une page complète et d'une seule version, ou un message clair (jamais une page vide) ----------
+  // Un ancien index.html (gardé par le navigateur ou par un ancien service worker) peut charger ce fichier neuf sans les
+  // autres, et un bloqueur de contenu peut empêcher un fichier de se charger. On répare alors une seule fois (le service
+  // worker et les caches de Hello GO effacés, puis la page rechargée à une adresse neuve), puis on explique, avec les détails
+  // techniques à recopier. Le dossier de l'élève (localStorage) n'est jamais touché. Le même message est écrit dans
+  // index.html (HG_PANNE), pour le cas où ce fichier-ci ne peut pas s'exécuter : les deux textes vont ensemble.
+  const VERSION_APP = '1.3.2'; // la même que HG_VERSION (index.html), sw.js et les ?v= de index.html (tests/versions.test.js)
+  window.HG_VERSION_APP = VERSION_APP;
+  const MODULES = [['HGDonnees', 'js/donnees.js'], ['HGDecouvertes', 'js/decouvertes.js'], ['HGAnalyse', 'js/coach.js'],
+    ['HGRetours', 'js/retours.js'], ['HGEnLigne', 'js/en-ligne.js'], ['HGProf', 'js/prof.js']];
+  const CLE_REPARATION = 'hellogo:reparation', BASE = new URL('./', location.href).href;
+  function oublierHelloGo() {
+    // Le service worker et les caches de Hello GO seulement : ceux des autres applications de babash.github.io restent.
+    const essai = (f) => { try { return Promise.resolve(f()).catch(() => {}); } catch (x) { return Promise.resolve(); } };
+    const sw = essai(() => navigator.serviceWorker.getRegistrations().then((l) => Promise.all(l.filter((r) => r.scope.indexOf(BASE) === 0).map((r) => r.unregister()))));
+    const ca = essai(() => caches.keys().then((l) => Promise.all(l.filter((k) => k.indexOf('hello-go-') === 0).map((k) => caches.delete(k)))));
+    return Promise.race([Promise.all([sw, ca]), new Promise((ok) => setTimeout(ok, 3000))]);
+  }
+  function dejaRepare() {
+    let s = null; try { s = sessionStorage.getItem(CLE_REPARATION); } catch (x) { /* pas de mémoire de séance : l'adresse suffit */ }
+    return s === VERSION_APP || new URL(location.href).searchParams.get('v') === VERSION_APP;
+  }
+  function reparer() {
+    window.HG_REPARATION = true;
+    try { sessionStorage.setItem(CLE_REPARATION, VERSION_APP); } catch (x) { /* l'adresse suffit */ }
+    const u = new URL(location.href); u.searchParams.set('v', VERSION_APP);
+    oublierHelloGo().then(() => location.replace(u.href));
+  }
+  // Le texte d'une erreur, sans ce qui suit un guillemet (cela pourrait venir du dossier), sauf un nom de propriété du code.
+  function propre(m) {
+    const t = String(m == null ? '' : m).replace(/\s+/g, ' '), re = /(^|[\s(\[,:=])(["'«“`])/g; let r;
+    while ((r = re.exec(t))) {
+      const ouvre = r.index + r[1].length, nom = /^[\w$.\[\]()]{1,60}["'»”`]/.exec(t.slice(ouvre + 1));
+      if (nom && /(reading|setting|property|evaluating)\s?$/i.test(t.slice(0, ouvre))) { re.lastIndex = ouvre + 1 + nom[0].length; continue; }
+      return t.slice(0, Math.min(ouvre, 200)) + '…';
+    }
+    return t.slice(0, 200);
+  }
+  function texteErreur(x) {
+    const ou = /(https?:\/\/[^\s()]+?):(\d+):(\d+)/.exec(String((x && x.stack) || ''));
+    return 'Erreur : ' + propre(x && x.name ? x.name + ': ' + x.message : x) + (ou ? ' (' + ou[1].split('#')[0].replace(BASE, '') + ', ligne ' + ou[2] + ', colonne ' + ou[3] + ')' : '');
+  }
+  function causeDe(absents) {
+    if (navigator.onLine === false) return 'Tu sembles hors ligne : reconnecte-toi, puis recharge la page.';
+    if (window.HG_VERSION !== VERSION_APP) return 'Ton navigateur a gardé une ancienne version de la page (' + (window.HG_VERSION || 'inconnue') + ') : elle ne va pas avec la nouvelle (' + VERSION_APP + ').';
+    if (absents.length) {
+      const f = absents[0], erreur = (window.HG_ERREURS || []).some((x) => x.message && String(x.fichier || '').indexOf(f) >= 0);
+      return erreur ? 'Le fichier ' + f + ' n’a pas pu s’exécuter dans ce navigateur : mets-le à jour, ou essaie avec un autre navigateur.'
+        : 'Le fichier ' + f + ' n’a pas pu être chargé : un bloqueur de contenu (de publicités ou de pistage) l’empêche peut-être. Si tu en utilises un, autorise ce site, puis recharge la page.';
+    }
+    return 'Une erreur a arrêté le démarrage.';
+  }
+  function panne(cause, details) {
+    if (typeof window.HG_PANNE === 'function') return window.HG_PANNE(cause, details);
+    window.HG_PANNE_AFFICHEE = true;
+    const vue = document.getElementById('vue'); if (!vue) return;
+    const el = (tag, texte, classe) => { const x = document.createElement(tag); if (texte) x.textContent = texte; if (classe) x.className = classe; return x; };
+    const s = el('section', '', 'carte alerte'); s.setAttribute('role', 'alert');
+    s.appendChild(el('h1', 'Hello GO n’a pas pu se charger en entier'));
+    s.appendChild(el('p', cause || causeDe([])));
+    s.appendChild(el('p', 'Recharge la page : Ctrl+Maj+R sur ordinateur (Cmd+Maj+R sur Mac) ; sur téléphone, ferme l’onglet, puis rouvre-le. Ton dossier n’est pas perdu : il reste sur cet appareil.'));
+    const b = el('button', 'Recharger', 'principal'); b.type = 'button';
+    b.addEventListener('click', () => { b.disabled = true; oublierHelloGo().then(() => location.reload()); });
+    const p = el('p'); p.appendChild(b); s.appendChild(p);
+    s.appendChild(el('p', 'Si le problème continue, recopie ces détails pour ton enseignant·e :', 'note'));
+    const t = el('p', ['Hello GO : page ' + (window.HG_VERSION || 'inconnue') + ', application ' + VERSION_APP].concat(details || [], ['Navigateur : ' + String(navigator.userAgent).slice(0, 200)]).join('\n'), 'note');
+    t.style.whiteSpace = 'pre-line'; t.style.overflowWrap = 'anywhere'; t.style.fontFamily = 'monospace'; s.appendChild(t);
+    vue.textContent = ''; vue.appendChild(s);
+  }
+  const absents = MODULES.filter((m) => !window[m[0]]).map((m) => m[1]);
+  if (absents.length || window.HG_VERSION !== VERSION_APP) {
+    if (!dejaRepare() && navigator.onLine !== false) { reparer(); return; }
+    panne(causeDe(absents), (absents.length ? ['Fichiers absents : ' + absents.join(', ')] : [])
+      .concat(window.HG_VERSION !== VERSION_APP ? ['Version de la page : ' + (window.HG_VERSION || 'inconnue') + ', attendue : ' + VERSION_APP] : []));
+    return;
+  }
+  // Une erreur avant le premier affichage : le message, au lieu d'une page vide (index.html a déjà noté l'erreur, s'il est neuf).
+  window.addEventListener('error', (ev) => {
+    if (window.HG_DEMARRE || window.HG_REPARATION) return;
+    panne(null, window.HG_ERREURS ? [] : [texteErreur(ev.error || { message: ev.message, stack: ev.filename + ':' + ev.lineno + ':' + ev.colno })]);
+  });
+
   const D = window.HGDonnees, A = window.HGAnalyse, R = window.HGRetours, EL = window.HGEnLigne;
   const CLE = 'hellogo:dossier:v1', CLE_APART = 'hellogo:a-part:v1', CLE_BASE = 'hellogo:base:v1';
   const $ = (s, r) => (r || document).querySelector(s);
@@ -166,6 +248,8 @@
     if (change) { enregistrer(true); rendreSiLibre(); }
     return change;
   }
+  // Mémoire indisponible (navigateur qui bloque les données des sites) : rien à relire, jamais d'erreur.
+  const aPartExiste = () => { try { return !!localStorage.getItem(CLE_APART); } catch (x) { return false; } };
   const nonLus = () => retoursProf.items.filter((x) => !((d.suivi || {}).lus || {})[x.id]);
   const motsDemandes = () => new Set(Object.values((d.suivi || {}).def || {}));
   window.addEventListener('online', () => { envoyer().then(interroger); });
@@ -280,7 +364,7 @@
     ${s ? `<p class="compte">Classe ${e(s.classe)} · ${e(s.enseignant)} · <a href="#/reglages">Ce n’est pas toi ?</a></p>` : ''}
     ${s && sessionExpiree ? '<section class="carte alerte"><p>Ta session a expiré sur cet appareil : ton travail reste ici, et part dès que tu entres de nouveau ton code.</p><p><a class="bouton principal" href="#/entrer">Entrer mon code</a></p></section>' : ''}
     ${n ? `<a class="carte lien-carte nouveautes" href="#/retours"><span class="pastille">${n}</span> ${n > 1 ? 'nouveautés' : 'nouveauté'} de ton enseignant·e</a>` : ''}
-    ${localStorage.getItem(CLE_APART) ? '<p class="note"><a href="#/a-part">Relire ma saisie mise de côté</a></p>' : ''}
+    ${aPartExiste() ? '<p class="note"><a href="#/a-part">Relire ma saisie mise de côté</a></p>' : ''}
     <section class="carte action">
       <p class="sur-titre">Ta prochaine étape · ${e(pa.duree)}</p>
       <p class="gros">${e(pa.texte)}</p>
@@ -937,11 +1021,16 @@
   window.addEventListener('hashchange', () => { rendre(false); window.scrollTo(0, 0); $('#vue').focus({ preventScroll: true }); });
   // Un jour de travail de plus (sans jamais rien retirer : pas de série à tenir).
   // Un haut fait gagné au chargement (« Nage droit devant », au 5e jour) est annoncé comme les autres, et enregistré.
-  const nouveauJour = (function () { const jour = Math.floor(Date.now() / 864e5); if (d.vus.jour !== jour) { d.vus.jour = jour; d.compteurs.jours = (d.compteurs.jours || 0) + 1; return true; } return false; })();
-  const gagnes = A.majHautsFaits(d); rendre(false);
-  if (d.profil.vu && (nouveauJour || gagnes.length)) ecrire();
-  if (d.profil.vu) gagnes.forEach((h) => toast('Haut fait débloqué : ' + h.titre, '#/hauts-faits', 'Voir'));
-  if (EL.session()) { if (EL.session().attente) montrerEtat('attente'); reprendre().then(interroger); }
-  if (!memoireOk) toast('Ce navigateur ne garde pas ton dossier.');
-  if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+  try {
+    const nouveauJour = (function () { const jour = Math.floor(Date.now() / 864e5); if (d.vus.jour !== jour) { d.vus.jour = jour; d.compteurs.jours = (d.compteurs.jours || 0) + 1; return true; } return false; })();
+    const gagnes = A.majHautsFaits(d); rendre(false);
+    window.HG_DEMARRE = true; try { sessionStorage.removeItem(CLE_REPARATION); } catch (x) { /* rien */ }
+    if (d.profil.vu && (nouveauJour || gagnes.length)) ecrire();
+    if (d.profil.vu) gagnes.forEach((h) => toast('Haut fait débloqué : ' + h.titre, '#/hauts-faits', 'Voir'));
+    if (EL.session()) { if (EL.session().attente) montrerEtat('attente'); reprendre().then(interroger); }
+    if (!memoireOk) toast('Ce navigateur ne garde pas ton dossier.');
+  } catch (x) {
+    if (!window.HG_DEMARRE) panne(causeDe([]), [texteErreur(x)]);
+  }
+  try { if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {}); } catch (x) { /* pas de service worker ici */ }
 })();

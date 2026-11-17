@@ -11,8 +11,8 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icone.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icone.svg">
-<link rel="stylesheet" href="css/polices.css">
-<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/polices.css?v=1.3.2">
+<link rel="stylesheet" href="css/app.css?v=1.3.2">
 </head>
 <body>
 <a class="evitement" href="#vue">Aller au contenu</a>
@@ -23,14 +23,87 @@
 <dialog id="dialogue"></dialog>
 <footer class="pied">Hello GO · Babash - NSI Tani Malandi · code MIT, textes CC BY-SA 4.0 · conçu avec l’aide de l’IA · <a href="https://github.com/babash/Hello-GO" target="_blank" rel="noopener">Code source sur GitHub</a> · <a href="https://babash.github.io/Babash-NSI-SNT/" target="_blank" rel="noopener">Ressources NSI et SNT</a></footer>
 <noscript><p style="padding:1rem">Hello GO a besoin de JavaScript pour fonctionner.</p></noscript>
-<script>window.HG_VERSION = '1.3.1';</script>
-<script src="vendor/sortable.min.js"></script>
-<script src="js/donnees.js"></script>
-<script src="js/decouvertes.js"></script>
-<script src="js/analyse.js"></script>
-<script src="js/retours.js"></script>
-<script src="js/en-ligne.js"></script>
-<script src="js/prof.js"></script>
-<script src="js/app.js"></script>
+<script>
+// La version de cette page : la même que VERSION_APP (js/app.js), sw.js et les ?v= des fichiers (tests/versions.test.js).
+window.HG_VERSION = '1.3.2';
+// Le filet de démarrage, écrit pour tout navigateur : une erreur ou un fichier qui ne se charge pas est noté ; si Hello GO
+// ne s'est pas affiché à la fin du chargement, un message clair remplace la page vide, avec les détails techniques (le même
+// message est dans js/app.js : les deux textes vont ensemble). Rien du dossier de l'élève n'y figure.
+(function () {
+  var erreurs = window.HG_ERREURS = [], base = location.href.split('#')[0].split('?')[0].replace(/[^\/]*$/, '');
+  var MODULES = [['HGDonnees', 'js/donnees.js'], ['HGDecouvertes', 'js/decouvertes.js'], ['HGAnalyse', 'js/coach.js'], ['HGRetours', 'js/retours.js'],
+    ['HGEnLigne', 'js/en-ligne.js'], ['HGProf', 'js/prof.js'], ['HG_VERSION_APP', 'js/app.js']];
+  window.addEventListener('error', function (ev) {
+    var t = ev.target;
+    if (t && t !== window && t.nodeType === 1) erreurs.push({ fichier: t.getAttribute('src') || t.getAttribute('href') || '', chargement: true });
+    else erreurs.push({ message: String(ev.message || ''), fichier: String(ev.filename || ''), ligne: ev.lineno || 0, colonne: ev.colno || 0 });
+  }, true);
+  // Le texte d'une erreur, sans ce qui suit un guillemet (cela pourrait venir du dossier), sauf un nom de propriété du code.
+  function propre(m) {
+    var t = String(m == null ? '' : m).replace(/\s+/g, ' '), re = /(^|[\s(\[,:=])(["'«“`])/g, r, ouvre, nom;
+    while ((r = re.exec(t))) {
+      ouvre = r.index + r[1].length; nom = /^[\w$.\[\]()]{1,60}["'»”`]/.exec(t.slice(ouvre + 1));
+      if (nom && /(reading|setting|property|evaluating)\s?$/i.test(t.slice(0, ouvre))) { re.lastIndex = ouvre + 1 + nom[0].length; continue; }
+      return t.slice(0, Math.min(ouvre, 200)) + '…';
+    }
+    return t.slice(0, 200);
+  }
+  function fichier(u) { return String(u || '').split('#')[0].replace(base, ''); }
+  function oublier() {
+    // Le service worker et les caches de Hello GO seulement : ceux des autres applications de babash.github.io restent.
+    var fait = false, fin = function () { if (!fait) { fait = true; location.reload(); } }, n = 2, un = function () { n--; if (n === 0) fin(); };
+    setTimeout(fin, 3000);
+    try { navigator.serviceWorker.getRegistrations().then(function (l) { return Promise.all(l.filter(function (r) { return r.scope.indexOf(base) === 0; }).map(function (r) { return r.unregister(); })); }).then(un, un); } catch (x) { un(); }
+    try { caches.keys().then(function (l) { return Promise.all(l.filter(function (k) { return k.indexOf('hello-go-') === 0; }).map(function (k) { return caches.delete(k); })); }).then(un, un); } catch (x) { un(); }
+  }
+  window.HG_PANNE = function (cause, details) {
+    window.HG_PANNE_AFFICHEE = true;
+    var vue = document.getElementById('vue'), absents = [], lignes = [], i, x, f, err = false;
+    if (!vue) return;
+    for (i = 0; i < MODULES.length; i++) if (!window[MODULES[i][0]]) absents.push(MODULES[i][1]);
+    for (i = 0; i < erreurs.length; i++) if (absents.length && erreurs[i].message && fichier(erreurs[i].fichier).indexOf(absents[0]) === 0) err = true;
+    if (!cause) {
+      f = absents[0];
+      cause = navigator.onLine === false ? 'Tu sembles hors ligne : reconnecte-toi, puis recharge la page.'
+        : window.HG_VERSION_APP && window.HG_VERSION_APP !== window.HG_VERSION ? 'Ton navigateur a gardé une ancienne version de la page (' + window.HG_VERSION + ') : elle ne va pas avec la nouvelle (' + window.HG_VERSION_APP + ').'
+        : f && err ? 'Le fichier ' + f + ' n’a pas pu s’exécuter dans ce navigateur : mets-le à jour, ou essaie avec un autre navigateur.'
+        : f ? 'Le fichier ' + f + ' n’a pas pu être chargé : un bloqueur de contenu (de publicités ou de pistage) l’empêche peut-être. Si tu en utilises un, autorise ce site, puis recharge la page.'
+        : 'Une erreur a arrêté le démarrage.';
+    }
+    lignes.push('Hello GO : page ' + window.HG_VERSION + ', application ' + (window.HG_VERSION_APP || 'non chargée'));
+    lignes = lignes.concat(details || []);
+    if (absents.length && !(details || []).length) lignes.push('Fichiers absents : ' + absents.join(', '));
+    for (i = 0; i < erreurs.length && i < 6; i++) {
+      x = erreurs[i];
+      lignes.push(x.chargement ? 'Fichier non chargé : ' + fichier(x.fichier) : 'Erreur : ' + propre(x.message) + (x.fichier ? ' (' + fichier(x.fichier) + ', ligne ' + x.ligne + ', colonne ' + x.colonne + ')' : ''));
+    }
+    lignes.push('Navigateur : ' + String(navigator.userAgent).slice(0, 200));
+    function el(tag, texte, classe) { var e = document.createElement(tag); if (texte) e.textContent = texte; if (classe) e.className = classe; return e; }
+    var s = el('section', '', 'carte alerte'), b = el('button', 'Recharger', 'principal'), p = el('p'), t;
+    s.setAttribute('role', 'alert');
+    s.appendChild(el('h1', 'Hello GO n’a pas pu se charger en entier'));
+    s.appendChild(el('p', cause));
+    s.appendChild(el('p', 'Recharge la page : Ctrl+Maj+R sur ordinateur (Cmd+Maj+R sur Mac) ; sur téléphone, ferme l’onglet, puis rouvre-le. Ton dossier n’est pas perdu : il reste sur cet appareil.'));
+    b.type = 'button'; b.onclick = function () { b.disabled = true; oublier(); };
+    p.appendChild(b); s.appendChild(p);
+    s.appendChild(el('p', 'Si le problème continue, recopie ces détails pour ton enseignant·e :', 'note'));
+    t = el('p', lignes.join('\n'), 'note'); t.style.whiteSpace = 'pre-line'; t.style.overflowWrap = 'anywhere'; t.style.fontFamily = 'monospace';
+    s.appendChild(t);
+    vue.textContent = ''; vue.appendChild(s);
+  };
+  window.addEventListener('load', function () {
+    var vue = document.getElementById('vue');
+    if (!window.HG_DEMARRE && !window.HG_REPARATION && !window.HG_PANNE_AFFICHEE && vue && !vue.children.length) window.HG_PANNE(null, []);
+  });
+})();
+</script>
+<script src="vendor/sortable.min.js?v=1.3.2"></script>
+<script src="js/donnees.js?v=1.3.2"></script>
+<script src="js/decouvertes.js?v=1.3.2"></script>
+<script src="js/coach.js?v=1.3.2"></script>
+<script src="js/retours.js?v=1.3.2"></script>
+<script src="js/en-ligne.js?v=1.3.2"></script>
+<script src="js/prof.js?v=1.3.2"></script>
+<script src="js/app.js?v=1.3.2"></script>
 </body>
 </html>

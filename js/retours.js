@@ -2,7 +2,7 @@
 // Fonctions pures, sans page : elles servent à l'élève, à l'enseignant·e et aux tests (node tests/retours.test.js).
 (function (racine) {
   'use strict';
-  const A = racine.HGAnalyse || (typeof require !== 'undefined' ? require('./analyse.js') : null);
+  const A = racine.HGAnalyse || (typeof require !== 'undefined' ? require('./coach.js') : null);
   const D = racine.HGDonnees || (typeof require !== 'undefined' ? require('./donnees.js') : null);
   const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
   const objet = (x) => x !== null && typeof x === 'object' && !Array.isArray(x);

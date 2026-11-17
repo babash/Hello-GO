@@ -45,7 +45,7 @@ En fin d'année : exportez votre espace (JSON), puis supprimez vos classes. Rien
 
 ## Où en est le projet
 
-Version 1.3.1 : la version en ligne (élève et enseignant·e), sur la base appliquée le 17/11/2026 (dossier [`supabase/`](supabase/LISEZMOI.md)) ; depuis la 1.3.1, l'interface dit « ton enseignant·e » partout où elle disait « ton prof ».
+Version 1.3.2 : la version en ligne (élève et enseignant·e), sur la base appliquée le 17/11/2026 (dossier [`supabase/`](supabase/LISEZMOI.md)) ; depuis la 1.3.1, l'interface dit « ton enseignant·e » partout où elle disait « ton prof » ; la 1.3.2 répare le démarrage : `js/analyse.js` devient `js/coach.js` (les bloqueurs de contenu, avec la liste EasyPrivacy, bloquaient tout fichier nommé `analyse.js`), une page et ses fichiers sont toujours de la même version (`?v=`, un cache par version), et un message clair, avec les détails techniques, remplace la page vide si un fichier manque.
 
 À venir : un correcteur de grammaire sans serveur (Grammalecte).
 
@@ -88,7 +88,8 @@ Le dossier part dans la base 3 secondes après la dernière frappe, quand la pag
 ## Pour vérifier
 
 ```
-node tests/analyse.test.js     # les analyses (coach, questionnaire, hauts faits, fichiers importés)
+node tests/analyse.test.js     # les analyses de js/coach.js (coach, questionnaire, hauts faits, fichiers importés)
+node tests/versions.test.js    # une seule version partout (index.html, js/app.js, sw.js, ?v=), et aucun nom de fichier que bloquent les bloqueurs de contenu
 python3 tests/parcours.py      # le parcours complet dans un navigateur, à 4 largeurs d'écran
 python3 tests/robustesse.py    # deux onglets, fichiers abîmés ou piégés, clavier, longues adresses à 320 px, dossier de la version 1.0.0
 node tests/retours.test.js     # retours, résumé, fusion à trois, format pour l'IA et lecture tolérante de sa réponse, code

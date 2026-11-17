@@ -1,4 +1,6 @@
 // Hello GO : les analyses automatiques (coach, questionnaire, questions probables, hauts faits).
+// Nom de fichier neutre : un fichier nommé « analyse.js » est bloqué par les bloqueurs de contenu (règle « /analyse.js »
+// d'EasyPrivacy, liste active par défaut dans uBlock Origin) ; ne pas le renommer en analyse, analytics, stats, track…
 // Tout se calcule sur l'appareil, à partir du dossier : rien n'est envoyé.
 (function (racine) {
   'use strict';
