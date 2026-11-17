@@ -19,9 +19,11 @@ def essais(nav, Appareil, ok, base, prof, URL, CODE_PROF_A, classe_A, erreurs):
     # --- créer son espace ---
     p.goto(URL + '#/prof'); p.wait_for_selector('#prof-nom')
     P.large('p0-entree')
+    ok('entrée : case « Rester connecté·e sur cet appareil », décochée par défaut', p.locator('#prof-rester').count() == 1 and not p.locator('#prof-rester').is_checked())
     p.fill('#prof-nom', 'M. Durand'); p.click('[data-pa=creer-espace]'); p.wait_for_selector('.code-eleve')
     code = p.inner_text('.code-eleve').strip()
     ok('espace : code de 3 mots et 4 chiffres montré une fois', re.fullmatch(r'[A-Z]+-[A-Z]+-[A-Z]+-\d{4}', code) is not None, code)
+    ok('code montré : case « Rester connecté·e », décochée par défaut', p.locator('#prof-rester').count() == 1 and not p.locator('#prof-rester').is_checked())
     p.click('[data-pa=code-note]'); attendre('Mon espace · M. Durand')
     ok('code gardé pour la séance seulement (sessionStorage, pas localStorage)',
        p.evaluate("sessionStorage.getItem('hellogo:prof:code')") == code and p.evaluate("localStorage.getItem('hellogo:prof:code')") is None)
@@ -124,9 +126,17 @@ def essais(nav, Appareil, ok, base, prof, URL, CODE_PROF_A, classe_A, erreurs):
     s2, rr = base.appel('go_inscription', {'p_code_classe': code_classe, 'p_pseudo': 'Léo P.'})
     ok('inscriptions fermées', not rr['ok'])
     P2 = Appareil(nav, 'P-320-obscur', 320, True)
-    P2.p.goto(URL + '#/prof'); P2.p.fill('#prof-code', code.lower().replace('-', ' ')); P2.p.click('[data-pa=ouvrir]'); P2.p.wait_for_selector('.lien-carte')
+    P2.p.goto(URL + '#/prof'); P2.p.fill('#prof-code', code.lower().replace('-', ' ')); P2.p.check('#prof-rester'); P2.p.click('[data-pa=ouvrir]'); P2.p.wait_for_selector('.lien-carte')
+    ok('« Rester connecté·e » cochée : le code est aussi dans localStorage', P2.p.evaluate("localStorage.getItem('hellogo:prof:code')") == code)
     P2.p.click('.lien-carte'); P2.p.wait_for_selector('.tableau-classe'); P2.large('p5-tableau-telephone')
     P2.p.click('.tableau-classe th a'); P2.p.wait_for_selector('.question-prof'); P2.large('p6-dossier-telephone')
+    ok('le code n’est jamais dans l’adresse', code not in P2.p.url and code not in p.url)
+    P3 = P2.ctx.new_page(); P3.goto(URL + '#/prof'); P3.wait_for_selector('.lien-carte')
+    ok('« Rester connecté·e » : un nouvel onglet ouvre l’espace sans redemander le code', P3.locator('#prof-code').count() == 0)
+    P3.close()
+    P2.p.goto(URL + '#/prof'); P2.p.wait_for_selector('[data-pa=quitter]'); P2.p.click('[data-pa=quitter]'); P2.p.wait_for_selector('#prof-code')
+    ok('« Fermer mon espace sur cet appareil » : le code est effacé des deux stockages',
+       P2.p.evaluate("localStorage.getItem('hellogo:prof:code')") is None and P2.p.evaluate("sessionStorage.getItem('hellogo:prof:code')") is None)
     p.click('[data-pa=supprimer-eleve]'); attendre('Aucun·e élève', '#vue')
     reponses.append('TNSI B'); p.locator('details.carte summary').last.click(); p.click('[data-pa=supprimer-classe]'); attendre('Classe supprimée.', '#toasts')
     # --- son code, son espace ---
@@ -135,6 +145,17 @@ def essais(nav, Appareil, ok, base, prof, URL, CODE_PROF_A, classe_A, erreurs):
     s2, rr = base.appel('go_prof_ouvrir', {'p_code': code})
     ok('changer son code : l’ancien ne marche plus', not rr['ok'] and nouveau != code)
     p.click('[data-pa=code-note]'); attendre('Mon espace')
+    # --- garde-fou (Gardien, T75) : un résumé piégé, écrit avec le jeton d'un·e élève, n'est jamais exécuté chez l'enseignant·e ---
+    k = prof('go_prof_creer_classe', p_code=nouveau, p_nom='Classe piège')
+    x = prof('go_inscription', p_code_classe=k['code'], p_pseudo='Max R.')
+    piege = '<img src=x onerror="window.piege=1">'
+    prof('go_sauvegarde', p_jeton=x['jeton'], p_dossier={'v': 1, 'questions': []}, p_version_connue=0,
+         p_resume={'v': 1, 'etape': piege, 'questions': [{'titre': 'Q', 'statut': 'brouillon', 'points': piege}, piege], 'points': piege, 'mots': piege,
+                   'mots_complets': piege, 'sources': piege, 'hauts_faits': piege, 'oraux': piege})
+    p.goto(URL + '#/prof/classe/' + k['id']); p.wait_for_selector('.tableau-classe'); time.sleep(.5)
+    ok('résumé piégé (écrit avec le jeton d’un·e élève) : jamais exécuté dans le tableau de la classe',
+       not p.evaluate('window.piege') and p.locator('.tableau-classe img').count() == 0 and '0/0 mots' in p.inner_text('.tableau-classe'))
+    p.goto(URL + '#/prof'); attendre('Mon espace')
     p.click('[data-pa=debloquer]'); attendre('Réseau débloqué', '#toasts')
     p.locator('details.carte summary').last.click(); p.fill('#prof-supprimer', 'SUPPRIMER'); p.click('[data-pa=supprimer-espace]'); p.wait_for_selector('#prof-nom')
     s2, rr = base.appel('go_prof_ouvrir', {'p_code': nouveau})

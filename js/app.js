@@ -89,11 +89,22 @@
     const fusion = A.dossierValide(f.resultat) ? f.resultat : distant;
     // ce qui avait été écrit ici (absent de la version connue) et qui n'est pas dans la fusion
     const connus = new Set(R.textesAbsents(connu || {}, {}).map((x) => x[1])), absents = R.textesAbsents(d, fusion).filter((x) => !connus.has(x[1]));
-    if (absents.length) { try { localStorage.setItem(CLE_APART, JSON.stringify({ le: new Date().toISOString(), textes: absents.slice(0, 300) })); } catch (x) { /* pas de place */ } }
+    if (absents.length) mettreDeCote(absents);
     adopter(distant, version, fusion, absents.length > 0);
     if (absents.length) toast('Ton dossier a été mis à jour. Ce que tu venais d’écrire est gardé à part.', '#/a-part', 'Relire');
   }
+  // « Ma saisie mise de côté » : les nouveaux textes s'ajoutent à ceux qui y sont déjà (jamais d'écrasement d'une copie
+  // que l'élève n'a pas encore relue).
+  function mettreDeCote(textes) {
+    let avant = null; try { avant = JSON.parse(localStorage.getItem(CLE_APART)); } catch (x) { /* copie illisible */ }
+    const deja = avant && Array.isArray(avant.textes) ? avant.textes.filter((t) => Array.isArray(t) && t.length === 2) : [];
+    const vus = new Set(deja.map((t) => t[0] + '\n' + t[1])), tous = deja.concat(textes.filter((t) => !vus.has(t[0] + '\n' + t[1])));
+    try { localStorage.setItem(CLE_APART, JSON.stringify({ le: new Date().toISOString(), textes: tous.slice(-300) })); } catch (x) { /* pas de place */ }
+  }
   function adopter(distant, version, fusion, forcer) {
+    // Un dossier venu de la base n'est repris que s'il a la forme d'un dossier Hello GO (contrat : supabase/LISEZMOI.md) :
+    // la base n'en vérifie que la forme générale, et la page insère ses identifiants dans ses liens et ses boutons.
+    if (!A.dossierValide(distant) || (fusion && !A.dossierValide(fusion))) { montrerEtat('erreur'); return; }
     const prenom = d.profil.prenom, s = EL.session();
     d = Object.assign(dossierNeuf(), JSON.parse(JSON.stringify(fusion || distant))); d.profil = Object.assign({}, d.profil, { vu: true, prenom: (s && s.pseudo) || prenom });
     garderBase(distant); ecrire(true);
@@ -439,8 +450,8 @@
     ${d.mots.map((m) => `<section class="carte mot-carte">
       <div class="tete">${champ('mots.' + m.id + '.mot', m.mot, 'class="titre" placeholder="Le mot" aria-label="Le mot"')}
         <span class="badge ${A.motComplet(m) ? 'validee' : 'brouillon'}" data-zone="etat-mot" data-m="${m.id}">${A.motComplet(m) ? 'Complet' : 'À compléter'}</span>
-        ${demandes.has(m.id) ? '<span class="badge prof">Demandé par ton prof</span>' : ''}
         <button class="croix" data-a="suppr-mot" data-m="${m.id}" aria-label="Supprimer le mot">✕</button></div>
+      ${demandes.has(m.id) ? '<p><span class="badge prof">Demandé par ton prof</span></p>' : ''}
       <label>Définition d’une source ${zoneTexte('mots.' + m.id + '.defSource', m.defSource, 'placeholder="La définition exacte, recopiée"')}</label>
       <label>D’où vient-elle ? ${champ('mots.' + m.id + '.sourceTexte', m.sourceTexte, 'placeholder="Un dictionnaire, un cours, un site officiel…"')}</label>
       <label>Avec mes mots ${zoneTexte('mots.' + m.id + '.defMoi', m.defMoi, 'placeholder="Comme je l’expliquerais à un·e camarade"')}</label>
@@ -780,13 +791,27 @@
     connexion(b) {
       const code = R.lireCode($('#code-eleve').value), envoyerLocal = !!($('#envoyer-local') && $('#envoyer-local').checked);
       if (code.replace(/-/g, '').length < 6) return toast('Écris ton code : 2 mots et 3 chiffres.');
-      b.disabled = true;
-      EL.rpc('go_connexion', { p_code: code }).then((r) => {
-        b.disabled = false;
-        if (!r || !r.ok) return toast((r && r.message) || 'Ce code n’a pas marché.');
-        const meme = EL.session() && EL.session().code === r.code_affiche;
-        entrerAvec(r, envoyerLocal || meme, meme); location.hash = '#/'; reprendre();
-      }, (x) => { b.disabled = false; toast(x.reseau ? 'Pas de réseau : reconnecte-toi, puis réessaie.' : 'L’entrée n’a pas pu se faire. Réessaie dans un moment.'); });
+      const entrer = () => {
+        b.disabled = true;
+        EL.rpc('go_connexion', { p_code: code }).then((r) => {
+          b.disabled = false;
+          if (!r || !r.ok) return toast((r && r.message) || 'Ce code n’a pas marché.');
+          const meme = EL.session() && EL.session().code === r.code_affiche;
+          entrerAvec(r, envoyerLocal || meme, meme); location.hash = '#/'; reprendre();
+        }, (x) => { b.disabled = false; toast(x.reseau ? 'Pas de réseau : reconnecte-toi, puis réessaie.' : 'L’entrée n’a pas pu se faire. Réessaie dans un moment.'); });
+      };
+      // Un autre code que celui de cet appareil : ce qui n'est pas encore en ligne (travail pas encore envoyé, saisie mise
+      // de côté) serait effacé de l'appareil. On essaie d'abord d'envoyer ; s'il reste quelque chose, l'élève décide.
+      const avant = EL.session();
+      if (avant && avant.code !== code) {
+        if (enAttente) ecrire();
+        return envoyer().then(() => {
+          const s2 = EL.session(); let aPart = null; try { aPart = localStorage.getItem(CLE_APART); } catch (x) { /* rien */ }
+          if (((s2 && s2.attente) || aPart) && !window.confirm('Une partie du travail de cet appareil n’est pas encore en ligne (travail pas encore envoyé, ou saisie mise de côté). Avec un autre code, elle sera effacée de cet appareil. Pour la garder, annule, puis télécharge ton dossier dans les réglages. Continuer quand même ?')) return;
+          entrer();
+        });
+      }
+      entrer();
     },
     'voir-code'(b) { const z = $('#mon-code'); z.hidden = !z.hidden; b.textContent = z.hidden ? 'Voir mon code' : 'Cacher mon code'; },
     deconnexion() {
@@ -812,7 +837,9 @@
     const avant = EL.session();
     EL.ouvrirSession({ jeton: r.jeton, pseudo: r.pseudo, code: r.code_affiche, classe: r.classe, enseignant: r.enseignant,
       version: avant && avant.code === r.code_affiche ? avant.version : 0, attente: !!(garderLocal && dossierRempli()) || !!(avant && avant.code === r.code_affiche && avant.attente), retoursVersion: null });
-    if (!garderLocal && dossierRempli() && !(avant && avant.code !== r.code_affiche)) { const t = R.textesAbsents(d, {}); if (t.length) try { localStorage.setItem(CLE_APART, JSON.stringify({ le: new Date().toISOString(), textes: t.slice(0, 300) })); } catch (x) { /* rien */ } }
+    // Un autre compte que celui de cet appareil : rien de l'ancien compte ne reste lisible (pas même sa saisie mise de côté).
+    if (avant && avant.code !== r.code_affiche) { try { localStorage.removeItem(CLE_APART); } catch (x) { /* rien */ } }
+    else if (!garderLocal && dossierRempli()) { const t = R.textesAbsents(d, {}); if (t.length) mettreDeCote(t); }
     if (!garderLocal) d = dossierNeuf();
     if (neuf || !d.profil.prenom) d.profil.prenom = r.pseudo;
     d.profil.vu = true; sessionExpiree = false; retoursProf = R.vides(); EL.garderRetours(null);

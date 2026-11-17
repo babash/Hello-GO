@@ -1,6 +1,8 @@
 // Hello GO : l'espace de l'enseignant·e (#/prof). Ses classes, le tableau de chaque classe, le dossier de chaque élève
 // et les outils de retour. Le code de l'enseignant·e n'est gardé que pour la séance (sessionStorage), sauf si la case
-// « Rester connecté·e sur cet appareil » est cochée. Tout texte venu de la base est échappé avant affichage.
+// « Rester connecté·e sur cet appareil » est cochée (localStorage, décision de l'enseignant du 17/11) ; jamais dans un
+// cookie ni dans une adresse. Tout texte venu de la base est échappé avant affichage, et ce que la page de l'élève
+// écrit (dossier, résumé) est relu avant d'être montré.
 (function (racine) {
   'use strict';
   const EL = racine.HGEnLigne, R = racine.HGRetours, A = racine.HGAnalyse, D = racine.HGDonnees;
@@ -136,11 +138,15 @@
     <details class="carte"><summary>Supprimer la classe</summary><p>La classe, ses élèves et leurs dossiers seront effacés. C’est définitif. Exportez-la d’abord.</p>
       <p><button data-pa="exporter-classe">Télécharger l’export</button> <button class="danger" data-pa="supprimer-classe">Supprimer la classe</button></p></details>`;
   }
+  // Le résumé est écrit par la page de l'élève, et la base n'en vérifie que la taille : rien n'y est sûr. Chaque nombre
+  // est relu comme un nombre, chaque texte est échappé, et une forme inattendue ne casse pas le tableau.
   function resumeHtml(r) {
-    if (!r || !r.v) return '<span class="note">Rien d’enregistré</span>';
-    const q = (r.questions || []).map((x) => `${x.statut === 'validee' ? '✓ ' : ''}${e(x.titre || 'sans titre')} (${x.points} pts)`).join(' ; ');
-    const oraux = (r.oraux || []).filter((o) => o.criteres === 5).length;
-    return `<span class="resume">${q || 'Pas encore de question'}<br>${r.mots_complets || 0}/${r.mots || 0} mots · ${r.sources || 0} sources · ${oraux} oral${oraux > 1 ? 's' : ''} évalué${oraux > 1 ? 's' : ''} · ${r.hauts_faits || 0} hauts faits</span>`;
+    if (!r || typeof r !== 'object' || !r.v) return '<span class="note">Rien d’enregistré</span>';
+    const n = (x) => (typeof x === 'number' && Number.isFinite(x) && x >= 0 ? Math.floor(x) : 0);
+    const liste = (x) => (Array.isArray(x) ? x.filter((y) => y && typeof y === 'object') : []);
+    const q = liste(r.questions).map((x) => `${x.statut === 'validee' ? '✓ ' : ''}${e(typeof x.titre === 'string' && x.titre ? x.titre : 'sans titre')} (${n(x.points)} pts)`).join(' ; ');
+    const oraux = liste(r.oraux).filter((o) => o.criteres === 5).length;
+    return `<span class="resume">${q || 'Pas encore de question'}<br>${n(r.mots_complets)}/${n(r.mots)} mots · ${n(r.sources)} sources · ${oraux} oral${oraux > 1 ? 's' : ''} évalué${oraux > 1 ? 's' : ''} · ${n(r.hauts_faits)} hauts faits</span>`;
   }
 
   // ---------- Le dossier d'un·e élève : lecture, retours, outils ----------

@@ -142,11 +142,11 @@
   // ---------- Les textes d'un dossier absents d'un autre (une saisie refusée, à relire) ----------
   function textes(d) {
     const l = [], ajoute = (quoi, t) => { if (typeof t === 'string' && t.trim()) l.push([quoi, t.trim()]); };
-    (d.questions || []).forEach((q) => { ajoute('Question', q.titre); q.parties.forEach((p) => p.points.forEach((x) => ajoute('Point', x.texte))); (q.echange || []).forEach((x) => { ajoute('Question du jury', x.question); ajoute('Réponse', x.reponse); }); });
+    (d.questions || []).forEach((q) => { ajoute('Question', q.titre); q.parties.forEach((p) => { ajoute('Partie', p.titre); p.points.forEach((x) => ajoute('Point', x.texte)); }); (q.echange || []).forEach((x) => { ajoute('Question du jury', x.question); ajoute('Réponse', x.reponse); }); });
     (d.mots || []).forEach((m) => ['mot', 'defSource', 'sourceTexte', 'defMoi', 'analogie'].forEach((k) => ajoute('Mot', m[k])));
     (d.sources || []).forEach((s) => ['titre', 'auteur', 'lien', 'date', 'retiens'].forEach((k) => ajoute('Source', s[k])));
     (d.pistes || []).forEach((p) => { ajoute('Piste', p.titre); ajoute('Piste', p.pourquoi); (p.idees || []).concat(p.candidates || []).forEach((t) => ajoute('Piste', t)); });
-    (d.oraux || []).forEach((o) => ajoute('Oral', o.objectifs));
+    (d.oraux || []).forEach((o) => { ajoute('Oral', o.nom); ajoute('Oral', o.objectifs); });
     (d.interets || []).concat(d.ponts || []).forEach((t) => ajoute('Centre d’intérêt', t));
     return l;
   }
@@ -159,7 +159,9 @@
   // Ce qui n'a changé que d'un côté est gardé ; un même texte changé des deux côtés prend la version de la base (la copie
   // de l'appareil est alors gardée à part par la page). Les listes à identifiants (questions, points, mots, sources…) sont
   // fusionnées élément par élément : un ajout de chaque côté est gardé, une suppression aussi si l'autre côté n'a rien changé.
-  const pareil = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+  // Comparer le contenu, pas l'ordre des clés : la base (jsonb) range les clés à sa façon, la page dans l'ordre de création.
+  const canon = (x) => (Array.isArray(x) ? x.map(canon) : objet(x) ? Object.keys(x).sort().reduce((o, k) => { o[k] = canon(x[k]); return o; }, {}) : x);
+  const pareil = (a, b) => a === b || JSON.stringify(canon(a)) === JSON.stringify(canon(b));
   const listeAId = (x) => Array.isArray(x) && x.length > 0 && x.every((y) => objet(y) && id(y.id));
   function fusionner(base, local, distant) {
     let conflit = false;
@@ -180,7 +182,8 @@
         });
         l.forEach((x, i) => { if (bm[x.id] || rm[x.id]) return; // ajouté ici : après son voisin d'avant, s'il est encore là
           const avant = i > 0 ? out.findIndex((y) => y.id === l[i - 1].id) : -1; out.splice(avant >= 0 ? avant + 1 : (i === 0 ? 0 : out.length), 0, x); });
-        // un élément supprimé par la base mais modifié ici est remis (sinon la saisie serait perdue)
+        // un élément supprimé par la base mais modifié ici n'est pas remis : c'est un conflit, et la page garde à part
+        // ce qui y avait été écrit (« Ma saisie mise de côté »)
         l.forEach((x) => { if (bm[x.id] && !rm[x.id] && !pareil(x, bm[x.id])) { conflit = true; } });
         return out;
       }

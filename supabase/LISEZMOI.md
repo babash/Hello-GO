@@ -13,7 +13,7 @@ Ce dossier contient la migration de la base de Hello GO. Avec elle, Hello GO n'a
 **La migration est appliquée**, après l'accord de l'enseignant sur le SQL exact (« Ok go », 17/11 à 00:13, heure de Mayotte ; règle M4) : `grand_oral_0001_dossiers`, le 17/11 à 05:19 (version 20261117021957), puis `base_unique_0006_registre_grand_oral` du site, à 05:20 (version 20261117022024).
 - Le texte enregistré a la même empreinte que `0001-dossiers.sql` (md5 sans commentaires, espaces ni `;` : `bfddf6cbd7e80d7a7faee1a95757c068`), et le corps des 34 fonctions en base est identique à celui du fichier.
 - Vérification par les métadonnées (Gardien, 17/11) : les 5 tables sous RLS, sans règle ni droit ; le schéma fermé à anon et à authenticated ; 10 fonctions internes appelables par personne ; 24 fonctions `go_` security definer, à `search_path` vide, appelables par anon seul ; 64 mots ; tables des comptes vides juste après l'application ; conseillers : seulement les avis attendus (0008 et 0028, voir « Vérifier »).
-- La page n'appelle pas encore la base : elle garde le dossier sur l'appareil jusqu'à sa version en ligne (règle M7 : la page n'appelle que des fonctions qui existent).
+- La page s'en sert depuis sa version 1.3.0 (T75, la version en ligne) : elle n'appelle que ces 24 fonctions, qui existent toutes en base avec les noms de paramètres qu'elle envoie (règle M7 ; vérifié par les métadonnées par le Gardien, le 17/11). Sans compte (mode découverte), elle n'appelle rien.
 
 ## Les fichiers
 
@@ -103,10 +103,10 @@ Toutes : `public`, `security definer`, `search_path` vide, appelables par `anon`
 
 - **Appeler en POST** (`supabase.rpc`, ou `fetch` en POST avec l'en-tête `apikey`), jamais en GET : un code dans l'adresse resterait dans les journaux.
 - **Garder le jeton** de l'élève sur l'appareil (il expire après 30 jours sans usage), et proposer « Se déconnecter de cet appareil » (`go_deconnexion`) : sur un poste partagé du lycée, l'élève suivant·e ne doit pas reprendre le dossier d'un·e autre. À la reprise, la page affiche le pseudo (« Ce n'est pas toi ? »).
-- **Le code enseignant·e** n'est gardé que le temps de la séance (mémoire de la page ou `sessionStorage`), jamais dans `localStorage`.
+- **Le code de l'enseignant·e** est gardé le temps de la séance (mémoire de la page et `sessionStorage`). Sur choix explicite, sur un appareil personnel, il peut aussi être gardé dans `localStorage` : case « Rester connecté·e sur cet appareil », décochée par défaut (décision de l'enseignant du 17/11, 06:13). Jamais dans un cookie, une adresse, un journal ou le cache du service worker ; « Fermer mon espace sur cet appareil » l'efface des deux stockages.
 - **Enregistrer avec la version connue** et, en cas de conflit, reprendre le dossier renvoyé (en gardant une copie locale du texte refusé, que l'élève peut relire). Après une correction de l'enseignant·e, l'élève ne revient pas en arrière : la page ne propose pas de restaurer l'ancienne version.
 - **Interroger au plus toutes les quelques secondes** (`go_retours`), ou à l'ouverture : jamais de canal temps réel.
-- **Valider ce qu'elle reçoit** avant de l'afficher : `HGAnalyse.dossierValide` pour un dossier (côté élève comme côté enseignant·e), et tout texte échappé. La base ne vérifie que la forme générale (un objet de version `v: 1`) et la taille.
+- **Valider ce qu'elle reçoit** avant de l'afficher : `HGAnalyse.dossierValide` pour un dossier (côté élève, avant de le reprendre sur l'appareil, comme côté enseignant·e), `HGRetours.nettoyer` pour des retours, chaque nombre du résumé relu comme un nombre, et tout texte échappé. La base ne vérifie que la forme générale (un objet de version `v: 1`) et la taille : un dossier ou un résumé peut venir de n'importe qui ayant le code d'un·e élève.
 - **Calculer le résumé** à chaque enregistrement (étape, nombre de questions, de points, de mots, de sources, oraux faits…) : c'est lui que lit le tableau de la classe.
 - **Les liens des retours** (ressources suggérées) ne s'ouvrent que s'ils commencent par `https://` ou `http://`.
 

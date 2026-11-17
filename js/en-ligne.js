@@ -25,7 +25,8 @@
     catch (x) { return false; }
   }
 
-  // La session de l'élève sur cet appareil : le jeton (pas le code), et ce qu'il faut pour travailler hors ligne.
+  // La session de l'élève sur cet appareil : le jeton, le code (pour « Voir mon code » ; go_reprise le rend de toute façon
+  // à qui a le jeton), et ce qu'il faut pour travailler hors ligne. « Quitter cet appareil » efface tout.
   const lire = (cle) => { try { const t = localStorage.getItem(cle); return t ? JSON.parse(t) : null; } catch (x) { return null; } };
   const ecrire = (cle, v) => { try { if (v == null) localStorage.removeItem(cle); else localStorage.setItem(cle, JSON.stringify(v)); return true; } catch (x) { return false; } };
   const uuid = (x) => typeof x === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(x);

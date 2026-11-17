@@ -33,7 +33,7 @@ Hello GO fait partie des [Ressources NSI et SNT](https://babash.github.io/Babash
 
 Une seule version, **en ligne**, sur téléphone comme sur ordinateur.
 
-1. **Créez votre espace** sur [babash.github.io/Hello-GO/#/prof](https://babash.github.io/Hello-GO/#/prof) : un code de 3 mots et 4 chiffres, montré une seule fois (aucun courriel, aucun mot de passe). Il n'est gardé que le temps de la séance, sauf si vous cochez « Rester connecté·e sur cet appareil ».
+1. **Créez votre espace** sur [babash.github.io/Hello-GO/#/prof](https://babash.github.io/Hello-GO/#/prof) : un code de 3 mots et 4 chiffres, montré une seule fois (aucun courriel, aucun mot de passe). Il n'est gardé que le temps de la séance, dans l'onglet, sauf si vous cochez « Rester connecté·e sur cet appareil », à réserver à un appareil personnel ; « Fermer mon espace sur cet appareil » l'efface.
 2. **Créez une classe** : vous obtenez son lien et son QR code. Chaque élève s'inscrit avec son prénom et l'initiale de son nom, et reçoit un code de 2 mots et 3 chiffres (comme `MICRO-DECOR-123`) qui suffit pour retrouver son dossier depuis n'importe quel appareil. Aucun plafond du nombre d'élèves.
 3. **Le tableau de la classe** : une ligne par élève (question, points, mots, sources, oraux évalués, dernière visite, nouveau travail depuis votre dernière visite) et tous les codes, masqués par défaut, à révéler ou à imprimer.
 4. **Le dossier d'un·e élève** : son plan, ses mots, ses sources, ses pistes et ses oraux, avec vos outils : commenter un point, un mot, une source, une piste ou une question ; demander une définition ; suggérer une ressource ou une question pour l'échange ; valider une question ou demander de la retravailler ; évaluer un oral blanc ou une vidéo sur la grille ; corriger un texte (rare, sans annonce) ; télécharger son PDF.
@@ -53,13 +53,14 @@ Version 1.3.0 : la version en ligne (élève et enseignant·e), sur la base appl
 
 **Données d'élèves : prénom et initiale du nom, code, dossier, retours.** Elles sont gardées dans la base Supabase partagée des applications du site (projet « Babash - applications », schéma `grand_oral`), et sur l'appareil de l'élève (copie de travail, pour continuer hors ligne).
 
-- **Le compte** : le prénom et l'initiale du nom (jamais le nom complet), le code, la classe. Sur l'appareil, un jeton (pas le code) ; « Quitter cet appareil » l'efface, avec la copie du dossier.
+- **Le compte** : le prénom et l'initiale du nom (jamais le nom complet), le code, la classe. Sur l'appareil, un jeton (un par appareil, 5 au plus, valable 30 jours sans usage) et le code, pour « Voir mon code » dans les réglages ; « Quitter cet appareil » efface l'un et l'autre, avec la copie du dossier. Sur un ordinateur partagé du lycée, l'élève quitte l'appareil en partant.
 - **Le dossier** : avis sur les cartes, réponses au questionnaire « Mes goûts » (dont la deuxième spécialité et l'après-bac), pistes, plans, mots, sources, oraux et auto-évaluations, hauts faits **et leurs compteurs** (jours de travail, annulations, déplacements…), qui partent dans la base avec le dossier ; et un **résumé** chiffré pour le tableau de la classe.
 - **Les retours** de l'enseignant·e (forme ci-dessous).
 - L'élève n'a pas de bouton d'effacement de son compte : seul·e l'enseignant·e supprime un·e élève, une classe ou son espace. Aucun effacement automatique.
 - Le code de l'enseignant·e n'est jamais gardé en clair dans la base (empreinte seulement).
 - En mode découverte (sans compte), rien n'est envoyé : « Plus », puis « Réglages » permet de télécharger son dossier, de l'importer ou de tout effacer.
-- La page n'appelle que les fonctions `go_…` de la base, en POST, avec la clé publique (« publishable ») du projet. Tout texte venu de la base est échappé avant affichage ; un lien suggéré ne s'ouvre que s'il commence par `http://` ou `https://`.
+- La page n'appelle que les fonctions `go_…` de la base, en POST, avec la clé publique (« publishable ») du projet, dans l'en-tête `apikey`. Tout ce qui vient de la base est relu avant d'être affiché : la forme du dossier (`dossierValide`, chez l'élève comme chez l'enseignant·e), celle des retours (`HGRetours.nettoyer`), les nombres du résumé, et chaque texte est échappé ; un lien suggéré ne s'ouvre que s'il commence par `http://` ou `https://`, dans un nouvel onglet, sans transmettre l'adresse de la page.
+- Le code de l'enseignant·e n'est jamais dans une adresse, un cookie ou le cache hors ligne de l'application ; l'export pour une IA ne contient ni prénom ni code.
 
 ### Les retours (`retours`, en JSON)
 

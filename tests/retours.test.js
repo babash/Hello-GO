@@ -102,6 +102,12 @@ essai('fusion à trois : le même texte changé des deux côtés prend la versio
   const f = R.fusionner(base, local, distant);
   assert.ok(f.conflit); assert.strictEqual(f.resultat.questions[0].titre, 'Ailleurs');
   assert.deepStrictEqual(R.textesAbsents(local, f.resultat).map((x) => x[1]), ['Ici']);
+  // de même pour le titre d'une partie et le nom d'un oral (gardés à part, jamais perdus en silence)
+  const b2 = dossier(), l2 = dossier(), r2 = dossier();
+  l2.questions[0].parties[1].titre = 'Axe 1 : ici'; r2.questions[0].parties[1].titre = 'Axe 1 : ailleurs';
+  l2.oraux[0].nom = 'Oral du lundi'; r2.oraux[0].nom = 'Oral du mardi';
+  const f2 = R.fusionner(b2, l2, r2);
+  assert.ok(f2.conflit); assert.deepStrictEqual(R.textesAbsents(l2, f2.resultat).map((x) => x[1]), ['Axe 1 : ici', 'Oral du lundi']);
 });
 essai('fusion à trois : un point ajouté ici reste à sa place', () => {
   const base = dossier(), local = dossier(), distant = dossier();
@@ -109,6 +115,25 @@ essai('fusion à trois : un point ajouté ici reste à sa place', () => {
   distant.questions[0].parties[1].points.push({ id: 'pd', texte: 'De la base', etiquette: '', mots: [], sources: [] });
   const f = R.fusionner(base, local, distant);
   assert.deepStrictEqual(f.resultat.questions[0].parties[1].points.map((p) => p.id), ['p2', 'pn', 'p3', 'pd']);
+});
+
+// La base (jsonb) rend les clés dans son ordre à elle : par longueur, puis dans l'ordre des caractères.
+const commeLaBase = (x) => Array.isArray(x) ? x.map(commeLaBase) : (x && typeof x === 'object')
+  ? Object.keys(x).sort((a, b) => a.length - b.length || (a < b ? -1 : a > b ? 1 : 0)).reduce((o, k) => { o[k] = commeLaBase(x[k]); return o; }, {}) : x;
+essai('fusion à trois : l’ordre des clés rendu par la base ne compte pas (une suppression ici reste faite)', () => {
+  const base = dossier(), local = dossier(), distant = commeLaBase(dossier());
+  local.questions[0].parties[1].points = local.questions[0].parties[1].points.filter((p) => p.id !== 'p3');
+  local.mots = [];
+  distant.questions[0].parties[1].points[0].texte = 'Modifié ailleurs';
+  const f = R.fusionner(base, local, distant);
+  assert.ok(!f.conflit, 'pas de conflit');
+  assert.deepStrictEqual(f.resultat.questions[0].parties[1].points.map((p) => p.id), ['p2']);
+  assert.strictEqual(f.resultat.questions[0].parties[1].points[0].texte, 'Modifié ailleurs');
+  assert.deepStrictEqual(f.resultat.mots, []);
+  assert.ok(A.dossierValide(f.resultat));
+  // et la même chose quand la version connue vient elle-même de la base
+  const f2 = R.fusionner(commeLaBase(dossier()), local, distant);
+  assert.ok(!f2.conflit); assert.deepStrictEqual(f2.resultat.questions[0].parties[1].points.map((p) => p.id), ['p2']);
 });
 
 console.log('retours, résumé, fusion et format pour l’IA : ' + n + ' essais passés');

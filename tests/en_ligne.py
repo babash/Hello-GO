@@ -52,7 +52,14 @@ class Appareil:
         self.p.on('pageerror', lambda x: erreurs.append(nom + ' erreur JS : ' + str(x)))
         self.p.on('console', lambda m: erreurs.append(nom + ' console : ' + m.text) if m.type == 'error' and 'internetdisconnected' not in m.text.lower() and 'failed to load resource' not in m.text.lower() else None)
         self.reponses = []  # les réponses aux fenêtres « prompt », dans l'ordre
-        self.p.on('dialog', lambda dlg: dlg.accept(self.reponses.pop(0)) if dlg.type == 'prompt' and self.reponses else dlg.accept())
+        self.refuser, self.dialogues, self.appels = False, [], []  # refuser : « Annuler » aux fenêtres « confirm »
+        self.p.on('dialog', self.dialogue)
+
+    def dialogue(self, dlg):
+        self.dialogues.append(dlg.message)
+        if dlg.type == 'confirm' and self.refuser:
+            return dlg.dismiss()
+        return dlg.accept(self.reponses.pop(0)) if dlg.type == 'prompt' and self.reponses else dlg.accept()
 
     def servir(self, route):
         req = route.request
@@ -65,6 +72,7 @@ class Appareil:
         if req.method != 'POST' or h.get('apikey') != CLE or 'authorization' in h:
             erreurs.append('%s : appel non conforme %s %s %s' % (self.nom, req.method, req.url, sorted(h)))
         fonction = req.url.rsplit('/', 1)[-1]
+        self.appels.append(fonction)  # les appels de cet appareil seulement (les autres interrogent la base toutes les 20 s)
         with verrou:
             statut, corps = base.appel(fonction, json.loads(req.post_data or '{}'))
         route.fulfill(status=statut, headers=dict(cors, **{'Content-Type': 'application/json'}), body=json.dumps(corps))
@@ -140,7 +148,7 @@ try:
         # --- 3. Deux appareils : A, hors ligne, écrit un mot pendant que B modifie le point (fusion sans perte) ---
         A.hors_ligne = True
         B.p.locator('.texte-pt').first.fill('Amazon : IA de recrutement abandonnée en 2018')
-        B.etat('Enregistré')
+        B.etat('Modifié', 5000); B.etat('Enregistré')  # « Modifié » d'abord : sans lui, l'état d'avant la frappe suffisait
         A.p.goto(URL + '#/mots'); A.p.click('[data-a=plus-mot]'); A.p.keyboard.type('Biais algorithmique')
         A.etat('Hors ligne : sera envoyé')
         ok('hors ligne : le travail continue sur la copie locale', 'Biais algorithmique' in A.p.evaluate("localStorage.getItem('hellogo:dossier:v1')"))
@@ -155,7 +163,7 @@ try:
         A.p.goto(URL + '#/question/' + qid); A.p.wait_for_selector('.texte-pt')
         A.hors_ligne = True
         B.p.goto(URL + '#/question/' + qid); B.visible(); time.sleep(1); B.p.reload(); B.p.wait_for_selector('.texte-pt'); B.etat('Enregistré')
-        B.p.locator('.texte-pt').first.fill('Version de B'); B.etat('Enregistré')
+        B.p.locator('.texte-pt').first.fill('Version de B'); B.etat('Modifié', 5000); B.etat('Enregistré')
         A.p.locator('.texte-pt').first.fill('Version de A'); A.etat('Hors ligne : sera envoyé')
         A.hors_ligne = False; A.p.evaluate("window.dispatchEvent(new Event('online'))")
         A.p.wait_for_selector('#toasts a[href="#/a-part"]', timeout=15000)
@@ -246,10 +254,10 @@ try:
         C.p.reload(); C.p.wait_for_selector('#toasts .toast')
         ok('haut fait gagné au chargement : annoncé et enregistré', 'Nage droit devant' in C.p.inner_text('#toasts') and C.p.evaluate("JSON.parse(localStorage.getItem('hellogo:dossier:v1')).hf.dory") is not None)
         C.p.goto(URL + '#/questions'); C.p.fill('#question-libre', 'Une IA peut-elle composer ?'); C.p.click('[data-a=question-libre]'); C.p.wait_for_selector('[data-a=plus-pt]')
-        ok('mode découverte : aucun appel', not [a for a in base.appels[-50:] if False])
-        n_avant = len(base.appels)
+        C.visible(); C.p.evaluate("window.dispatchEvent(new Event('online'))"); time.sleep(.5)
+        ok('mode découverte : aucun appel à la base', C.appels == [], C.appels)
         C.p.goto(URL + '#/classe/' + classe['code']); C.p.wait_for_selector('#envoyer-local')
-        ok('mode découverte : le seul appel est celui du lien de classe', base.appels[n_avant:] == ['go_classe_par_code'], base.appels[n_avant:])
+        ok('mode découverte : le seul appel est celui du lien de classe', C.appels == ['go_classe_par_code'], C.appels)
         C.p.fill('#pseudo', 'Lou R.'); C.p.click('[data-a=inscription]'); C.p.wait_for_selector('.code-eleve')
         C.etat('Enregistré')
         eleves = prof('go_prof_classe', p_code=CODE_PROF, p_classe=classe['id'])['eleves']
@@ -260,6 +268,34 @@ try:
         prof('go_prof_nouveau_code_eleve', p_code=CODE_PROF, p_eleve=lou['id'])
         C.p.goto(URL + '#/'); C.p.reload(); C.etat('Session expirée')
         ok('session expirée : le travail reste, invitation à entrer son code', C.p.locator('.carte.alerte a[href="#/entrer"]').count() == 1)
+
+        # --- 10. Garde-fous (Gardien, T75) : dossier hors forme venu de la base, autre code avec du travail pas encore envoyé ---
+        noe = prof('go_inscription', p_code_classe=classe['code'], p_pseudo='Noé T.')
+        jade = prof('go_inscription', p_code_classe=classe['code'], p_pseudo='Jade K.')
+        D = Appareil(nav, 'D-390-clair', 390)
+        D.p.goto(URL + '#/entrer'); D.p.fill('#code-eleve', noe['code_affiche']); D.p.click('[data-a=connexion]'); D.p.wait_for_selector('.compte')
+        D.p.goto(URL + '#/questions'); D.p.fill('#question-libre', 'Question de Noé'); D.p.click('[data-a=question-libre]'); D.p.wait_for_selector('[data-a=plus-pt]')
+        D.etat('Modifié', 5000); D.etat('Enregistré')
+        v = prof('go_reprise', p_jeton=noe['jeton'])['dossier_version']
+        piege = {'v': 1, 'questions': [{'id': 'q1"><img src=x onerror="window.piege=1">', 'titre': 'T', 'statut': 'brouillon', 'echange': [], 'parties': []}]}
+        prof('go_sauvegarde', p_jeton=noe['jeton'], p_dossier=piege, p_resume=None, p_version_connue=v)
+        D.visible(); D.etat('Pas enregistré en ligne')
+        local = D.p.evaluate("localStorage.getItem('hellogo:dossier:v1')")
+        ok('dossier hors forme venu de la base : refusé, ni repris ni exécuté', not D.p.evaluate('window.piege') and 'onerror' not in local and 'Question de Noé' in local)
+        D.p.goto(URL + '#/mots'); D.p.click('[data-a=plus-mot]'); D.p.keyboard.type('Mot de Noé')
+        D.etat('Pas enregistré en ligne'); time.sleep(.6)
+        D.p.goto(URL + '#/entrer'); D.p.fill('#code-eleve', jade['code_affiche']); D.refuser = True; D.p.click('[data-a=connexion]')
+        for _ in range(150):  # la page essaie d'abord d'envoyer, puis demande (attendre la fenêtre, jusqu'à 15 s)
+            if D.dialogues:
+                break
+            D.p.wait_for_timeout(100)  # et non time.sleep : les appels à la base locale ne sont servis que pendant une attente de Playwright
+        D.p.wait_for_timeout(500); s = D.p.evaluate("JSON.parse(localStorage.getItem('hellogo:session:v1'))")
+        ok('autre code avec du travail pas encore envoyé : l’élève est prévenu·e, « Annuler » ne change rien',
+           len(D.dialogues) == 1 and 'pas encore en ligne' in D.dialogues[0] and s['code'] == noe['code_affiche'] and 'Mot de Noé' in D.p.evaluate("localStorage.getItem('hellogo:dossier:v1')"), D.dialogues)
+        D.refuser = False; D.p.click('[data-a=connexion]'); D.p.wait_for_function("JSON.parse(localStorage.getItem('hellogo:session:v1')).code === '%s'" % jade['code_affiche'], timeout=20000)
+        D.etat('Enregistré')
+        ok('autre code, confirmé : rien du compte d’avant ne reste sur l’appareil', 'Noé' not in D.p.evaluate("localStorage.getItem('hellogo:dossier:v1')") and D.p.evaluate("localStorage.getItem('hellogo:a-part:v1')") is None)
+        D.large('10-autre-code')
 
         if os.environ.get('HG_PROF', '1') == '1' and os.path.exists(os.path.join(RACINE, 'tests', 'prof_en_ligne.py')):
             import prof_en_ligne
