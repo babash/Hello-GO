@@ -1,0 +1,162 @@
+{
+ "v": 1,
+ "profil": {
+  "prenom": "Essai",
+  "vu": true
+ },
+ "quiz": {
+  "reponses": {
+   "i": [
+    "musique"
+   ],
+   "n": [
+    "ia"
+   ],
+   "a": "avenir",
+   "s": "maths"
+  },
+  "fait": true
+ },
+ "interets": [
+  "",
+  "",
+  ""
+ ],
+ "ponts": [
+  ""
+ ],
+ "pistes": [
+  {
+   "id": "rjncjsu9j8vf",
+   "titre": "L’informatique va-t-elle révolutionner la composition musicale ?",
+   "pourquoi": "",
+   "idees": [
+    "Les IA qui composent"
+   ],
+   "candidates": [
+    "L’IA peut-elle composer une musique originale ?"
+   ]
+  }
+ ],
+ "questions": [
+  {
+   "id": "ixmzcha9j911",
+   "titre": "L’IA peut-elle composer une musique originale ?",
+   "statut": "brouillon",
+   "echange": [
+    {
+     "id": "h893ds8bja03",
+     "question": "Pourquoi as-tu choisi cette question ?",
+     "reponse": ""
+    }
+   ],
+   "parties": [
+    {
+     "id": "jw2ljcjfj911",
+     "titre": "Introduction",
+     "minutes": 2,
+     "points": [
+      {
+       "id": "bep8kfnzj92r",
+       "texte": "En 2023, 60 % des titres mis en ligne utilisent un algorithme",
+       "etiquette": "accroche",
+       "mots": [
+        "ssia832qj9e7"
+       ],
+       "sources": [
+        "o9afu4fmj9hf"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "04uuy67oj911",
+     "titre": "Axe 1",
+     "minutes": 3,
+     "points": [
+      {
+       "id": "evf8atg3j97j",
+       "texte": "Peut-on parler de création ?",
+       "etiquette": "",
+       "mots": [],
+       "sources": []
+      },
+      {
+       "id": "wsuyaltrj911",
+       "texte": "Les IA qui composent",
+       "etiquette": "",
+       "mots": [],
+       "sources": []
+      }
+     ]
+    },
+    {
+     "id": "96pk9x0rj911",
+     "titre": "Axe 2",
+     "minutes": 3,
+     "points": []
+    },
+    {
+     "id": "i2dpaawjj911",
+     "titre": "Conclusion",
+     "minutes": 2,
+     "points": []
+    }
+   ]
+  }
+ ],
+ "mots": [
+  {
+   "id": "ssia832qj9e7",
+   "mot": "Algorithme",
+   "defSource": "Suite finie et non ambiguë d’opérations",
+   "sourceTexte": "",
+   "defMoi": "Suite finie et non ambigue d operations",
+   "analogie": ""
+  }
+ ],
+ "sources": [
+  {
+   "id": "o9afu4fmj9hf",
+   "titre": "Rapport de la Sacem",
+   "auteur": "",
+   "lien": "",
+   "type": "experte",
+   "date": "",
+   "retiens": ""
+  }
+ ],
+ "oraux": [
+  {
+   "id": "yawsettdj7np",
+   "nom": "Oral blanc 1",
+   "auto": {
+    "oral": 3,
+    "continu": 3,
+    "connaissances": 3,
+    "interaction": 3,
+    "argumentation": 3
+   }
+  },
+  {
+   "id": "6g22m844j7np",
+   "nom": "Oral blanc 2",
+   "auto": {}
+  }
+ ],
+ "hf": {
+  "quiz": "2026-11-17",
+  "hello": "2026-11-17",
+  "accroche": "2026-11-17",
+  "tri": "2026-11-17",
+  "pdf": "2026-11-17",
+  "oral1": "2026-11-17",
+  "canard": "2026-11-17"
+ },
+ "compteurs": {
+  "deplacements": 1,
+  "pdf": 1,
+  "canard": 1
+ },
+ "vus": {}
+}

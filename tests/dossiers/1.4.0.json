@@ -1,0 +1,336 @@
+{
+ "v": 1,
+ "profil": {
+  "prenom": "Inès B.",
+  "vu": true
+ },
+ "quiz": {
+  "reponses": {
+   "gouts": [
+    "musique"
+   ],
+   "spe": "maths",
+   "dansspe": [
+    "probas"
+   ],
+   "angle": "avenir"
+  },
+  "fait": true
+ },
+ "interets": [
+  "",
+  "",
+  ""
+ ],
+ "ponts": [
+  ""
+ ],
+ "pistes": [
+  {
+   "id": "1lxu20d9jhtm",
+   "titre": "L’informatique va-t-elle révolutionner la composition musicale ?",
+   "pourquoi": "",
+   "idees": [
+    "Les IA qui composent"
+   ],
+   "candidates": [
+    "L’IA peut-elle composer une musique originale ?"
+   ]
+  }
+ ],
+ "questions": [
+  {
+   "id": "mbgbo8u6ji03",
+   "titre": "L’IA peut-elle composer une musique originale ?",
+   "statut": "validee",
+   "echange": [
+    {
+     "id": "3jq5xe3jjiyc",
+     "question": "Pourquoi as-tu choisi cette question ?",
+     "reponse": "Je joue de la guitare depuis 6 ans"
+    }
+   ],
+   "parties": [
+    {
+     "id": "rn0pcprzji03",
+     "titre": "Introduction",
+     "minutes": 2,
+     "points": [
+      {
+       "id": "1nq52fqvji1w",
+       "texte": "En 2023, 60 % des titres mis en ligne utilisent un algorithme",
+       "etiquette": "accroche",
+       "mots": [
+        "rz28fomkjibh"
+       ],
+       "sources": [
+        "weu2pfjdjie9"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "d88pmsxwji03",
+     "titre": "Axe 1",
+     "minutes": 3,
+     "points": [
+      {
+       "id": "w46wfnsgji5o",
+       "texte": "Peut-on parler de création ?",
+       "etiquette": "",
+       "mots": [],
+       "sources": []
+      },
+      {
+       "id": "u4lhfa0oji04",
+       "texte": "Les IA qui composent",
+       "etiquette": "",
+       "mots": [],
+       "sources": []
+      },
+      {
+       "id": "r29berl0paca",
+       "texte": "Point ajouté avec la 1.4.0",
+       "etiquette": "",
+       "mots": [],
+       "sources": []
+      }
+     ]
+    },
+    {
+     "id": "25a7pe0dji03",
+     "titre": "Axe 2",
+     "minutes": 3,
+     "points": [
+      {
+       "id": "qut8q08yoswj",
+       "texte": "Des audits des algorithmes : 3 cas en 2023",
+       "etiquette": "",
+       "mots": [],
+       "sources": []
+      }
+     ]
+    },
+    {
+     "id": "319b8genji03",
+     "titre": "Conclusion",
+     "minutes": 2,
+     "points": [
+      {
+       "id": "y19f5ahaot4v",
+       "texte": "L’IA aide, mais la création reste humaine",
+       "etiquette": "",
+       "mots": [],
+       "sources": []
+      },
+      {
+       "id": "pw8xonf2otd6",
+       "texte": "Et demain : qui touche les droits d’auteur ?",
+       "etiquette": "",
+       "mots": [],
+       "sources": []
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "icnw71naottd",
+   "titre": "Les réseaux sociaux enferment-ils dans des bulles ?",
+   "statut": "brouillon",
+   "echange": [],
+   "parties": [
+    {
+     "id": "q9p9bzl6ottd",
+     "titre": "Introduction",
+     "minutes": 2,
+     "points": [
+      {
+       "id": "tm1f43exotv7",
+       "texte": "Accroche : 2 h 30 par jour sur les réseaux",
+       "etiquette": "",
+       "mots": [],
+       "sources": []
+      }
+     ]
+    },
+    {
+     "id": "r424tz9dottd",
+     "titre": "Axe 1",
+     "minutes": 3,
+     "points": []
+    },
+    {
+     "id": "n6bwoxw4ottd",
+     "titre": "Axe 2",
+     "minutes": 3,
+     "points": []
+    },
+    {
+     "id": "dxe4r1xlottd",
+     "titre": "Conclusion",
+     "minutes": 2,
+     "points": []
+    }
+   ]
+  }
+ ],
+ "decouverte": {
+  "reactions": {
+   "22": -1,
+   "23": -1,
+   "39": 1,
+   "44": 1,
+   "50": 1,
+   "58": -1,
+   "63": -1,
+   "71": 1,
+   "77": 1,
+   "80": -1
+  }
+ },
+ "comprendre": {
+  "epreuve": {
+   "meilleur": 10,
+   "dernier": 10,
+   "le": "2026-11-17",
+   "essais": 1,
+   "rates": []
+  },
+  "plan": {
+   "meilleur": 8,
+   "dernier": 8,
+   "le": "2026-11-17",
+   "essais": 1,
+   "rates": [
+    "p3",
+    "p6"
+   ]
+  }
+ },
+ "mots": [
+  {
+   "id": "rz28fomkjibh",
+   "mot": "Algorithme",
+   "defSource": "Suite finie et non ambiguë d’opérations",
+   "sourceTexte": "",
+   "defMoi": "Suite finie et non ambigue d operations",
+   "analogie": ""
+  },
+  {
+   "id": "5nxp1eo7ou3j",
+   "mot": "Bulle de filtres",
+   "defSource": "Isolement intellectuel dû aux recommandations personnalisées",
+   "sourceTexte": "",
+   "defMoi": "On ne voit plus que ce qui nous ressemble",
+   "analogie": ""
+  },
+  {
+   "id": "l483gdzgp1ko",
+   "mot": "Droit d’auteur",
+   "defSource": "",
+   "sourceTexte": "",
+   "defMoi": "",
+   "analogie": ""
+  }
+ ],
+ "sources": [
+  {
+   "id": "weu2pfjdjie9",
+   "titre": "Rapport de la Sacem",
+   "auteur": "",
+   "lien": "",
+   "type": "experte",
+   "date": "",
+   "retiens": ""
+  },
+  {
+   "id": "mnr2gu9vouax",
+   "titre": "Rapport sur les algorithmes de recommandation",
+   "auteur": "",
+   "lien": "https://example.org/rapport",
+   "type": "experte",
+   "date": "",
+   "retiens": ""
+  },
+  {
+   "id": "x3qfqz34p36v",
+   "titre": "Un article",
+   "auteur": "",
+   "lien": "https://example.org/article",
+   "type": "",
+   "date": "",
+   "retiens": ""
+  }
+ ],
+ "oraux": [
+  {
+   "id": "0ewf0vhijgfn",
+   "nom": "Oral blanc 1",
+   "auto": {
+    "oral": 3,
+    "continu": 3,
+    "connaissances": 3,
+    "interaction": 3,
+    "argumentation": 3
+   }
+  },
+  {
+   "id": "u5wr7smvjgfn",
+   "nom": "Oral blanc 2",
+   "auto": {}
+  },
+  {
+   "id": "jq4wsxe3oz6u",
+   "nom": "Vidéo d’entraînement",
+   "auto": {}
+  }
+ ],
+ "hf": {
+  "cartes10": "2026-11-17",
+  "surprise": "2026-11-17",
+  "quiz": "2026-11-17",
+  "hello": "2026-11-17",
+  "accroche": "2026-11-17",
+  "zelda": "2026-11-17",
+  "tri": "2026-11-17",
+  "ctrlz": "2026-11-17",
+  "pdf": "2026-11-17",
+  "oral1": "2026-11-17",
+  "canard": "2026-11-17",
+  "avengers": "2026-11-17",
+  "pourquoi": "2026-11-17",
+  "planb": "2026-11-17",
+  "sujet": "2026-11-17",
+  "volontaire": "2026-11-17",
+  "regles": "2026-11-17"
+ },
+ "compteurs": {
+  "jours": 1,
+  "deplacements": 1,
+  "annulations": 1,
+  "pdf": 1,
+  "canard": 1
+ },
+ "vus": {
+  "jour": 20774,
+  "suite": 1
+ },
+ "suivi": {
+  "def": {
+   "r1def": "l483gdzgp1ko"
+  },
+  "faits": {
+   "r3val": 1
+  },
+  "lus": {
+   "r1def": 1,
+   "r2com": 1,
+   "r3val": 1,
+   "r4res": 1
+  },
+  "ressources": {
+   "r4res": "ajoutee"
+  }
+ }
+}

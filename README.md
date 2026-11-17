@@ -46,7 +46,7 @@ En fin d'année : exportez votre espace (JSON), puis supprimez vos classes. Rien
 
 ## Où en est le projet
 
-Version 1.4.0 : les deux quiz « Vérifie que tu as compris » (l'épreuve, la méthode du plan), proposés sur l'accueil, dans l'aide et par la prochaine étape, leurs résultats dans le dossier, le résumé et l'espace de l'enseignant·e, deux hauts faits, et le lien vers la vidéo du ministère avec sa mise en garde. Avant elle : la version en ligne (élève et enseignant·e), sur la base appliquée le 17/11/2026 (dossier [`supabase/`](supabase/LISEZMOI.md)) ; depuis la 1.3.1, l'interface dit « ton enseignant·e » partout où elle disait « ton prof » ; la 1.3.2 répare le démarrage : `js/analyse.js` devient `js/coach.js` (les bloqueurs de contenu, avec la liste EasyPrivacy, bloquaient tout fichier nommé `analyse.js`), une page et ses fichiers sont toujours de la même version (`?v=`, un cache par version), et un message clair, avec les détails techniques, remplace la page vide si un fichier manque.
+Version 1.4.0 : les deux quiz « Vérifie que tu as compris » (l'épreuve, la méthode du plan), proposés sur l'accueil, dans l'aide et par la prochaine étape, leurs résultats dans le dossier, le résumé et l'espace de l'enseignant·e, deux hauts faits, et le lien vers la vidéo du ministère avec sa mise en garde ; les dossiers des versions publiées sont rejoués avant chaque publication (`tests/dossiers.py`, voir « Mettre à jour sans rien perdre »). Avant elle : la version en ligne (élève et enseignant·e), sur la base appliquée le 17/11/2026 (dossier [`supabase/`](supabase/LISEZMOI.md)) ; depuis la 1.3.1, l'interface dit « ton enseignant·e » partout où elle disait « ton prof » ; la 1.3.2 répare le démarrage : `js/analyse.js` devient `js/coach.js` (les bloqueurs de contenu, avec la liste EasyPrivacy, bloquaient tout fichier nommé `analyse.js`), une page et ses fichiers sont toujours de la même version (`?v=`, un cache par version), et un message clair, avec les détails techniques, remplace la page vide si un fichier manque.
 
 À venir : un correcteur de grammaire sans serveur (Grammalecte).
 
@@ -86,6 +86,10 @@ Version 1.4.0 : les deux quiz « Vérifie que tu as compris » (l'épreuve, la m
 
 Le dossier part dans la base 3 secondes après la dernière frappe, quand la page passe en arrière-plan, à la fermeture et au retour du réseau, avec sa version connue. Si la base a changé entre-temps (un autre appareil, ou une correction de l'enseignant·e), la page fusionne : ce qui n'a changé que d'un côté est gardé ; un même texte changé des deux côtés prend la version de la base, et la saisie de l'appareil est gardée à part (« Ma saisie mise de côté »), jamais perdue en silence. Les retours sont relus à l'ouverture, puis toutes les 20 secondes quand la page est visible.
 
+### Mettre à jour sans rien perdre
+
+Règle de l'enseignant (17/11/2026) : toute publication conserve les données des élèves déjà inscrit·e·s, sans rupture d'expérience. Le dossier ne fait que s'enrichir : un champ nouveau est facultatif, et chaque version garde tel quel ce qu'elle ne connaît pas, car un onglet ou un appareil resté sur l'ancienne version reçoit de la base le dossier écrit par la nouvelle. Avant chaque publication, `tests/dossiers.py` ouvre avec la nouvelle version les dossiers types des versions publiées (`tests/dossiers/`), puis fait relire le dossier de la nouvelle version par les versions publiées en ligne (tirées de l'historique Git).
+
 ## Pour vérifier
 
 ```
@@ -96,6 +100,7 @@ python3 tests/comprendre.py    # les deux quiz « Vérifie que tu as compris » 
 python3 tests/robustesse.py    # deux onglets, fichiers abîmés ou piégés, clavier, longues adresses à 320 px, dossier de la version 1.0.0
 node tests/retours.test.js     # retours, résumé, fusion à trois, format pour l'IA et lecture tolérante de sa réponse, code
 python3 tests/en_ligne.py      # élève et enseignant·e en ligne, contre une reproduction locale de la base (PostgreSQL 16)
+python3 tests/dossiers.py      # les dossiers des versions publiées s'ouvrent, se modifient et s'enregistrent sans perte ; celui de cette version est accepté par les versions publiées en ligne
 ```
 
 `tests/en_ligne.py` n'appelle jamais la base en ligne : la page y est configurée vers une adresse inexistante, servie par un PostgreSQL local neuf (`tests/base_locale.py`, qui applique le socle commun du site, `HG_SOCLE`, puis `supabase/0001-dossiers.sql`), avec des données inventées.
@@ -103,6 +108,7 @@ python3 tests/en_ligne.py      # élève et enseignant·e en ligne, contre une r
 ## Sources
 
 - Les règles de l'épreuve : note de service du 10 septembre 2026, Bulletin officiel spécial n° 4 du 17 septembre 2026, et la foire aux questions d'Éduscol (septembre 2026).
+- La vidéo « Grand oral : comprendre l'épreuve en un clin d'œil » (ministère de l'Éducation nationale, YouTube, 18 janvier 2021) : un simple lien, avec ce qui a changé pour la session 2027. Elle date de la session 2021, dont les règles (note de service n° 2020-036 du 11 février 2020, Bulletin officiel spécial n° 2 du 13 février 2020) étaient : exposé de 5 minutes, échange de 10 minutes, puis 5 minutes sur le projet d'orientation ; coefficient 10.
 - Les cartes à découvrir : « Timeline – Histoire de l'informatique » (TimelineNSI), Babash - NSI Tani Malandi, CC BY-SA 4.0 ; `outils/generer_decouvertes.py` en reprend les textes tels quels et y ajoute, pour chaque carte, la question qu'elle ouvre.
 - Les sujets : exemples du ministère de l'Éducation nationale et sujets du dossier « Grand oral » de l'enseignant ; d'autres sujets, le questionnaire et les questions des cartes ont été écrits avec l'aide de l'IA.
 

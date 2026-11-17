@@ -332,11 +332,14 @@
       && sinon(n.sources, function (l) { return liste(l, source); }) && sinon(n.oraux, function (l) { return liste(l, oral); })
       && sinon(n.decouverte, function (o) { return objet(o) && reactions(o.reactions); })
       // Les quiz « Vérifie que tu as compris » : par quiz, meilleur et dernier score, date, essais, questions ratées au dernier essai.
+      // Tolérant pour ce qu'une version plus récente pourrait écrire (un quiz, une question, des questions de plus) : un
+      // appareil resté sur cette version ne refuse jamais le dossier (tests/dossiers.py). Ce qui s'affiche reste contrôlé :
+      // des entiers pour les scores, un texte pour la date, des identifiants pour les questions ratées (seules celles de la
+      // page sont montrées) ; un quiz inconnu est gardé tel quel, jamais lu.
       && sinon(n.comprendre, function (o) { return objet(o) && Object.keys(o).every(function (k) {
         const z = D.COMPRENDRE.find(function (x) { return x.id === k; }), r = o[k];
-        if (!z || !objet(r)) return false;
-        const score = function (x) { return entier(x) && x <= z.questions.length; };
-        return score(r.meilleur) && score(r.dernier) && entier(r.essais) && texte(r.le) && sinon(r.rates, function (l) { return liste(l, function (x) { return z.questions.some(function (q) { return q.id === x; }); }); });
+        if (!z) return id(k) && objet(r);
+        return objet(r) && entier(r.meilleur) && entier(r.dernier) && entier(r.essais) && texte(r.le) && sinon(r.rates, function (l) { return liste(l, id); });
       }); })
       && sinon(n.hf, function (o) { return valeurs(o, function (v) { return typeof v === 'string'; }); })
       && sinon(n.compteurs, function (o) { return valeurs(o, entier); }) && sinon(n.vus, function (o) { return valeurs(o, entier); })

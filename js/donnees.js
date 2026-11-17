@@ -169,7 +169,7 @@
     { p: 2, t: 'Tu présentes debout, sans lire tes notes. Regarde les deux membres du jury, chacun son tour.' },
     { p: 2, t: 'Vise 100 à 125 mots par minute. Trop vite, le jury perd le fil.' },
     { p: 2, t: 'L’échange dure 10 minutes, autant que l’exposé : prépare-le autant.' },
-    { p: 2, t: 'Le jury peut t’interroger sur tout le programme de la spécialité : révise les chapitres liés à ton sujet.' },
+    { p: 2, t: 'Le jury peut t’interroger sur tout le programme des spécialités concernées : révise les chapitres liés à ton sujet.' },
     { p: 2, t: 'Écoute la question jusqu’au bout, puis prends quelques secondes avant de répondre.' },
     { p: 2, t: 'Tu ne sais pas ? Dis-le, puis propose un raisonnement : « Je n’ai pas la donnée exacte, mais… ».' },
     { p: 2, t: 'L’échange n’est pas un contrôle de connaissances : le jury veut voir comment tu argumentes.' },
@@ -270,7 +270,7 @@
   const COMPRENDRE = [
     { id: 'epreuve', titre: 'Ai-je compris l’épreuve ?', court: 'Épreuve', chapo: '10 questions sur les règles du Grand oral, session 2027. Après chaque réponse, une explication. Ce n’est pas noté : c’est pour vérifier que tu as compris.', questions: [
       { id: 'e1', q: 'Tes spécialités sont la NSI et les maths. Quelles questions prépares-tu pour le jour J ?', b: 1, r: REVOIR_EPREUVE, o: [
-        ['Deux questions de NSI seule.', 'Pas tout à fait : tes deux questions ne peuvent pas porter sur la même spécialité.'],
+        ['Deux questions de NSI seule.', 'Tes deux questions ne peuvent pas porter sur la même spécialité.'],
         ['Une question de NSI, et une question transversale qui relie la NSI et les maths.', 'Oui : deux questions qui ne portent pas sur la même spécialité, et une question peut être transversale.'],
         ['Une seule question, transversale : elle compte pour les deux spécialités.', 'Il en faut deux : le jour J, le jury choisit l’une des deux.'],
         ['Trois questions, et le jury en garde une.', 'Tu en présentes deux, pas trois : prépare-les aussi bien l’une que l’autre.']] },
@@ -290,7 +290,7 @@
         ['20 minutes, debout : c’est la moitié de l’épreuve.', '20 minutes, c’est la préparation. L’exposé, lui, dure 10 minutes.'],
         ['10 minutes, debout, sans lire tes notes.', 'Oui : 10 minutes, debout, sans lire. Tu peux garder ta feuille et la montrer au jury.']] },
       { id: 'e5', q: 'Que se passe-t-il juste après ton exposé ?', b: 1, r: REVOIR_EPREUVE, o: [
-        ['10 minutes d’échange, puis 5 minutes sur ton projet d’orientation.', 'C’est un ancien déroulé, comme dans la vidéo de 2021. En 2027 : 10 minutes d’exposé, puis 10 minutes d’échange.'],
+        ['10 minutes d’échange, puis 5 minutes sur ton projet d’orientation.', 'C’était le déroulé de la session 2021, l’année de la vidéo. En 2027 : 10 minutes d’exposé, puis 10 minutes d’échange.'],
         ['10 minutes d’échange avec le jury.', 'Oui : l’échange dure 10 minutes, autant que l’exposé. Prépare-le autant.'],
         ['5 minutes de questions sur ton exposé seulement.', 'L’échange dure 10 minutes, et il peut aller au-delà de ton exposé.'],
         ['Rien : l’épreuve s’arrête à la fin de ton exposé.', 'L’exposé n’est que la moitié : ensuite vient l’échange, 10 minutes.']] },
@@ -305,9 +305,9 @@
         ['Oui : c’est le premier critère de la grille.', 'Aucun des 5 critères ne note la question : ils portent sur ton oral, tes connaissances, l’échange et ton argumentation.'],
         ['Seulement si elle est transversale.', 'Transversale ou non, la question n’est pas notée : ton argumentation et ton oral, si.']] },
       { id: 'e8', q: 'Pendant l’échange, sur quoi le jury peut-il t’interroger ?', b: 3, r: REVOIR_EPREUVE, o: [
-        ['Seulement sur ce que tu as dit dans ton exposé.', 'Plus large : le jury peut aussi t’interroger sur le programme de la spécialité. Révise les chapitres liés à ton sujet.'],
+        ['Seulement sur ce que tu as dit dans ton exposé.', 'Plus large : le jury peut aussi t’interroger sur le programme des spécialités concernées. Révise les chapitres liés à ton sujet.'],
         ['Sur toutes les matières du bac.', 'Pas toutes : sur ton sujet, et sur le programme des spécialités concernées par ta question.'],
-        ['Seulement sur tes sources.', 'Le jury peut parler de tes sources, mais il t’interroge sur ton sujet et sur le programme de la spécialité.'],
+        ['Seulement sur tes sources.', 'Le jury peut parler de tes sources, mais il t’interroge sur ton sujet et sur le programme des spécialités concernées.'],
         ['Sur ton sujet, et sur tout le programme des spécialités concernées.', 'Oui : révise les chapitres liés à ton sujet, en NSI, et dans ton autre spécialité pour une question transversale.']] },
       { id: 'e9', q: 'Qui compose le jury ?', b: 1, r: REVOIR_EPREUVE, o: [
         ['Deux enseignant·e·s de NSI.', 'Un·e des deux n’est pas spécialiste de NSI : prépare une image simple pour chaque mot technique.'],
@@ -369,7 +369,7 @@
       { id: 'p10', q: 'Ton plan est prêt. Comment prépares-tu l’échange avec le jury ?', b: 3, r: revoir('jury'), o: [
         ['Tu ne le prépares pas : on ne peut pas deviner les questions.', 'Beaucoup de questions se devinent, comme « Pourquoi as-tu choisi ce sujet ? » : prépare-les.'],
         ['Tu rédiges des réponses complètes, à apprendre par cœur.', 'Une réponse apprise par cœur sonne faux : note plutôt tes idées en mots-clés.'],
-        ['Tu révises seulement ton exposé : l’échange ne porte que sur lui.', 'Le jury peut t’interroger sur tout le programme de la spécialité : révise aussi les chapitres liés à ton sujet.'],
+        ['Tu révises seulement ton exposé : l’échange ne porte que sur lui.', 'Le jury peut t’interroger sur tout le programme des spécialités concernées : révise aussi les chapitres liés à ton sujet.'],
         ['Tu notes les questions probables, comme « Pourquoi as-tu choisi ce sujet ? », et tes idées de réponse en mots-clés.', 'Oui : l’échange dure 10 minutes, autant que l’exposé. Prépare-le autant.']] },
     ] },
   ];

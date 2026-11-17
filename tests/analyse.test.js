@@ -175,9 +175,14 @@ assert.ok(/^https:\/\/www\.youtube\.com\/watch\?v=3mN9w6rpXgE$/.test(D.VIDEO_EPR
 const base = () => ({ v: 1, questions: [] });
 assert.ok(A.dossierValide(base()), 'ancien dossier, sans quiz');
 assert.ok(A.dossierValide(Object.assign(base(), { comprendre: { epreuve: { meilleur: 10, dernier: 8, le: '2026-11-17', essais: 2, rates: ['e3', 'e6'] } } })));
-[{ autre: { meilleur: 1, dernier: 1, le: '', essais: 1 } }, { plan: { meilleur: 11, dernier: 1, le: '', essais: 1 } }, { plan: { meilleur: 2, dernier: -1, le: '', essais: 1 } },
-  { plan: { meilleur: 2, dernier: 1, le: 3, essais: 1 } }, { plan: { meilleur: 2, dernier: 1, le: '', essais: 1, rates: ['e1'] } }, { plan: { meilleur: 2, dernier: 1, le: '', essais: 1, rates: ['<img>'] } }, []]
+[{ plan: { meilleur: 2, dernier: -1, le: '', essais: 1 } }, { plan: { meilleur: '10', dernier: 1, le: '', essais: 1 } }, { plan: { meilleur: 2, dernier: 1, le: '', essais: 1.5 } },
+  { plan: { meilleur: 2, dernier: 1, le: 3, essais: 1 } }, { plan: { meilleur: 2, dernier: 1, le: '', essais: 1, rates: ['<img>'] } }, { plan: null }, { autre: 3 }, { '<b>': {} }, []]
   .forEach((c) => assert.ok(!A.dossierValide(Object.assign(base(), { comprendre: c })), JSON.stringify(c)));
+// ce qu'une version plus récente pourrait écrire (un quiz de plus, plus de questions, une question nouvelle) : accepté,
+// pour qu'un appareil resté sur cette version ne refuse jamais le dossier (tests/dossiers.py)
+[{ autre: { meilleur: 1, dernier: 1, le: '', essais: 1, nouveau: [1] } }, { plan: { meilleur: 11, dernier: 1, le: '', essais: 1 } },
+  { plan: { meilleur: 2, dernier: 1, le: '', essais: 1, rates: ['e1', 'p11'], duree: 300 } }]
+  .forEach((c) => assert.ok(A.dossierValide(Object.assign(base(), { comprendre: c })), JSON.stringify(c)));
 // hauts faits et prochaine étape
 const dq = dossier(question()); dq.comprendre = { epreuve: { meilleur: 9, dernier: 9, le: '2026-11-17', essais: 1, rates: ['e1'] } };
 assert.ok(!A.majHautsFaits(dq).some((h) => h.id === 'regles'));

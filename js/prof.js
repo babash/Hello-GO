@@ -207,7 +207,8 @@
     return `<section class="carte"><h2>Quiz de compréhension</h2>${D.COMPRENDRE.map((z) => { const r = (d.comprendre || {})[z.id], t = z.questions.length;
       if (!r || !r.essais) return `<p><b>${e(z.titre)}</b> <span class="note">pas encore fait</span></p>`;
       const rates = (r.rates || []).map((id) => z.questions.find((q) => q.id === id)).filter(Boolean);
-      return `<p><b>${e(z.titre)}</b> · meilleur score ${r.meilleur}/${t} · dernier ${r.dernier}/${t} · ${r.essais} essai${r.essais > 1 ? 's' : ''} · le ${e(r.le)}</p>
+      // (un score d'une version qui aurait plus de questions est ramené au total de cette page)
+      return `<p><b>${e(z.titre)}</b> · meilleur score ${Math.min(r.meilleur, t)}/${t} · dernier ${Math.min(r.dernier, t)}/${t} · ${r.essais} essai${r.essais > 1 ? 's' : ''}${r.le ? ' · le ' + e(r.le) : ''}</p>
         ${rates.length ? `<p class="note">Ratées au dernier essai :</p><ul class="quiz-rates">${rates.map((q) => `<li>${e(q.q)}</li>`).join('')}</ul>` : ''}`; }).join('')}</section>`;
   }
   function vueMotsSources(d) {

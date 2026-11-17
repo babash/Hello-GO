@@ -1,0 +1,185 @@
+{
+ "v": 1,
+ "profil": {
+  "prenom": "Essai",
+  "vu": true
+ },
+ "quiz": {
+  "reponses": {
+   "gouts": [
+    "musique"
+   ],
+   "spe": "maths",
+   "dansspe": [
+    "probas"
+   ],
+   "angle": "avenir"
+  },
+  "fait": true
+ },
+ "interets": [
+  "",
+  "",
+  ""
+ ],
+ "ponts": [
+  ""
+ ],
+ "pistes": [
+  {
+   "id": "1lxu20d9jhtm",
+   "titre": "L’informatique va-t-elle révolutionner la composition musicale ?",
+   "pourquoi": "",
+   "idees": [
+    "Les IA qui composent"
+   ],
+   "candidates": [
+    "L’IA peut-elle composer une musique originale ?"
+   ]
+  }
+ ],
+ "questions": [
+  {
+   "id": "mbgbo8u6ji03",
+   "titre": "L’IA peut-elle composer une musique originale ?",
+   "statut": "brouillon",
+   "echange": [
+    {
+     "id": "3jq5xe3jjiyc",
+     "question": "Pourquoi as-tu choisi cette question ?",
+     "reponse": ""
+    }
+   ],
+   "parties": [
+    {
+     "id": "rn0pcprzji03",
+     "titre": "Introduction",
+     "minutes": 2,
+     "points": [
+      {
+       "id": "1nq52fqvji1w",
+       "texte": "En 2023, 60 % des titres mis en ligne utilisent un algorithme",
+       "etiquette": "accroche",
+       "mots": [
+        "rz28fomkjibh"
+       ],
+       "sources": [
+        "weu2pfjdjie9"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "d88pmsxwji03",
+     "titre": "Axe 1",
+     "minutes": 3,
+     "points": [
+      {
+       "id": "w46wfnsgji5o",
+       "texte": "Peut-on parler de création ?",
+       "etiquette": "",
+       "mots": [],
+       "sources": []
+      },
+      {
+       "id": "u4lhfa0oji04",
+       "texte": "Les IA qui composent",
+       "etiquette": "",
+       "mots": [],
+       "sources": []
+      }
+     ]
+    },
+    {
+     "id": "25a7pe0dji03",
+     "titre": "Axe 2",
+     "minutes": 3,
+     "points": []
+    },
+    {
+     "id": "319b8genji03",
+     "titre": "Conclusion",
+     "minutes": 2,
+     "points": []
+    }
+   ]
+  }
+ ],
+ "decouverte": {
+  "reactions": {
+   "22": -1,
+   "23": -1,
+   "39": 1,
+   "44": 1,
+   "50": 1,
+   "58": -1,
+   "63": -1,
+   "71": 1,
+   "77": 1,
+   "80": -1
+  }
+ },
+ "mots": [
+  {
+   "id": "rz28fomkjibh",
+   "mot": "Algorithme",
+   "defSource": "Suite finie et non ambiguë d’opérations",
+   "sourceTexte": "",
+   "defMoi": "Suite finie et non ambigue d operations",
+   "analogie": ""
+  }
+ ],
+ "sources": [
+  {
+   "id": "weu2pfjdjie9",
+   "titre": "Rapport de la Sacem",
+   "auteur": "",
+   "lien": "",
+   "type": "experte",
+   "date": "",
+   "retiens": ""
+  }
+ ],
+ "oraux": [
+  {
+   "id": "0ewf0vhijgfn",
+   "nom": "Oral blanc 1",
+   "auto": {
+    "oral": 3,
+    "continu": 3,
+    "connaissances": 3,
+    "interaction": 3,
+    "argumentation": 3
+   }
+  },
+  {
+   "id": "u5wr7smvjgfn",
+   "nom": "Oral blanc 2",
+   "auto": {}
+  }
+ ],
+ "hf": {
+  "cartes10": "2026-11-17",
+  "surprise": "2026-11-17",
+  "quiz": "2026-11-17",
+  "hello": "2026-11-17",
+  "accroche": "2026-11-17",
+  "zelda": "2026-11-17",
+  "tri": "2026-11-17",
+  "ctrlz": "2026-11-17",
+  "pdf": "2026-11-17",
+  "oral1": "2026-11-17",
+  "canard": "2026-11-17"
+ },
+ "compteurs": {
+  "jours": 1,
+  "deplacements": 1,
+  "annulations": 1,
+  "pdf": 1,
+  "canard": 1
+ },
+ "vus": {
+  "jour": 20774,
+  "suite": 1
+ }
+}
