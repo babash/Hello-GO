@@ -182,7 +182,102 @@
 
   // Les quiz « Vérifie que tu as compris » : essayé au moins une fois, réussi sans faute.
   function quizEssaye(d, id) { const r = (d.comprendre || {})[id]; return !!(r && r.essais); }
-  function quizSansFaute(d, id) { const r = (d.comprendre || {})[id], z = D.COMPRENDRE.find(function (x) { return x.id === id; }); return !!(r && z && r.meilleur === z.questions.length); }
+  // Le sans-faute porte sur une salve (10 questions), même si la banque du quiz en compte plus.
+  function surSalve(z) { return Math.min(D.SALVE, z.questions.length); }
+  function quizSansFaute(d, id) { const r = (d.comprendre || {})[id], z = D.COMPRENDRE.find(function (x) { return x.id === id; }); return !!(r && z && r.meilleur === surSalve(z)); }
+
+  // Ce que l'élève a déjà vu d'un quiz : pour chaque question, le nombre de fois où elle est apparue (vues) et si elle a
+  // été ratée la dernière fois (ratees). Vient de d.banque (version 1.5.0 et suivantes) ; un résultat plus récent que la
+  // banque (dossier de la version 1.4.0, ou essai fait sur un appareil resté en 1.4.0) compte aussi : cette version
+  // montrait toujours les 10 premières questions, et « rates » dit lesquelles ont été ratées.
+  function suiviQuiz(d, z) {
+    const b = ((d.banque || {})[z.id]) || null, r = (d.comprendre || {})[z.id], vues = {}, ratees = {};
+    if (b) { Object.keys(b.vues || {}).forEach(function (k) { vues[k] = b.vues[k]; }); Object.keys(b.ratees || {}).forEach(function (k) { ratees[k] = 1; }); }
+    if (r && r.essais && (!b || (typeof r.le === 'string' && r.le > (b.le || '')))) {
+      const rates = r.rates || [];
+      z.questions.slice(0, D.ANCIENNES).forEach(function (q) { vues[q.id] = vues[q.id] || 1; if (rates.indexOf(q.id) >= 0) ratees[q.id] = 1; else delete ratees[q.id]; });
+    }
+    const connues = z.questions.map(function (q) { return q.id; });
+    return { vues: vues, ratees: ratees, nVues: connues.filter(function (k) { return vues[k]; }).length };
+  }
+  // Une salve : SALVE questions différentes. D'abord une question de chaque sous-thème (th), pour les couvrir tous ; puis,
+  // une à une, la question la plus prioritaire qui reste : jamais vue, puis ratée la dernière fois, puis les autres ; à
+  // priorité égale, celle du sous-thème le moins représenté dans la salve, puis au hasard. Les questions sont rendues dans
+  // l'ordre de la banque. alea : une fonction comme Math.random (les essais en donnent une prévisible).
+  function tirerSalve(d, z, alea) {
+    alea = alea || Math.random;
+    const s = suiviQuiz(d, z), rang = function (q) { return !s.vues[q.id] ? 0 : s.ratees[q.id] ? 1 : 2; };
+    const themes = {};
+    z.questions.forEach(function (q) { const t = q.th || ''; (themes[t] = themes[t] || []).push({ q: q, rang: rang(q), x: alea() }); });
+    const files = Object.keys(themes).map(function (t) { return { l: themes[t].sort(function (a, b) { return a.rang - b.rang || a.x - b.x; }), pris: 0, x: alea() }; });
+    const n = surSalve(z), pris = [], prendre = function (f) { pris.push(f.l.shift().q); f.pris++; };
+    files.slice().sort(function (a, b) { return a.l[0].rang - b.l[0].rang || a.x - b.x; }).forEach(function (f) { if (pris.length < n) prendre(f); });
+    while (pris.length < n) {
+      const restent = files.filter(function (f) { return f.l.length; });
+      if (!restent.length) break;
+      prendre(restent.sort(function (a, b) { return a.l[0].rang - b.l[0].rang || a.pris - b.pris || a.l[0].x - b.l[0].x; })[0]);
+    }
+    return z.questions.filter(function (q) { return pris.indexOf(q) >= 0; }).map(function (q) { return q.id; });
+  }
+  // Le résultat d'une salve, dans le dossier. d.comprendre[id] garde la forme de la version 1.4.0 (scores sur 10, et
+  // « rates » ne cite que les 10 premières questions, les seules qu'une version 1.4.0 accepte) ; « rates_toutes » cite
+  // toutes les questions ratées de la salve. d.banque[id] retient les questions vues et ratées, d'une salve à l'autre.
+  function noterSalve(d, z, ids, justes, le) {
+    le = le || new Date().toISOString().slice(0, 10);
+    const avant = (d.comprendre || {})[z.id] || {}, s = suiviQuiz(d, z), anciennes = z.questions.slice(0, D.ANCIENNES).map(function (q) { return q.id; });
+    const ratees = ids.filter(function (k, i) { return !justes[i]; }), juste = ids.length - ratees.length;
+    d.comprendre = d.comprendre || {};
+    d.comprendre[z.id] = { meilleur: Math.max(avant.meilleur || 0, juste), dernier: juste, le: le, essais: (avant.essais || 0) + 1,
+      rates: ratees.filter(function (k) { return anciennes.indexOf(k) >= 0; }), rates_toutes: ratees };
+    ids.forEach(function (k) { s.vues[k] = (s.vues[k] || 0) + 1; if (ratees.indexOf(k) >= 0) s.ratees[k] = 1; else delete s.ratees[k]; });
+    d.banque = d.banque || {};
+    d.banque[z.id] = { le: le, vues: s.vues, ratees: s.ratees };
+    return juste;
+  }
+
+  // ---------- Le suivi : les jours de visite, l'absence, les hauts faits datés (version 1.5.0) ----------
+  // Une date du calendrier de l'appareil, sans heure : AAAA-MM-JJ.
+  function jourLocal(t) { const x = t instanceof Date ? t : new Date(t); const z = function (n) { return (n < 10 ? '0' : '') + n; }; return x.getFullYear() + '-' + z(x.getMonth() + 1) + '-' + z(x.getDate()); }
+  const DATE = /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/;
+  // Le nombre de jours du calendrier entre deux dates (AAAA-MM-JJ, Date ou horodatage), sans souci d'heure d'été.
+  function ecartJours(a, b) {
+    const j = function (x) { const s = typeof x === 'string' && DATE.test(x) ? x : jourLocal(x), p = s.split('-'); return Date.UTC(+p[0], +p[1] - 1, +p[2]); };
+    return Math.round((j(b) - j(a)) / 864e5);
+  }
+  const VISITES_MAX = 400;
+  // Note le jour de visite dans d.visites ({ "AAAA-MM-JJ": 1 }), une fois par jour, en gardant les 400 derniers jours.
+  // Un objet plutôt qu'une liste : deux appareils qui notent chacun leur jour se fusionnent sans conflit.
+  function noterVisite(d, quand) {
+    const k = jourLocal(quand || new Date());
+    d.visites = d.visites && typeof d.visites === 'object' && !Array.isArray(d.visites) ? d.visites : {};
+    if (d.visites[k]) return false;
+    d.visites[k] = 1;
+    const l = Object.keys(d.visites).filter(function (x) { return DATE.test(x); }).sort();
+    l.slice(0, Math.max(0, l.length - VISITES_MAX)).forEach(function (x) { delete d.visites[x]; });
+    return true;
+  }
+  // Les jours de visite (du plus ancien au plus récent) et les jours actifs sur 7 et 30 jours (aujourd'hui compris).
+  function statsVisites(d, maintenant) {
+    const l = Object.keys((d && d.visites) || {}).filter(function (x) { return DATE.test(x); }).sort(), auj = jourLocal(maintenant || new Date());
+    const dans = function (n) { return l.filter(function (x) { const e = ecartJours(x, auj); return e >= 0 && e < n; }).length; };
+    return { jours: l, j7: dans(7), j30: dans(30), total: l.length, depuis: l[0] || null, derniere: l[l.length - 1] || null };
+  }
+  // L'absence d'un·e élève, d'après la dernière visite que garde la base (vu_le) et la date d'inscription (cree_le) :
+  // le voyant s'allume au-delà de 14 jours sans visite ; « jamais revenu·e » : aucune visite après le jour de l'inscription.
+  const ABSENCE_MAX = 14;
+  function absence(vuLe, creeLe, maintenant) {
+    const now = maintenant || new Date(), ok = function (x) { return x && !isNaN(new Date(x).getTime()); };
+    const jours = ok(vuLe) ? Math.max(0, ecartJours(new Date(vuLe), now)) : null;
+    const jamaisRevenu = ok(creeLe) && ok(vuLe) && jourLocal(new Date(vuLe)) === jourLocal(new Date(creeLe)) && ecartJours(new Date(creeLe), now) >= 1;
+    return { jours: jours, alerte: jours === null || jours > ABSENCE_MAX, jamaisRevenu: !!jamaisRevenu };
+  }
+  // Les hauts faits gagnés, dans l'ordre où ils l'ont été. Un haut fait gagné avant que sa date soit lisible garde sa
+  // place, avec « le: null » (date inconnue) ; un identifiant inconnu de cette version est laissé de côté.
+  function hautsFaitsDates(d) {
+    const hf = (d && d.hf) || {};
+    return HAUTS_FAITS.filter(function (h) { return hf[h.id]; }).map(function (h) { const v = String(hf[h.id]).slice(0, 10); return { id: h.id, titre: h.titre, le: DATE.test(v) ? v : null }; })
+      .sort(function (a, b) { return a.le === b.le ? 0 : a.le === null ? 1 : b.le === null ? -1 : a.le < b.le ? -1 : 1; });
+  }
 
   // La prochaine action : une seule, choisie d'après l'état du dossier. Un quiz est proposé une fois, au bon moment
   // (avant de choisir sa question, puis quand le plan prend forme) : dès qu'il est essayé, la suite reprend.
@@ -339,8 +434,14 @@
       && sinon(n.comprendre, function (o) { return objet(o) && Object.keys(o).every(function (k) {
         const z = D.COMPRENDRE.find(function (x) { return x.id === k; }), r = o[k];
         if (!z) return id(k) && objet(r);
-        return objet(r) && entier(r.meilleur) && entier(r.dernier) && entier(r.essais) && texte(r.le) && sinon(r.rates, function (l) { return liste(l, id); });
+        return objet(r) && entier(r.meilleur) && entier(r.dernier) && entier(r.essais) && texte(r.le) && sinon(r.rates, function (l) { return liste(l, id); })
+          && sinon(r.rates_toutes, function (l) { return liste(l, id); });
       }); })
+      // Version 1.5.0, tout est facultatif. Les questions vues et ratées de chaque quiz (une question d'une version plus
+      // récente est acceptée : seule sa forme compte), et les jours de visite.
+      && sinon(n.banque, function (o) { return cles(o) && valeurs(o, function (b) { return objet(b) && texte(b.le)
+        && sinon(b.vues, function (x) { return cles(x) && valeurs(x, entier); }) && sinon(b.ratees, function (x) { return cles(x) && valeurs(x, entier); }); }); })
+      && sinon(n.visites, function (o) { return objet(o) && Object.keys(o).every(function (k) { return DATE.test(k) && entier(o[k]); }); })
       && sinon(n.hf, function (o) { return valeurs(o, function (v) { return typeof v === 'string'; }); })
       && sinon(n.compteurs, function (o) { return valeurs(o, entier); }) && sinon(n.vus, function (o) { return valeurs(o, entier); })
       // Ce que l'élève a fait des retours de son enseignant·e (version en ligne) : lus, mots créés, ressources gardées.
@@ -351,7 +452,8 @@
   }
 
   const api = { choixDe, profil, gouts, prochaineCarte, surprises, CARTES, coach, coachMot, motComplet, coachSources, suggestions, questionsProbables, phase, prochaineAction, HAUTS_FAITS, majHautsFaits,
-    tousLesPoints, ressemblance, contient, aChiffre, reference, dossierValide, SEC_PAR_POINT, quizEssaye, quizSansFaute };
+    tousLesPoints, ressemblance, contient, aChiffre, reference, dossierValide, SEC_PAR_POINT, quizEssaye, quizSansFaute,
+    surSalve, suiviQuiz, tirerSalve, noterSalve, jourLocal, ecartJours, noterVisite, statsVisites, absence, ABSENCE_MAX, VISITES_MAX, hautsFaitsDates };
   racine.HGAnalyse = api;
   if (typeof module !== 'undefined') module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);

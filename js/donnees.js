@@ -267,114 +267,221 @@
   // l'épreuve » et « à savoir », d'après le BO spécial n° 4 du 17/09/2026).
   const REVOIR_EPREUVE = ['#/aide/epreuve', 'Comprendre l’épreuve'];
   const revoir = (id) => ['#/aide/' + id, FICHES.find((f) => f.id === id).titre];
+  // Chaque quiz a une banque d'au moins 20 questions ; une salve en tire SALVE (10), équilibrée par sous-thème (th), en
+  // commençant par les questions jamais vues, puis par les ratées (HGAnalyse.tirerSalve). Les ANCIENNES premières
+  // questions de chaque quiz sont celles de la version 1.4.0 : leurs identifiants ne changent jamais, et ce sont les
+  // seules que le champ « rates » d'un résultat peut contenir (une version 1.4.0 refuse un dossier qui en cite d'autres).
+  const SALVE = 10, ANCIENNES = 10;
   const COMPRENDRE = [
-    { id: 'epreuve', titre: 'Ai-je compris l’épreuve ?', court: 'Épreuve', chapo: '10 questions sur les règles du Grand oral, session 2027. Après chaque réponse, une explication. Ce n’est pas noté : c’est pour vérifier que tu as compris.', questions: [
-      { id: 'e1', q: 'Tes spécialités sont la NSI et les maths. Quelles questions prépares-tu pour le jour J ?', b: 1, r: REVOIR_EPREUVE, o: [
+    { id: 'epreuve', titre: 'Ai-je compris l’épreuve ?', court: 'Épreuve', chapo: '10 questions sur les règles du Grand oral, session 2027, tirées parmi 20 : chaque essai t’en propose de nouvelles. Après chaque réponse, une explication. Ce n’est pas noté : c’est pour vérifier que tu as compris.', questions: [
+      { id: 'e1', th: 'questions', q: 'Tes spécialités sont la NSI et les maths. Quelles questions prépares-tu pour le jour J ?', b: 1, r: REVOIR_EPREUVE, o: [
         ['Deux questions de NSI seule.', 'Tes deux questions ne peuvent pas porter sur la même spécialité.'],
         ['Une question de NSI, et une question transversale qui relie la NSI et les maths.', 'Oui : deux questions qui ne portent pas sur la même spécialité, et une question peut être transversale.'],
         ['Une seule question, transversale : elle compte pour les deux spécialités.', 'Il en faut deux : le jour J, le jury choisit l’une des deux.'],
         ['Trois questions, et le jury en garde une.', 'Tu en présentes deux, pas trois : prépare-les aussi bien l’une que l’autre.']] },
-      { id: 'e2', q: 'Le jour J, qui choisit la question sur laquelle tu passes ?', b: 2, r: REVOIR_EPREUVE, o: [
+      { id: 'e2', th: 'questions', q: 'Le jour J, qui choisit la question sur laquelle tu passes ?', b: 2, r: REVOIR_EPREUVE, o: [
         ['Toi : tu prends celle que tu préfères.', 'C’est le jury qui choisit : prépare tes deux questions aussi bien.'],
         ['Un tirage au sort.', 'Tu peux tirer au sort pour t’entraîner, mais le jour J, c’est le jury qui choisit.'],
         ['Le jury, parmi tes deux questions.', 'Oui : le jury en choisit une. D’où l’intérêt de préparer les deux aussi bien.'],
         ['Ton enseignant·e de NSI, avant l’épreuve.', 'Tu prépares tes questions avec tes enseignant·e·s, mais le jour J, c’est le jury qui choisit.']] },
-      { id: 'e3', q: 'Tu as 20 minutes de préparation. Avec quoi prépares-tu tes notes ?', b: 0, r: REVOIR_EPREUVE, o: [
+      { id: 'e3', th: 'deroule', q: 'Tu as 20 minutes de préparation. Avec quoi prépares-tu tes notes ?', b: 0, r: REVOIR_EPREUVE, o: [
         ['Du papier, pour refaire ton plan à la main.', 'Oui : du papier seulement. Entraîne-toi à refaire ton plan à la main en 20 minutes.'],
         ['Ton ordinateur, pour relire ton diaporama.', 'Aucun support numérique le jour J : ni ordinateur, ni diaporama.'],
         ['Ton téléphone, pour relire tes notes.', 'Pas de téléphone : aucun support numérique. Tes notes, tu les refais sur papier.'],
         ['Rien : tu dois tout garder en tête.', 'Tu as du papier pour préparer tes notes, et tu peux garder ta feuille pendant l’exposé.']] },
-      { id: 'e4', q: 'Comment se passe ton exposé ?', b: 3, r: REVOIR_EPREUVE, o: [
+      { id: 'e4', th: 'deroule', q: 'Comment se passe ton exposé ?', b: 3, r: REVOIR_EPREUVE, o: [
         ['10 minutes, assis·e, en lisant ton texte.', 'Tu présentes debout, et sans lire : parle à partir de tes points.'],
         ['5 minutes, debout, sans notes.', 'L’exposé dure 10 minutes. Et tu peux garder ta feuille.'],
         ['20 minutes, debout : c’est la moitié de l’épreuve.', '20 minutes, c’est la préparation. L’exposé, lui, dure 10 minutes.'],
         ['10 minutes, debout, sans lire tes notes.', 'Oui : 10 minutes, debout, sans lire. Tu peux garder ta feuille et la montrer au jury.']] },
-      { id: 'e5', q: 'Que se passe-t-il juste après ton exposé ?', b: 1, r: REVOIR_EPREUVE, o: [
+      { id: 'e5', th: 'echange', q: 'Que se passe-t-il juste après ton exposé ?', b: 1, r: REVOIR_EPREUVE, o: [
         ['10 minutes d’échange, puis 5 minutes sur ton projet d’orientation.', 'C’était le déroulé de la session 2021, l’année de la vidéo. En 2027 : 10 minutes d’exposé, puis 10 minutes d’échange.'],
         ['10 minutes d’échange avec le jury.', 'Oui : l’échange dure 10 minutes, autant que l’exposé. Prépare-le autant.'],
         ['5 minutes de questions sur ton exposé seulement.', 'L’échange dure 10 minutes, et il peut aller au-delà de ton exposé.'],
         ['Rien : l’épreuve s’arrête à la fin de ton exposé.', 'L’exposé n’est que la moitié : ensuite vient l’échange, 10 minutes.']] },
-      { id: 'e6', q: 'Session 2027, voie générale : quel est le coefficient du Grand oral ?', b: 2, r: REVOIR_EPREUVE, o: [
+      { id: 'e6', th: 'notation', q: 'Session 2027, voie générale : quel est le coefficient du Grand oral ?', b: 2, r: REVOIR_EPREUVE, o: [
         ['Coefficient 10.', 'C’était l’ancienne règle, celle de la vidéo de 2021. À partir de la session 2027 : coefficient 8.'],
         ['Coefficient 4.', 'Plus que ça : coefficient 8 à partir de la session 2027.'],
         ['Coefficient 8.', 'Oui : coefficient 8 au bac général, à partir de la session 2027.'],
         ['Aucun : c’est un entraînement.', 'Il compte bien pour le bac : coefficient 8 à partir de la session 2027.']] },
-      { id: 'e7', q: 'Ta question est-elle notée ?', b: 0, r: REVOIR_EPREUVE, o: [
+      { id: 'e7', th: 'notation', q: 'Ta question est-elle notée ?', b: 0, r: REVOIR_EPREUVE, o: [
         ['Non : ce qui compte, c’est ton argumentation et ta façon de parler.', 'Exact : la question elle-même n’est pas notée. Choisis-la pour bien argumenter.'],
         ['Oui : une question originale rapporte des points.', 'La question elle-même n’est pas notée : c’est ce que tu en fais qui compte.'],
         ['Oui : c’est le premier critère de la grille.', 'Aucun des 5 critères ne note la question : ils portent sur ton oral, tes connaissances, l’échange et ton argumentation.'],
         ['Seulement si elle est transversale.', 'Transversale ou non, la question n’est pas notée : ton argumentation et ton oral, si.']] },
-      { id: 'e8', q: 'Pendant l’échange, sur quoi le jury peut-il t’interroger ?', b: 3, r: REVOIR_EPREUVE, o: [
+      { id: 'e8', th: 'echange', q: 'Pendant l’échange, sur quoi le jury peut-il t’interroger ?', b: 3, r: REVOIR_EPREUVE, o: [
         ['Seulement sur ce que tu as dit dans ton exposé.', 'Plus large : le jury peut aussi t’interroger sur le programme des spécialités concernées. Révise les chapitres liés à ton sujet.'],
         ['Sur toutes les matières du bac.', 'Pas toutes : sur ton sujet, et sur le programme des spécialités concernées par ta question.'],
         ['Seulement sur tes sources.', 'Le jury peut parler de tes sources, mais il t’interroge sur ton sujet et sur le programme des spécialités concernées.'],
         ['Sur ton sujet, et sur tout le programme des spécialités concernées.', 'Oui : révise les chapitres liés à ton sujet, en NSI, et dans ton autre spécialité pour une question transversale.']] },
-      { id: 'e9', q: 'Qui compose le jury ?', b: 1, r: REVOIR_EPREUVE, o: [
+      { id: 'e9', th: 'echange', q: 'Qui compose le jury ?', b: 1, r: REVOIR_EPREUVE, o: [
         ['Deux enseignant·e·s de NSI.', 'Un·e des deux n’est pas spécialiste de NSI : prépare une image simple pour chaque mot technique.'],
         ['Deux enseignant·e·s, dont un·e n’est pas spécialiste de NSI.', 'Oui : parle aussi pour le membre du jury non spécialiste, avec des images simples.'],
         ['Un·e seul·e enseignant·e de NSI.', 'Le jury compte deux enseignant·e·s, dont un·e n’est pas spécialiste de NSI.'],
         ['Trois personnes, dont une du monde du travail.', 'Le jury compte deux enseignant·e·s, dont un·e n’est pas spécialiste de NSI.']] },
-      { id: 'e10', q: 'La grille d’évaluation indicative compte 5 critères. Lequel n’en fait pas partie ?', b: 2, r: REVOIR_EPREUVE, o: [
+      { id: 'e10', th: 'notation', q: 'La grille d’évaluation indicative compte 5 critères. Lequel n’en fait pas partie ?', b: 2, r: REVOIR_EPREUVE, o: [
         ['La qualité orale.', 'Elle en fait partie : ta voix, ton débit, ton vocabulaire comptent.'],
         ['L’interaction avec le jury.', 'Elle en fait partie : pendant l’échange, réagis, reformule, rebondis.'],
         ['La présentation de ta feuille de notes.', 'Exact : tu peux montrer ta feuille au jury, mais il ne la note pas.'],
         ['La construction de l’argumentation.', 'Elle en fait partie : un raisonnement construit, avec des arguments précis.']] },
+      // Questions 11 à 20 (version 1.5.0) : mêmes sources (la page « Comprendre l'épreuve », les « à savoir », la grille).
+      { id: 'e11', th: 'questions', q: 'Ta question est transversale : elle relie la NSI et les SES. Qu’est-ce qui la rend vraiment transversale ?', b: 2, r: REVOIR_EPREUVE, o: [
+        ['Son titre cite les deux spécialités.', 'Citer les deux spécialités ne suffit pas : il faut qu’elles se répondent dans ta réflexion.'],
+        ['L’axe 1 parle de NSI, l’axe 2 de SES, sans lien entre les deux.', 'Poser les deux spécialités côte à côte ne suffit pas : elles doivent se répondre.'],
+        ['Les deux spécialités se répondent : chacune éclaire ce que dit l’autre.', 'Oui : dans une question transversale, les deux spécialités se répondent.'],
+        ['Elle compte pour tes deux spécialités : tu n’as pas besoin d’une autre question.', 'Il te faut quand même deux questions : le jour J, le jury en choisit une.']] },
+      { id: 'e12', th: 'questions', q: 'Avant l’épreuve, comment prépares-tu tes deux questions ?', b: 0, r: REVOIR_EPREUVE, o: [
+        ['Avec tes enseignant·e·s, mais à partir de ta réflexion personnelle.', 'Oui : tu les prépares avec tes enseignant·e·s, et elles viennent de ta réflexion, car c’est toi qui les défends.'],
+        ['Tu attends le jour J : le jury te les donne.', 'C’est toi qui prépares tes deux questions, avant l’épreuve. Le jour J, le jury en choisit une.'],
+        ['Ton enseignant·e les écrit pour toi.', 'Tes enseignant·e·s t’aident, mais ta question doit venir de ta réflexion personnelle : c’est toi qui devras la défendre.'],
+        ['Tu en recopies deux trouvées sur Internet, telles quelles.', 'Ta question doit venir de ta réflexion personnelle : c’est toi qui devras la défendre devant le jury.']] },
+      { id: 'e13', th: 'questions', q: 'Ta première question est prête, la seconde à peine commencée. Quel est le risque ?', b: 3, r: REVOIR_EPREUVE, o: [
+        ['Aucun : tu choisiras la première le jour J.', 'Le jour J, ce n’est pas toi qui choisis : c’est le jury.'],
+        ['Aucun : le jury note seulement la meilleure des deux.', 'Tu ne présentes qu’une question, celle que choisit le jury : il ne compare pas les deux.'],
+        ['Le jury te pénalise parce que tes questions sont inégales.', 'Le jury ne note pas tes questions : il choisit l’une des deux, puis il écoute ton exposé.'],
+        ['Le jury peut choisir celle que tu as le moins préparée.', 'Oui : le jury choisit l’une des deux. Prépare-les aussi bien l’une que l’autre.']] },
+      { id: 'e14', th: 'deroule', q: 'Le jour J, quand le jury choisit-il la question sur laquelle tu passes ?', b: 1, r: REVOIR_EPREUVE, o: [
+        ['Plusieurs semaines avant, sur ta convocation.', 'Le jury choisit le jour J : avant, tu prépares tes deux questions aussi bien.'],
+        ['Juste avant tes 20 minutes de préparation.', 'Oui : le jury choisit une de tes deux questions, puis tu as 20 minutes pour préparer tes notes.'],
+        ['À la fin de ton exposé, pour lancer l’échange.', 'Ton exposé porte déjà sur la question choisie : le jury la choisit avant tes 20 minutes de préparation.'],
+        ['Jamais : tu présentes tes deux questions l’une après l’autre.', 'Tu ne présentes qu’une de tes deux questions : celle que choisit le jury, avant la préparation.']] },
+      { id: 'e15', th: 'deroule', q: 'Pendant ton exposé, que fais-tu de ta feuille de notes ?', b: 2, r: REVOIR_EPREUVE, o: [
+        ['Tu la rends au jury avant de commencer.', 'Tu peux la garder pendant ton exposé.'],
+        ['Tu la lis : c’est fait pour ça.', 'Tu présentes sans lire : ta feuille t’aide à retrouver tes points, pas à lire un texte.'],
+        ['Tu peux la garder et la montrer au jury, sans la lire.', 'Oui : tu peux la garder et la montrer au jury. Il ne la note pas.'],
+        ['Tu la donnes au jury pour qu’il la note.', 'Tu peux la montrer au jury, mais il ne la note pas.']] },
+      { id: 'e16', th: 'deroule', q: 'À l’entraînement, ton exposé ne dure que 6 minutes. Qu’en penses-tu ?', b: 0, r: REVOIR_EPREUVE, o: [
+        ['C’est trop court : un exposé trop court fait perdre des points. Entraîne-toi à tenir les 10 minutes.', 'Oui : l’exposé dure 10 minutes. Entraîne-toi à les tenir, avec un chronomètre.'],
+        ['C’est parfait : le jury préfère les exposés courts.', 'Un exposé trop court fait perdre des points : vise les 10 minutes.'],
+        ['Aucune importance : seule ton argumentation compte.', 'L’argumentation compte, mais un exposé trop court fait perdre des points : vise les 10 minutes.'],
+        ['Tu compléteras en lisant tes notes le jour J.', 'Tu présentes sans lire : ajoute plutôt des points à ton plan, et entraîne-toi à tenir les 10 minutes.']] },
+      { id: 'e17', th: 'echange', q: 'Pendant l’échange, le jury te pose une question dont tu ne connais pas la réponse. Que fais-tu ?', b: 3, r: revoir('jury'), o: [
+        ['Tu inventes une réponse qui a l’air sûre.', 'Le jury s’en apercevra : dis plutôt que tu ne sais pas, puis propose un raisonnement.'],
+        ['Tu restes silencieux·se jusqu’à la question suivante.', 'Le silence ne t’aide pas : dis que tu ne sais pas, puis propose un raisonnement.'],
+        ['Tu réponds à une autre question, que tu connais mieux.', 'Le jury attend une réponse à sa question : dis ce que tu sais, et propose un raisonnement.'],
+        ['Tu le dis, puis tu proposes un raisonnement : « Je n’ai pas la donnée exacte, mais… »', 'Oui : dire que tu ne sais pas, puis raisonner, montre comment tu argumentes.']] },
+      { id: 'e18', th: 'echange', q: 'Pendant l’échange, que cherche surtout à voir le jury ?', b: 1, r: REVOIR_EPREUVE, o: [
+        ['Si tu sais réciter ton cours de NSI mot à mot.', 'L’échange n’est pas un contrôle de connaissances : le jury veut voir comment tu argumentes.'],
+        ['Comment tu argumentes : l’échange n’est pas un contrôle de connaissances.', 'Oui : le jury veut voir comment tu argumentes, comment tu réagis et comment tu rebondis.'],
+        ['Si tu as appris des réponses par cœur.', 'Une réponse apprise par cœur sonne faux : le jury veut voir comment tu argumentes.'],
+        ['Si tu connais des sujets sans lien avec ta question ni avec tes spécialités.', 'Le jury t’interroge sur ton sujet et sur le programme des spécialités concernées.']] },
+      { id: 'e19', th: 'notation', q: 'Une vidéo du ministère, de 2021, annonce un coefficient 10. Que retiens-tu ?', b: 2, r: REVOIR_EPREUVE, o: [
+        ['La vidéo est officielle : elle l’emporte sur tout le reste.', 'Elle date de 2021 et donne les anciennes règles. Pour la session 2027, c’est coefficient 8.'],
+        ['Les deux règles s’appliquent : tu choisis celle qui t’arrange.', 'Une seule règle s’applique en 2027 : coefficient 8.'],
+        ['Elle donne les anciennes règles : en 2027, c’est coefficient 8, et la page « Comprendre l’épreuve » fait foi.', 'Oui : la vidéo date de 2021. En cas de différence, la page « Comprendre l’épreuve » fait foi.'],
+        ['Le coefficient dépend de la question que choisit le jury.', 'Le coefficient ne dépend pas de ta question : coefficient 8 en voie générale, à partir de la session 2027.']] },
+      { id: 'e20', th: 'notation', q: 'La grille compte un critère « prise de parole en continu ». À quoi ressemble le meilleur niveau ?', b: 0, r: REVOIR_EPREUVE, o: [
+        ['Un discours fluide : tu utilises tout ton temps et tu développes tes idées.', 'Oui : c’est le meilleur niveau de ce critère de la grille.'],
+        ['Des phrases très courtes, avec beaucoup d’arrêts.', 'C’est le premier niveau de la grille : vise un discours fluide, qui développe tes idées.'],
+        ['Un texte rédigé, lu sans t’arrêter.', 'Tu présentes sans lire : le meilleur niveau, c’est un discours fluide, qui développe tes idées.'],
+        ['Parler le plus vite possible, pour tout dire.', 'Trop vite, le jury perd le fil : vise 100 à 125 mots par minute.']] },
     ] },
-    { id: 'plan', titre: 'Ai-je compris la méthode du plan ?', court: 'Plan', chapo: '10 situations, comme quand tu construis ton plan. Après chaque réponse, une explication. Ce n’est pas noté : c’est pour vérifier que tu as compris.', questions: [
-      { id: 'p1', q: 'Lequel de ces points est bien écrit ?', b: 2, r: revoir('point'), o: [
+    { id: 'plan', titre: 'Ai-je compris la méthode du plan ?', court: 'Plan', chapo: '10 situations, comme quand tu construis ton plan, tirées parmi 20 : chaque essai t’en propose de nouvelles. Après chaque réponse, une explication. Ce n’est pas noté : c’est pour vérifier que tu as compris.', questions: [
+      { id: 'p1', th: 'points', q: 'Lequel de ces points est bien écrit ?', b: 2, r: revoir('point'), o: [
         ['Il y a quelques années, l’entreprise Amazon a décidé d’abandonner l’intelligence artificielle qu’elle utilisait pour recruter, parce que ses équipes ont découvert qu’elle notait moins bien les CV des femmes.', 'C’est un paragraphe rédigé : tu serais tenté·e de le lire. Garde 1 à 3 lignes, en mots-clés.'],
         ['Amazon.', 'Trop court : un point doit te donner de quoi dire 3 à 5 phrases.'],
         ['IA de recrutement d’Amazon abandonnée : pénalisait les CV de femmes.', 'Oui : 1 à 3 lignes, en mots-clés, avec de quoi dire 3 à 5 phrases.'],
         ['Un exemple intéressant à développer.', 'Ce point ne dit rien : le jour J, tu ne sauras plus de quel exemple il s’agit.']] },
-      { id: 'p2', q: 'Ton plan compte 18 points. Pour tenir 10 minutes, que fais-tu ?', b: 0, r: revoir('plan'), o: [
+      { id: 'p2', th: 'points', q: 'Ton plan compte 18 points. Pour tenir 10 minutes, que fais-tu ?', b: 0, r: revoir('plan'), o: [
         ['Tu continues : vise 30 à 50 points.', 'Oui : 18 points font environ 5 minutes. Avec 30 à 50 points, tu tiens les 10 minutes.'],
         ['Rien : en parlant lentement, 18 points suffisent.', 'Parler plus lentement ne suffit pas : vise 100 à 125 mots par minute, et 30 à 50 points.'],
         ['Tu rédiges chaque point en paragraphe, pour qu’il dure plus longtemps.', 'Un paragraphe se lit au lieu de se dire : ajoute plutôt des points courts, jusqu’à 30 à 50.'],
         ['Tu en ajoutes 60 de plus, pour être sûr·e.', '78 points, c’est trop pour 10 minutes : vise 30 à 50 points.']] },
-      { id: 'p3', q: 'Comment répartis-tu tes 10 minutes d’exposé ?', b: 3, r: revoir('plan'), o: [
+      { id: 'p3', th: 'structure', q: 'Comment répartis-tu tes 10 minutes d’exposé ?', b: 3, r: revoir('plan'), o: [
         ['Introduction 1 min, axe 1 4 min, axe 2 4 min, conclusion 1 min.', 'L’introduction et la conclusion méritent plus : environ 2 minutes chacune.'],
         ['Introduction 4 min, axe 1 2 min, axe 2 2 min, conclusion 2 min.', 'L’introduction est trop longue : le cœur de l’exposé, ce sont tes deux axes, 3 minutes chacun.'],
         ['Un seul axe de 8 minutes, sans introduction ni conclusion.', 'Le jury a besoin d’une introduction et d’une conclusion pour suivre : 2, 3, 3 et 2 minutes.'],
         ['Introduction 2 min, axe 1 3 min, axe 2 3 min, conclusion 2 min.', 'Oui : 2, 3, 3 et 2 minutes. C’est l’équilibre que vérifie le coach.']] },
-      { id: 'p4', q: 'Ton introduction : une accroche (« L’IA de recrutement d’Amazon pénalisait les CV de femmes »), ta problématique (« Comment lutter contre les biais algorithmiques ? »), ta motivation (« En NSI, j’ai compris que nos choix d’algorithmes ont un effet sur la société »). Que lui manque-t-il ?', b: 1, r: revoir('plan'), o: [
+      { id: 'p4', th: 'structure', q: 'Ton introduction : une accroche (« L’IA de recrutement d’Amazon pénalisait les CV de femmes »), ta problématique (« Comment lutter contre les biais algorithmiques ? »), ta motivation (« En NSI, j’ai compris que nos choix d’algorithmes ont un effet sur la société »). Que lui manque-t-il ?', b: 1, r: revoir('plan'), o: [
         ['Une accroche.', 'Elle y est déjà : le fait sur Amazon accroche le jury.'],
         ['L’annonce du plan.', 'Oui : annonce tes deux axes, par exemple « D’abord les causes, puis les solutions ».'],
         ['Ton nom et ta classe.', 'Inutile : commence par ton accroche, pas par « Bonjour, je m’appelle… ».'],
         ['Ta conclusion.', 'La conclusion vient à la fin. À cette introduction, il manque l’annonce du plan.']] },
-      { id: 'p5', q: 'Ta conclusion a une synthèse et une ouverture. Que lui ajoutes-tu ?', b: 0, r: revoir('plan'), o: [
+      { id: 'p5', th: 'structure', q: 'Ta conclusion a une synthèse et une ouverture. Que lui ajoutes-tu ?', b: 0, r: revoir('plan'), o: [
         ['Une question de relance, pour guider le jury vers ce que tu maîtrises.', 'Oui : synthèse, ouverture, relance. Ta relance ouvre l’échange sur un terrain que tu connais.'],
         ['Une idée nouvelle, que tu n’as pas eu le temps de dire.', 'Dans la conclusion, n’ajoute pas d’idée nouvelle : réponds à ta question.'],
         ['La liste de tes sources, lue à voix haute.', 'Tes sources, tu les cites au fil de l’exposé : la conclusion finit par une question de relance.'],
         ['Rien : la conclusion s’arrête après l’ouverture.', 'Il manque la question de relance : elle guide le jury vers ce que tu maîtrises.']] },
-      { id: 'p6', q: 'Ton axe 1 explique les causes des biais, ton axe 2 les solutions. Qu’écris-tu entre les deux ?', b: 3, r: revoir('plan'), o: [
+      { id: 'p6', th: 'structure', q: 'Ton axe 1 explique les causes des biais, ton axe 2 les solutions. Qu’écris-tu entre les deux ?', b: 3, r: revoir('plan'), o: [
         ['Rien : le jury voit bien que tu changes de partie.', 'Sans transition, le jury peut perdre le fil : écris-la, elle montre que ton plan avance.'],
         ['Une nouvelle accroche.', 'L’accroche, c’est pour le début. Entre deux axes, on écrit une transition.'],
         ['Ta conclusion, pour gagner du temps.', 'La conclusion vient après le deuxième axe. Entre les deux axes : une transition.'],
         ['Une transition : « Les causes sont connues : que peut-on faire ? »', 'Oui : une transition relie tes parties et montre au jury que ton plan avance.']] },
-      { id: 'p7', q: 'Un de tes points donne un pourcentage lu dans une étude. Que fais-tu ?', b: 1, r: revoir('source'), o: [
+      { id: 'p7', th: 'sources', q: 'Un de tes points donne un pourcentage lu dans une étude. Que fais-tu ?', b: 1, r: revoir('source'), o: [
         ['Tu l’arrondis, pour qu’il soit plus facile à retenir.', 'Arrondir ne suffit pas : le jury voudra savoir d’où vient le chiffre. Donne sa source.'],
         ['Tu relies le point à sa source, et tu dis d’où vient le chiffre.', 'Oui : tout chiffre a une source. Le coach te le rappelle quand elle manque.'],
         ['Tu le gardes sans source : le jury te fera confiance.', 'Un chiffre sans source, c’est une rumeur : relie-le à sa source.'],
         ['Tu le retires : on ne donne jamais de chiffre à l’oral.', 'Un chiffre précis est un bon argument, à condition de dire d’où il vient.']] },
-      { id: 'p8', q: 'Tes trois sources sont trois articles de Wikipédia. Que te conseille la méthode ?', b: 2, r: revoir('source'), o: [
+      { id: 'p8', th: 'sources', q: 'Tes trois sources sont trois articles de Wikipédia. Que te conseille la méthode ?', b: 2, r: revoir('source'), o: [
         ['Rien : trois sources, c’est assez.', 'Le nombre ne fait pas tout : il te faut au moins deux types de sources différents.'],
         ['Les remplacer par trois vidéos.', 'Trois vidéos, c’est encore un seul type de source : croise des types différents.'],
         ['Ajouter une source d’un autre type, experte ou officielle, et lire les sources citées par Wikipédia.', 'Oui : au moins deux types de sources différents. Wikipédia est un bon point de départ, pas une arrivée.'],
         ['Ne pas dire au jury d’où viennent tes informations.', 'Au contraire : dis toujours d’où viennent tes informations.']] },
-      { id: 'p9', q: 'Ton plan emploie le mot « algorithme ». Que prépares-tu dans « Mes mots » ?', b: 0, r: revoir('definition'), o: [
+      { id: 'p9', th: 'mots-echange', q: 'Ton plan emploie le mot « algorithme ». Que prépares-tu dans « Mes mots » ?', b: 0, r: revoir('definition'), o: [
         ['Une définition d’une source, une avec tes mots, et une image simple pour le membre du jury non spécialiste.', 'Oui : deux définitions et une image, comme « un algorithme, c’est comme une recette de cuisine ».'],
         ['La définition d’une source, recopiée : elle suffit.', 'Ajoute ta propre définition : si tu sais le dire avec tes mots, tu l’as compris.'],
         ['Rien : tout le jury connaît ce mot.', 'Un des deux membres du jury n’est pas spécialiste de NSI : définis chaque mot technique.'],
         ['La phrase de la source, avec deux mots changés.', 'Ce ne sont pas encore tes mots : reformule vraiment, comme pour un·e camarade.']] },
-      { id: 'p10', q: 'Ton plan est prêt. Comment prépares-tu l’échange avec le jury ?', b: 3, r: revoir('jury'), o: [
+      { id: 'p10', th: 'mots-echange', q: 'Ton plan est prêt. Comment prépares-tu l’échange avec le jury ?', b: 3, r: revoir('jury'), o: [
         ['Tu ne le prépares pas : on ne peut pas deviner les questions.', 'Beaucoup de questions se devinent, comme « Pourquoi as-tu choisi ce sujet ? » : prépare-les.'],
         ['Tu rédiges des réponses complètes, à apprendre par cœur.', 'Une réponse apprise par cœur sonne faux : note plutôt tes idées en mots-clés.'],
         ['Tu révises seulement ton exposé : l’échange ne porte que sur lui.', 'Le jury peut t’interroger sur tout le programme des spécialités concernées : révise aussi les chapitres liés à ton sujet.'],
         ['Tu notes les questions probables, comme « Pourquoi as-tu choisi ce sujet ? », et tes idées de réponse en mots-clés.', 'Oui : l’échange dure 10 minutes, autant que l’exposé. Prépare-le autant.']] },
+      // Questions 11 à 20 (version 1.5.0) : mêmes sources (les fiches de méthode et les « à savoir »).
+      { id: 'p11', th: 'points', q: 'Un point de ton plan doit te donner de quoi dire combien de phrases ?', b: 3, r: revoir('point'), o: [
+        ['Une seule : le point est déjà la phrase à dire.', 'Un point en mots-clés te donne de quoi dire plus : 3 à 5 phrases.'],
+        ['Une vingtaine, pour tenir les 10 minutes avec peu de points.', 'C’est trop pour un point : vise plutôt 30 à 50 points, de 3 à 5 phrases chacun.'],
+        ['Aucune : tu le lis tel quel au jury.', 'Tu présentes sans lire : le point te rappelle de quoi dire 3 à 5 phrases.'],
+        ['3 à 5 phrases.', 'Oui : 1 à 3 lignes en mots-clés, de quoi dire 3 à 5 phrases.']] },
+      { id: 'p12', th: 'points', q: 'Pourquoi écrire tes points en mots-clés plutôt qu’en paragraphes ?', b: 1, r: revoir('point'), o: [
+        ['Pour que le jury ne puisse pas les lire.', 'Ce n’est pas la raison : tu peux même montrer ta feuille au jury. Les mots-clés t’évitent de lire.'],
+        ['Pour parler à partir d’eux, sans être tenté·e de les lire.', 'Oui : un paragraphe rédigé, on est tenté·e de le lire. Des mots-clés, on les dit avec ses mots.'],
+        ['Pour en écrire le moins possible.', 'Il en faut quand même 30 à 50 : les mots-clés servent à ne pas lire, pas à en faire moins.'],
+        ['Parce que le jury note ta feuille.', 'Le jury ne note pas ta feuille. Les mots-clés t’aident à parler sans lire.']] },
+      { id: 'p13', th: 'points', q: 'Tu hésites entre trois exemples très généraux et un seul exemple précis. Que te conseille la méthode ?', b: 0, r: revoir('point'), o: [
+        ['L’exemple précis : faire moins, mais mieux.', 'Oui : un exemple précis vaut plus que trois généralités.'],
+        ['Les trois généralités : plus d’exemples, c’est plus de points.', 'Faire moins, mais mieux : un exemple précis vaut plus que trois généralités.'],
+        ['Aucun exemple : le jury préfère les idées générales.', 'Un fait concret aide le jury à suivre : choisis l’exemple précis.'],
+        ['Les quatre, en parlant plus vite.', 'Trop vite, le jury perd le fil : vise 100 à 125 mots par minute, et choisis l’exemple précis.']] },
+      { id: 'p14', th: 'structure', q: 'Pour organiser tes deux axes, lequel de ces plans la méthode propose-t-elle ?', b: 2, r: revoir('plan'), o: [
+        ['Un axe par source que tu as lue.', 'Tes sources servent tes arguments, elles ne font pas ton plan : pense plutôt « avantages et limites » ou « constat et solutions ».'],
+        ['L’ordre dans lequel tu as trouvé tes informations.', 'Cet ordre n’aide pas le jury à suivre : pense plutôt « avantages et limites » ou « constat et solutions ».'],
+        ['Avantages et limites, ou constat et solutions.', 'Oui : ou encore « hier, aujourd’hui, demain », ou « du général au particulier ».'],
+        ['Un seul grand axe, sans transition.', 'Il faut deux axes, reliés par une transition, pour que le jury suive ton plan.']] },
+      { id: 'p15', th: 'sources', q: 'Comment juges-tu si une source est sérieuse ?', b: 3, r: revoir('source'), o: [
+        ['Elle est sérieuse si elle arrive en premier dans le moteur de recherche.', 'Ce n’est pas un critère : demande-toi qui parle, si c’est son métier, et de quand ça date.'],
+        ['Elle est sérieuse si elle est longue.', 'La longueur ne dit rien : demande-toi qui parle, si c’est son métier, et de quand ça date.'],
+        ['Elle est sérieuse si elle dit ce que tu penses déjà.', 'Ce n’est pas un critère : demande-toi qui parle, si c’est son métier, et ce qu’en disent les autres.'],
+        ['Tu te demandes qui parle, si c’est son métier, de quand ça date et ce qu’en disent d’autres sites.', 'Oui : ce sont les questions de la fiche « Une bonne source ».']] },
+      { id: 'p16', th: 'sources', q: 'Quand dois-tu dire d’où vient une information ?', b: 1, r: revoir('source'), o: [
+        ['Seulement à la fin, en lisant la liste de tes sources.', 'Tu cites tes sources au fil de l’exposé : dès que tu donnes un chiffre, une définition ou une citation.'],
+        ['Quand tu donnes un chiffre, une définition ou une citation.', 'Oui : relie ce point à sa source, et dis d’où ça vient.'],
+        ['Jamais : le jury n’en a pas besoin.', 'Au contraire : quand tu donnes un chiffre, une définition ou une citation, dis d’où ça vient.'],
+        ['Seulement si le jury te le demande pendant l’échange.', 'N’attends pas l’échange : dis d’où ça vient dès que tu donnes un chiffre, une définition ou une citation.']] },
+      { id: 'p17', th: 'sources', q: 'Lequel de ces arguments est un argument « de droit » ?', b: 0, r: revoir('arguments'), o: [
+        ['Une loi ou un règlement.', 'Oui : un argument de droit s’appuie sur une loi ou un règlement.'],
+        ['Un résultat scientifique reconnu.', 'C’est un argument scientifique. Un argument de droit s’appuie sur une loi ou un règlement.'],
+        ['Ce que tu as vécu.', 'C’est un argument d’expérience. Un argument de droit s’appuie sur une loi ou un règlement.'],
+        ['Une personne ou une institution reconnue.', 'C’est un argument d’autorité. Un argument de droit s’appuie sur une loi ou un règlement.']] },
+      { id: 'p18', th: 'mots-echange', q: 'Comment vérifier que ton explication est claire pour le membre du jury non spécialiste ?', b: 2, r: revoir('non-specialiste'), o: [
+        ['Tu ajoutes des mots techniques, pour être précis·e.', 'Chaque mot technique de plus doit être expliqué : vérifie plutôt en l’expliquant à voix haute.'],
+        ['Tu la lis plus lentement.', 'Lire ne rend pas une explication plus claire : explique-la à voix haute, avec tes mots.'],
+        ['Tu l’expliques à voix haute à un canard en plastique : si tu bloques, ce n’est pas encore clair.', 'Oui : l’astuce du canard en plastique. Si tu bloques, c’est que ce n’est pas encore clair pour toi.'],
+        ['Rien : le jury connaît déjà la NSI.', 'Un des deux membres du jury ne connaît pas la NSI : vérifie que ton explication est claire pour lui ou pour elle.']] },
+      { id: 'p19', th: 'mots-echange', q: 'Laquelle de ces définitions « avec tes mots » est la meilleure pour « algorithme » ?', b: 1, r: revoir('definition'), o: [
+        ['« Un algorithme est un algorithme informatique. »', 'Définir un mot par lui-même n’explique rien : dis ce que c’est, avec des mots simples.'],
+        ['« Une liste d’étapes à suivre pour arriver à un résultat. »', 'Oui : c’est l’exemple de la fiche « Une bonne définition ». Ajoute une image : une recette de cuisine.'],
+        ['« Un truc compliqué que font les ordinateurs. »', 'Trop vague : le jury ne sait toujours pas ce qu’est un algorithme. Dis ce que c’est.'],
+        ['La phrase de la source, avec deux mots changés.', 'Ce ne sont pas encore tes mots : reformule vraiment, comme pour un·e camarade.']] },
+      { id: 'p20', th: 'mots-echange', q: 'Pendant l’échange, le jury te pose une question. Comment t’y prends-tu ?', b: 3, r: revoir('jury'), o: [
+        ['Tu réponds dès les premiers mots, pour montrer que tu sais.', 'Écoute d’abord la question jusqu’au bout : tu risques de répondre à côté.'],
+        ['Tu récites la réponse que tu as apprise par cœur.', 'Ne récite pas un texte appris par cœur : réponds avec tes idées en mots-clés.'],
+        ['Tu demandes au jury de passer à la question suivante.', 'Prends plutôt quelques secondes, et reformule si besoin : « Si je comprends bien, vous me demandez… ».'],
+        ['Tu l’écoutes jusqu’au bout, tu prends quelques secondes, et tu reformules si besoin.', 'Oui : « Si je comprends bien, vous me demandez… ». Puis tu réponds.']] },
     ] },
   ];
 
-  const api = { TAGS, ETIQUETTES, TYPES_SOURCE, QUIZ, SUJETS, DEBUTS_QUESTION, A_SAVOIR, GRILLE, TERMES, EXEMPLE, FICHES, VIDEO_EPREUVE, COMPRENDRE };
+  const api = { TAGS, ETIQUETTES, TYPES_SOURCE, QUIZ, SUJETS, DEBUTS_QUESTION, A_SAVOIR, GRILLE, TERMES, EXEMPLE, FICHES, VIDEO_EPREUVE, COMPRENDRE, SALVE, ANCIENNES };
   racine.HGDonnees = api;
   if (typeof module !== 'undefined') module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);

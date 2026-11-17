@@ -19,8 +19,8 @@ Hello GO fait partie des [Ressources NSI et SNT](https://babash.github.io/Babash
 3. **Définir** : chaque mot important a deux définitions, celle d'une source et celle de l'élève, et une image pour le membre du jury non spécialiste.
 4. **Préparer l'échange** : les questions que le jury pourrait poser, dont certaines proposées d'après le plan.
 5. **S'évaluer** après chaque oral blanc, sur les 5 critères de la grille nationale.
-6. **Télécharger son dossier en PDF** : le plan, puis le lexique, puis les sources.
-7. **Vérifier qu'il ou elle a compris** : deux quiz de 10 questions, « Ai-je compris l'épreuve ? » (les règles de la session 2027) et « Ai-je compris la méthode du plan ? » (des mises en situation). Une question par écran, une explication après chaque réponse, le score et les points à revoir à la fin, avec un lien vers la fiche concernée ; à refaire à volonté, sans note sanction. La page « Comprendre l'épreuve » donne aussi le lien vers la vidéo du ministère (2021), avec ce qui a changé pour 2027.
+6. **Télécharger son dossier** : en PDF (le plan, puis le lexique, puis les sources) ou en **Markdown**, un texte lisible tel quel comme une fois mis en forme (la question, le plan, l'échange, le lexique, les sources avec leurs liens, les pistes, les oraux, les quiz et les hauts faits), avec ou sans les retours de son enseignant·e.
+7. **Vérifier qu'il ou elle a compris** : deux quiz de 10 questions, « Ai-je compris l'épreuve ? » (les règles de la session 2027) et « Ai-je compris la méthode du plan ? » (des mises en situation). Chaque essai tire ses 10 questions d'une banque de 20 par quiz, en couvrant tous les thèmes, d'abord parmi les questions jamais vues, puis parmi les questions ratées. Une question par écran, une explication après chaque réponse, le score et les points à revoir à la fin, avec un lien vers la fiche concernée ; à refaire à volonté, sans note sanction. La page « Comprendre l'épreuve » donne aussi le lien vers la vidéo du ministère (2021), avec ce qui a changé pour 2027.
 
 ## Ce qui guide les élèves
 
@@ -28,7 +28,7 @@ Hello GO fait partie des [Ressources NSI et SNT](https://babash.github.io/Babash
 - **Un « à savoir » chaque jour** : une règle de l'épreuve ou un conseil, selon l'avancement.
 - **Un coach** dans le plan : nombre de points et durée estimée, équilibre des parties, chiffre sans source, mot technique à définir, définition recopiée.
 - **Un exemple** complet (les biais algorithmiques) et des fiches de méthode.
-- **54 hauts faits**, qui récompensent les bonnes habitudes, pas la quantité.
+- **54 hauts faits**, qui récompensent les bonnes habitudes, pas la quantité, avec la date où chacun a été gagné.
 
 ## Pour les enseignant·e·s
 
@@ -36,17 +36,19 @@ Une seule version, **en ligne**, sur téléphone comme sur ordinateur.
 
 1. **Créez votre espace** sur [babash.github.io/Hello-GO/#/prof](https://babash.github.io/Hello-GO/#/prof) : un code de 3 mots et 4 chiffres, montré une seule fois (aucun courriel, aucun mot de passe). Il n'est gardé que le temps de la séance, dans l'onglet, sauf si vous cochez « Rester connecté·e sur cet appareil », à réserver à un appareil personnel ; « Fermer mon espace sur cet appareil » l'efface.
 2. **Créez une classe** : vous obtenez son lien et son QR code. Chaque élève s'inscrit avec son prénom et l'initiale de son nom, et reçoit un code de 2 mots et 3 chiffres (comme `MICRO-DECOR-123`) qui suffit pour retrouver son dossier depuis n'importe quel appareil. Aucun plafond du nombre d'élèves.
-3. **Le tableau de la classe** : une ligne par élève (question, points, mots, sources, oraux évalués, meilleur score à chaque quiz, dernière visite, nouveau travail depuis votre dernière visite) et tous les codes, masqués par défaut, à révéler ou à imprimer.
-4. **Le dossier d'un·e élève** : son plan, ses mots, ses sources, ses pistes, ses oraux et ses quiz (scores, essais, questions ratées au dernier essai), avec vos outils : commenter un point, un mot, une source, une piste ou une question ; demander une définition ; suggérer une ressource ou une question pour l'échange ; valider une question ou demander de la retravailler ; évaluer un oral blanc ou une vidéo sur la grille ; corriger un texte (rare, sans annonce) ; télécharger son PDF.
+3. **Le tableau de la classe** : une ligne par élève (question, points, mots, sources, oraux évalués, meilleur score à chaque quiz, nombre de hauts faits et dernier gagné, dernière visite et jours actifs sur 30 jours, nouveau travail depuis votre dernière visite) et tous les codes, masqués par défaut, à révéler ou à imprimer. **Un voyant** (icône, texte et couleur) signale tout·e élève sans visite depuis plus de 14 jours, avec le nombre de jours, ou jamais revenu·e depuis l'inscription ; un compteur en tête de classe, un filtre « À relancer » et un tri par dernière visite. « Derniers hauts faits » : qui, quoi, quand, sans classement et sans rien montrer aux autres élèves.
+4. **Le dossier d'un·e élève** : l'onglet « Suivi » (ses jours de visite, mois par mois, et ses jours actifs sur 7 jours, 30 jours et depuis le début de l'historique ; ses hauts faits dans l'ordre où ils ont été gagnés ; son dossier en Markdown) ; son plan, ses mots, ses sources, ses pistes, ses oraux et ses quiz (scores, essais, questions ratées au dernier essai, nombre de questions différentes déjà vues), avec vos outils : commenter un point, un mot, une source, une piste ou une question ; demander une définition ; suggérer une ressource ou une question pour l'échange ; valider une question ou demander de la retravailler ; évaluer un oral blanc ou une vidéo sur la grille ; corriger un texte (rare, sans annonce) ; télécharger son PDF.
 5. **Avec une IA de votre choix** (facultatif) : « Copier pour l'IA » donne le dossier en texte simple, sans prénom ni code, avec des repères stables (`P3` un point, `M1` un mot, `S2` une source, `Q1` une question de l'échange), des consignes au début et le format de réponse à la fin. Collez sa réponse : chaque ligne `@…` devient un brouillon que vous relisez avant de l'envoyer ; l'élève voit « préparé avec l'aide d'une IA, relu par ton enseignant·e ».
 
 Sans code ni lien de classe, l'application reste utilisable en **mode découverte** : le dossier reste sur l'appareil, et part dans la base quand l'élève rejoint sa classe.
+
+**Exporter** : une classe ou tout votre espace en JSON ; toute une classe en **Markdown** (un fichier, une section par élève), avec ou sans vos retours, et sans les codes sauf si vous cochez « Inclure les codes des élèves ».
 
 En fin d'année : exportez votre espace (JSON), puis supprimez vos classes. Rien n'est effacé automatiquement.
 
 ## Où en est le projet
 
-Version 1.4.0 : les deux quiz « Vérifie que tu as compris » (l'épreuve, la méthode du plan), proposés sur l'accueil, dans l'aide et par la prochaine étape, leurs résultats dans le dossier, le résumé et l'espace de l'enseignant·e, deux hauts faits, et le lien vers la vidéo du ministère avec sa mise en garde ; les dossiers des versions publiées sont rejoués avant chaque publication (`tests/dossiers.py`, voir « Mettre à jour sans rien perdre »). Avant elle : la version en ligne (élève et enseignant·e), sur la base appliquée le 17/11/2026 (dossier [`supabase/`](supabase/LISEZMOI.md)) ; depuis la 1.3.1, l'interface dit « ton enseignant·e » partout où elle disait « ton prof » ; la 1.3.2 répare le démarrage : `js/analyse.js` devient `js/coach.js` (les bloqueurs de contenu, avec la liste EasyPrivacy, bloquaient tout fichier nommé `analyse.js`), une page et ses fichiers sont toujours de la même version (`?v=`, un cache par version), et un message clair, avec les détails techniques, remplace la page vide si un fichier manque.
+Version 1.5.0 : le suivi côté enseignant·e (l'historique des hauts faits et des jours de visite, le voyant des élèves sans visite depuis plus de deux semaines, un filtre et un tri), l'export du dossier en Markdown (élève, enseignant·e, toute une classe) et une banque de 20 questions par quiz. L'historique des visites commence avec cette version : les visites d'avant ne sont pas connues. Aucune modification de la base, et tous les dossiers déjà enregistrés restent lisibles, y compris par un appareil resté sur une version plus ancienne. Avant elle, la version 1.4.0 : les deux quiz « Vérifie que tu as compris » (l'épreuve, la méthode du plan), proposés sur l'accueil, dans l'aide et par la prochaine étape, leurs résultats dans le dossier, le résumé et l'espace de l'enseignant·e, deux hauts faits, et le lien vers la vidéo du ministère avec sa mise en garde ; les dossiers des versions publiées sont rejoués avant chaque publication (`tests/dossiers.py`, voir « Mettre à jour sans rien perdre »). Avant elle : la version en ligne (élève et enseignant·e), sur la base appliquée le 17/11/2026 (dossier [`supabase/`](supabase/LISEZMOI.md)) ; depuis la 1.3.1, l'interface dit « ton enseignant·e » partout où elle disait « ton prof » ; la 1.3.2 répare le démarrage : `js/analyse.js` devient `js/coach.js` (les bloqueurs de contenu, avec la liste EasyPrivacy, bloquaient tout fichier nommé `analyse.js`), une page et ses fichiers sont toujours de la même version (`?v=`, un cache par version), et un message clair, avec les détails techniques, remplace la page vide si un fichier manque.
 
 À venir : un correcteur de grammaire sans serveur (Grammalecte).
 
@@ -55,7 +57,7 @@ Version 1.4.0 : les deux quiz « Vérifie que tu as compris » (l'épreuve, la m
 **Données d'élèves : prénom et initiale du nom, code, dossier, retours.** Elles sont gardées dans la base Supabase partagée des applications du site (projet « Babash - applications », schéma `grand_oral`), et sur l'appareil de l'élève (copie de travail, pour continuer hors ligne).
 
 - **Le compte** : le prénom et l'initiale du nom (jamais le nom complet), le code, la classe. Sur l'appareil, un jeton (un par appareil, 5 au plus, valable 30 jours sans usage) et le code, pour « Voir mon code » dans les réglages ; « Quitter cet appareil » efface l'un et l'autre, avec la copie du dossier. Sur un ordinateur partagé du lycée, l'élève quitte l'appareil en partant.
-- **Le dossier** : avis sur les cartes, réponses au questionnaire « Mes goûts » (dont la deuxième spécialité et l'après-bac), pistes, plans, mots, sources, oraux et auto-évaluations, hauts faits **et leurs compteurs** (jours de travail, annulations, déplacements…), résultats des quiz (meilleur et dernier score, date, essais, questions ratées au dernier essai), qui partent dans la base avec le dossier ; et un **résumé** chiffré pour le tableau de la classe.
+- **Le dossier** : avis sur les cartes, réponses au questionnaire « Mes goûts » (dont la deuxième spécialité et l'après-bac), pistes, plans, mots, sources, oraux et auto-évaluations, hauts faits avec leur date **et leurs compteurs** (jours de travail, annulations, déplacements…), résultats des quiz (meilleur et dernier score, date, essais, questions ratées au dernier essai) et questions déjà vues ou ratées de chaque quiz (`banque`), **jours de visite** (`visites` : une date par jour, sans heure, les 400 derniers jours au plus, notée par la page de l'élève depuis la version 1.5.0 ; la base, elle, ne garde que la dernière visite), qui partent dans la base avec le dossier ; et un **résumé** chiffré pour le tableau de la classe (avec les 10 derniers hauts faits et les jours de visite des 35 derniers jours, en dates compactes).
 - **Les retours** de l'enseignant·e (forme ci-dessous).
 - L'élève n'a pas de bouton d'effacement de son compte : seul·e l'enseignant·e supprime un·e élève, une classe ou son espace. Aucun effacement automatique.
 - Le code de l'enseignant·e n'est jamais gardé en clair dans la base (empreinte seulement).
@@ -99,11 +101,26 @@ python3 tests/parcours.py      # le parcours complet dans un navigateur, à 4 la
 python3 tests/comprendre.py    # les deux quiz « Vérifie que tu as compris » : retours, score, points à revoir, refaire, haut fait, vidéo en lien simple
 python3 tests/robustesse.py    # deux onglets, fichiers abîmés ou piégés, clavier, longues adresses à 320 px, dossier de la version 1.0.0
 node tests/retours.test.js     # retours, résumé, fusion à trois, format pour l'IA et lecture tolérante de sa réponse, code
+node tests/suivi.test.js       # jours de visite, voyant à 13, 14 et 15 jours, hauts faits datés, résumé, tirage des salves de quiz
+node tests/export.test.js      # l'export en Markdown : contenu, ordre, textes neutralisés, liens http(s) seulement, retours et codes sur demande, classe
+node tests/compatibilite.test.js # non-régression : un dossier de chaque version publiée, utilisé par la version actuelle, reste accepté par chacune (historique Git)
 python3 tests/en_ligne.py      # élève et enseignant·e en ligne, contre une reproduction locale de la base (PostgreSQL 16)
 python3 tests/dossiers.py      # les dossiers des versions publiées s'ouvrent, se modifient et s'enregistrent sans perte ; celui de cette version est accepté par les versions publiées en ligne
 ```
 
 `tests/en_ligne.py` n'appelle jamais la base en ligne : la page y est configurée vers une adresse inexistante, servie par un PostgreSQL local neuf (`tests/base_locale.py`, qui applique le socle commun du site, `HG_SOCLE`, puis `supabase/0001-dossiers.sql`), avec des données inventées.
+
+## Pour les contributeurs et contributrices : conserver les données des élèves
+
+**Règle de l'enseignant (17/11/2026) : tout se fait en conservant les données des élèves déjà inscrit·e·s, sans rupture d'expérience.** En pratique :
+
+- Aucun champ existant du dossier ne change de sens ni de forme. Tout ajout est **facultatif**, avec une valeur par défaut (son absence veut dire « rien encore »).
+- Un dossier de n'importe quelle version publiée s'ouvre et s'enregistre sans perte.
+- Un appareil resté sur une ancienne version qui reçoit un dossier de la nouvelle ne le refuse pas. Le `dossierValide` des versions publiées accepte une clé inconnue **au premier niveau** du dossier et à l'intérieur d'un résultat de quiz, mais refuse une forme inattendue dans un champ qu'il connaît : un ajout va donc dans une **nouvelle clé de premier niveau** (`visites`, `banque` en 1.5.0) ou dans une nouvelle clé d'un objet que l'ancienne version ne parcourt pas (`rates_toutes` dans un résultat de quiz), jamais dans `hf`, `compteurs`, `vus` ou `suivi`, dont les anciennes versions vérifient chaque valeur. Exemple : `rates` ne cite que les 10 premières questions de chaque quiz (les seules que connaît la 1.4.0) ; les questions 11 à 20 ratées sont dans `rates_toutes`.
+- Les identifiants des questions, des hauts faits et des éléments du dossier ne changent jamais. Une clé ou un identifiant d'une version plus récente est accepté par la version actuelle dans les champs ajoutés (seule sa forme compte).
+- Une donnée qui grandit des deux côtés (deux appareils) est un objet à clés plutôt qu'une liste : la fusion à trois les réunit sans conflit (`visites` : `{ "2026-11-17": 1 }`).
+- Aucune modification de la base ni de `supabase/` sans migration montrée à l'enseignant (règles du site).
+- `node tests/compatibilite.test.js` le vérifie : un dossier type de chaque version publiée (`tests/dossiers-types.js`), ouvert et utilisé par la version actuelle, garde tous ses champs et reste accepté par le `dossierValide` de chaque version publiée, tiré de l'historique Git. À chaque nouvelle version, ajoutez-la à `VERSIONS` (avec le commit de sa publication) et son dossier type à `DOSSIERS`.
 
 ## Sources
 

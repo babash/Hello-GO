@@ -60,8 +60,11 @@ def parcours(nav, largeur, sombre):
     p.click('[data-a=quiz-commencer]'); p.wait_for_selector('#quiz-question')
     ok(nom + ' le focus va à la question', p.evaluate("document.activeElement.id") == 'quiz-question')
     Z = p.evaluate("HGDonnees.COMPRENDRE.find((z) => z.id === 'epreuve')")
-    ordres = []
-    for i, q in enumerate(Z['questions']):
+    parId = {q['id']: q for q in Z['questions']}
+    ok(nom + ' banque de 20 questions', len(Z['questions']) >= 20)
+    ordres, salve1 = [], []
+    for i in range(10):
+        q = parId[p.get_attribute('.quiz-q', 'data-qid')]; salve1.append(q['id'])
         ok(nom + ' question %d sur 10' % (i + 1), ('Question %d sur 10' % (i + 1)) in p.inner_text('#vue'))
         ordres.append([int(x) for x in p.eval_on_selector_all('[name=quiz-rep]', 'l => l.map((x) => x.value)')])
         if i == 0:
@@ -81,27 +84,34 @@ def parcours(nav, largeur, sombre):
         r = p.inner_text('#quiz-retour')
         ok(nom + ' retour immédiat de l’option choisie (q%d)' % (i + 1), q['o'][k][1] in r and ('Bien vu' in r) == (not faux), r)
         if faux:
-            ok(nom + ' erreur : la bonne réponse et le lien « Revoir »', 'La bonne réponse' in r and q['o'][q['b']][0] in r and p.locator('#quiz-retour a[href="#/aide/epreuve"]').count() == 1)
+            ok(nom + ' erreur : la bonne réponse et le lien « Revoir »', 'La bonne réponse' in r and q['o'][q['b']][0] in r and p.locator('#quiz-retour a[href="%s"]' % q['r'][0]).count() == 1)
             ok(nom + ' erreur : marques en texte, pas seulement en couleur', 'Ta réponse' in p.inner_text('.option.faux') and 'Bonne réponse' in p.inner_text('.option.juste'))
             if i == 2: large('2-erreur')
         ok(nom + ' options figées après la réponse', p.locator('[name=quiz-rep]:disabled').count() == 4)
         p.click('[data-a=quiz-suivant]')
     p.wait_for_selector('.score')
     ok(nom + ' score final : 8 sur 10, sans note sanction', '8 sur 10' in p.inner_text('.score') and 'Revois' in p.inner_text('#quiz-fin'))
-    ok(nom + ' points à revoir : les deux questions ratées', p.locator('#vue .liste li').count() == 2 and Z['questions'][2]['q'] in p.inner_text('#vue') and Z['questions'][5]['q'] in p.inner_text('#vue'))
+    ok(nom + ' salve : 10 questions différentes, de tous les thèmes', len(set(salve1)) == 10 and len({parId[k]['th'] for k in salve1}) == 4, salve1)
+    ok(nom + ' points à revoir : les deux questions ratées', p.locator('#vue .liste li').count() == 2 and parId[salve1[2]]['q'] in p.inner_text('#vue') and parId[salve1[5]]['q'] in p.inner_text('#vue'))
     large('3-resultat')
     ok(nom + ' options mélangées à l’affichage', any(o != [0, 1, 2, 3] for o in ordres), ordres)
     r = dossier(p)['comprendre']['epreuve']
-    ok(nom + ' résultat gardé : meilleur, dernier, date, essais, ratées', r['meilleur'] == 8 and r['dernier'] == 8 and r['essais'] == 1 and r['rates'] == ['e3', 'e6'] and len(r['le']) == 10, r)
+    anciennes = [q['id'] for q in Z['questions'][:10]]
+    ok(nom + ' résultat gardé : meilleur, dernier, date, essais, ratées', r['meilleur'] == 8 and r['dernier'] == 8 and r['essais'] == 1 and r['rates_toutes'] == [salve1[2], salve1[5]]
+       and r['rates'] == [k for k in [salve1[2], salve1[5]] if k in anciennes] and len(r['le']) == 10, r)
+    ok(nom + ' banque : 10 questions vues', len(dossier(p)['banque']['epreuve']['vues']) == 10)
     ok(nom + ' pas encore de haut fait', 'regles' not in dossier(p)['hf'])
     # « Revoir » ouvre la section ; le retour au quiz garde le résultat
     p.locator('#vue .liste a[href="#/aide/epreuve"]').first.click(); p.wait_for_selector('#epreuve[data-cible]')
     ok(nom + ' « Revoir » : la section est montrée', p.evaluate("document.querySelector('#epreuve').getBoundingClientRect().top") < 200)
     # refaire, sans faute
     p.goto(URL + '#/comprendre/epreuve'); p.wait_for_selector('[data-a=quiz-commencer]')
-    p.click('[data-a=quiz-commencer]')
-    for q in Z['questions']:
+    ok(nom + ' intro : questions déjà vues', 'Questions déjà vues : 10 sur 20' in p.inner_text('#vue'))
+    p.click('[data-a=quiz-commencer]'); salve2 = []
+    for _ in range(10):
+        q = parId[p.get_attribute('.quiz-q', 'data-qid')]; salve2.append(q['id'])
         p.locator('label.option:has([value="%d"])' % q['b']).click(); p.click('[data-a=quiz-valider]'); p.click('[data-a=quiz-suivant]')
+    ok(nom + ' deuxième salve : les 10 questions jamais vues', not set(salve2) & set(salve1) and len(set(salve2)) == 10, salve2)
     p.wait_for_selector('.score')
     ok(nom + ' refaire : sans faute', '10 sur 10' in p.inner_text('.score') and p.locator('#vue .liste li').count() == 0)
     d = dossier(p); r = d['comprendre']['epreuve']
@@ -110,13 +120,16 @@ def parcours(nav, largeur, sombre):
     # le quiz du plan : une erreur, puis « Revoir » ouvre la fiche
     p.goto(URL + '#/comprendre/plan'); p.click('[data-a=quiz-commencer]')
     P = p.evaluate("HGDonnees.COMPRENDRE.find((z) => z.id === 'plan')")
-    for i, q in enumerate(P['questions']):
+    parIdP = {q['id']: q for q in P['questions']}
+    for i in range(10):
+        q = parIdP[p.get_attribute('.quiz-q', 'data-qid')]
         k = (q['b'] + 2) % 4 if i == 0 else q['b']
         p.locator('label.option:has([value="%d"])' % k).click(); p.click('[data-a=quiz-valider]')
         if i == 0:
             large('4-plan-erreur')
-            p.click('#quiz-retour a[href="#/aide/point"]'); p.wait_for_selector('#fiche-point[open]')
-            ok(nom + ' « Revoir » ouvre la fiche « Un bon point »', p.evaluate("document.activeElement.closest('#fiche-point') !== null"))
+            f = q['r'][0].split('/')[-1]
+            p.click('#quiz-retour a[href="%s"]' % q['r'][0]); p.wait_for_selector('#fiche-%s[open]' % f)
+            ok(nom + ' « Revoir » ouvre la fiche « %s »' % q['r'][1], p.evaluate("document.activeElement.closest('#fiche-%s') !== null" % f))
             p.go_back(); p.wait_for_selector('#quiz-retour')
             ok(nom + ' retour au quiz : la question et la réponse sont gardées', 'Question 1 sur 10' in p.inner_text('#vue'))
         p.click('[data-a=quiz-suivant]')

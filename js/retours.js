@@ -52,12 +52,22 @@
       hauts_faits: Object.keys(d.hf || {}).length };
     // Les quiz « Vérifie que tu as compris » : seulement ceux qui ont été essayés (meilleur et dernier score, essais).
     const cq = {};
-    (D ? D.COMPRENDRE : []).forEach((z) => { const x = (d.comprendre || {})[z.id]; if (x && x.essais) cq[z.id] = { meilleur: x.meilleur, dernier: x.dernier, essais: x.essais, sur: z.questions.length }; });
+    (D ? D.COMPRENDRE : []).forEach((z) => { const x = (d.comprendre || {})[z.id]; if (x && x.essais) cq[z.id] = { meilleur: x.meilleur, dernier: x.dernier, essais: x.essais, sur: A.surSalve(z), vues: A.suiviQuiz(d, z).nVues }; });
     if (Object.keys(cq).length) r.comprendre = cq;
+    // Le suivi (version 1.5.0) : les derniers hauts faits gagnés, avec leur date compacte (AAMMJJ), du plus récent au plus
+    // ancien ; les jours de visite des 35 derniers jours (AAMMJJ), leur nombre et le premier jour noté. Le détail est
+    // dans le dossier. Le tableau de la classe recalcule tout par rapport au jour où il est lu.
+    const compact = (j) => j.slice(2).replace(/-/g, '');
+    const hf = A.hautsFaitsDates(d).filter((h) => h.le);
+    if (hf.length) r.hf_recents = hf.slice(-10).reverse().map((h) => [h.id, compact(h.le)]);
+    const v = A.statsVisites(d);
+    if (v.total) { r.visites = { n: v.total, depuis: compact(v.depuis), jours: v.jours.slice(-35).map(compact) }; }
     // Trop long (beaucoup de réponses au questionnaire, de longs titres) : on retire le moins utile d'abord.
     if (JSON.stringify(r).length > 3900) r.gouts = Object.keys(r.gouts).reduce((o, k) => { o[k] = Array.isArray(r.gouts[k]) ? r.gouts[k].length : 1; return o; }, {});
     if (JSON.stringify(r).length > 3900) r.questions.forEach((q) => { q.titre = court(q.titre, 40); });
     if (JSON.stringify(r).length > 3900) { delete r.gouts; r.oraux = r.oraux.slice(0, 10); }
+    if (JSON.stringify(r).length > 3900) { if (r.hf_recents) r.hf_recents = r.hf_recents.slice(0, 3); if (r.visites) r.visites.jours = r.visites.jours.slice(-7); }
+    if (JSON.stringify(r).length > 3900) r.questions = r.questions.slice(0, 3);
     return r;
   }
 

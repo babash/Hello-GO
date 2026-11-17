@@ -156,7 +156,11 @@ const cibles = ['#/aide/epreuve', '#/aide/exemple'].concat(D.FICHES.map((f) => '
 const idsQ = new Set();
 D.COMPRENDRE.forEach((z) => {
   assert.ok(z.titre && z.court && z.chapo, z.id);
-  assert.strictEqual(z.questions.length, 10, z.id + ' : 10 questions');
+  // 1.5.0 : une banque d'au moins 20 questions ; les 10 premières sont celles de la 1.4.0, aux mêmes identifiants.
+  assert.ok(z.questions.length >= 20, z.id + ' : au moins 20 questions');
+  assert.deepStrictEqual(z.questions.slice(0, D.ANCIENNES).map((q) => q.id), [...Array(10).keys()].map((i) => z.id[0] + (i + 1)), z.id + ' : identifiants de la 1.4.0 inchangés');
+  const parTheme = {}; z.questions.forEach((q) => { assert.ok(/^[a-z-]{3,20}$/.test(q.th || ''), q.id + ' : sous-thème'); parTheme[q.th] = (parTheme[q.th] || 0) + 1; });
+  assert.ok(Object.keys(parTheme).length >= 3 && Object.values(parTheme).every((k) => k >= 3), z.id + ' : sous-thèmes ' + JSON.stringify(parTheme));
   const positions = new Set();
   z.questions.forEach((q) => {
     assert.ok(/^[a-z0-9]{1,8}$/.test(q.id) && !idsQ.has(q.id), 'identifiant ' + q.id); idsQ.add(q.id);
@@ -196,4 +200,4 @@ assert.strictEqual(A.prochaineAction(dp).vers, '#/explorer/pistes', 'un essai su
 const dpl = dossier(question()); for (let i = 0; i < 9; i++) dpl.questions[0].parties[1].points.push(pt('point ' + i));
 dpl.comprendre = { epreuve: { meilleur: 3, dernier: 3, le: '', essais: 1, rates: [] } };
 assert.strictEqual(A.prochaineAction(dpl).vers, '#/comprendre/plan', 'quiz du plan quand le plan prend forme');
-console.log('quiz : 2 quiz de 10 questions, données, dossier, hauts faits et prochaine étape vérifiés');
+console.log('quiz : 2 quiz de ' + D.COMPRENDRE.map((z) => z.questions.length).join(' et ') + ' questions, données, dossier, hauts faits et prochaine étape vérifiés');

@@ -220,3 +220,20 @@ dialog::backdrop { background: rgba(0, 0, 0, .55); } dialog h2 { margin-top: 0; 
 .marque { font-weight: 700; } .option.juste .marque { color: var(--ok); } .option.faux .marque { color: var(--danger); }
 .retour-quiz { border-left: 4px solid var(--ok); } .retour-quiz.faux { border-left-color: var(--alerte); background: var(--alerte-fond); } .retour-quiz.juste { background: var(--ok-fond); }
 .score { font: 700 2rem var(--titre); margin: .2rem 0; color: var(--encre); }
+
+/* Le suivi (1.5.0) : voyant d'absence, filtres du tableau, frise des visites, hauts faits datés. */
+.voyant { display: inline-block; font-weight: 700; color: var(--alerte); background: var(--alerte-fond); border: 1px solid var(--alerte); border-radius: 8px; padding: 1px 8px; margin: 2px 0; }
+.bilan-visites p { margin: .2rem 0 .5rem; } .voyant-icone { font-size: 1.1em; }
+.filtres { display: flex; flex-wrap: wrap; gap: 6px; }
+.filtres [aria-pressed="true"] { background: var(--fort); color: var(--sur-fort); border-color: var(--fort); font-weight: 700; }
+.tableau-classe tr.a-relancer th { border-left: 4px solid var(--alerte); }
+.chiffres-suivi { list-style: none; padding: 0; margin: 6px 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.chiffres-suivi li { background: var(--carte2); border-radius: 10px; padding: 6px 10px; } .chiffres-suivi b { font: 700 1.2rem var(--titre); }
+.mois h4 { margin: 12px 0 4px; font-size: .95rem; }
+.frise { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(24px, 1fr)); gap: 3px; max-width: 440px; }
+.frise li { font-size: .7rem; text-align: center; line-height: 22px; border: 1px solid var(--trait); border-radius: 5px; color: var(--doux); }
+.frise li.vu { background: var(--accent); border-color: var(--accent); color: var(--sur-fort); font-weight: 700; }
+.frise li.auj { outline: 2px solid var(--encre); outline-offset: 1px; } .frise li.futur { border-style: dashed; }
+.hf-chrono li { padding: 4px 0; border-bottom: 1px solid var(--trait); }
+.bloc-md .coche { margin-top: 0; }
+@media print { .filtres { display: none; } }

@@ -43,10 +43,13 @@ def essais(nav, Appareil, ok, base, prof, URL, CODE_PROF_A, classe_A, erreurs):
     S.p.wait_for_selector('[data-a=plus-pt]'); S.p.locator('[data-a=plus-pt]').nth(1).click(); S.p.keyboard.type('Un centre de données consomme comme une ville')
     S.p.goto(URL + '#/mots'); S.p.click('[data-a=plus-mot]'); S.p.keyboard.type('Centre de données')
     S.p.goto(URL + '#/sources'); S.p.click('[data-a=plus-source]'); S.p.keyboard.type('Rapport ADEME')
-    # un quiz « Vérifie que tu as compris » : 2 erreurs (e3, e6), puis le résultat part avec le dossier et le résumé
+    # un quiz « Vérifie que tu as compris » : une salve de 10, 2 erreurs (3e et 6e), puis le résultat part avec le dossier et le résumé
     S.p.goto(URL + '#/comprendre/epreuve'); S.p.click('[data-a=quiz-commencer]')
-    for i, b in enumerate(S.p.evaluate("HGDonnees.COMPRENDRE[0].questions.map((q) => q.b)")):
-        S.p.locator('label.option:has([value="%d"])' % ((b + 1) % 4 if i in (2, 5) else b)).click(); S.p.click('[data-a=quiz-valider]'); S.p.click('[data-a=quiz-suivant]')
+    banque = {q['id']: q for q in S.p.evaluate("HGDonnees.COMPRENDRE[0].questions")}; ratees = []
+    for i in range(10):
+        q = banque[S.p.get_attribute('.quiz-q', 'data-qid')]
+        if i in (2, 5): ratees.append(q)
+        S.p.locator('label.option:has([value="%d"])' % ((q['b'] + 1) % 4 if i in (2, 5) else q['b'])).click(); S.p.click('[data-a=quiz-valider]'); S.p.click('[data-a=quiz-suivant]')
     S.p.wait_for_selector('.score')
     S.etat('Enregistré')
     # --- le tableau de la classe ---
@@ -55,6 +58,20 @@ def essais(nav, Appareil, ok, base, prof, URL, CODE_PROF_A, classe_A, erreurs):
     ok('tableau : l’élève, son résumé, nouveau travail', 'Inès B.' in ligne and 'Le cloud est-il écologique ?' in ligne and 'Nouveau travail' in ligne)
     ok('tableau : les codes sont masqués par défaut', code_eleve not in ligne)
     ok('tableau : le score du quiz (résumé)', 'Quiz : Épreuve 8/10' in ligne, ligne)
+    ok('tableau : les hauts faits, leur nombre et le dernier gagné', '1 haut fait' in ligne and 'Dernier : Hello, world' in ligne, ligne.replace('\n', ' | '))
+    ok('tableau : les jours actifs sur 30 jours', '1 jour actif sur 30' in ligne, ligne)
+    ok('tableau : personne à relancer', 'Tous les élèves sont venu·e·s dans les deux dernières semaines.' in p.inner_text('.bilan-visites') and p.locator('.tableau-classe .voyant').count() == 0)
+    p.click('#derniers-hf summary')
+    ok('derniers hauts faits de la classe : qui, quoi, quand', 'Inès B.' in p.inner_text('#derniers-hf') and 'Hello, world' in p.inner_text('#derniers-hf'), p.inner_text('#derniers-hf'))
+    # le voyant : dernière visite il y a 20 jours (reproduction locale, données inventées)
+    base.psql("update grand_oral.eleves set vu_le = now() - interval '20 days', cree_le = now() - interval '30 days' where pseudo = 'Inès B.';")
+    p.reload(); p.wait_for_selector('.tableau-classe')
+    ok('voyant : sans visite depuis 20 jours, en texte et avec une icône', 'Sans visite depuis 20 jours' in p.inner_text('.tableau-classe .voyant') and '⚠' in p.inner_text('.tableau-classe .voyant'))
+    ok('voyant : le compteur en tête de classe', '1 élève sans visite depuis plus de deux semaines' in p.inner_text('.bilan-visites'), p.inner_text('.bilan-visites'))
+    p.click('[data-pa=filtre][data-v=relancer]')
+    ok('filtre « À relancer » : l’élève y est', p.locator('.tableau-classe tbody tr').count() == 1 and p.get_attribute('[data-pa=filtre][data-v=relancer]', 'aria-pressed') == 'true')
+    p.click('[data-pa=tri][data-v=visite]'); P.large('p2-voyant')
+    p.click('[data-pa=filtre][data-v=tous]'); p.click('[data-pa=tri][data-v=nom]')
     p.click('[data-pa=voir-code]')
     ok('tableau : un code révélé d’un clic', code_eleve in p.inner_text('.tableau-classe tbody'))
     p.click('[data-pa=voir-codes]')
@@ -63,7 +80,25 @@ def essais(nav, Appareil, ok, base, prof, URL, CODE_PROF_A, classe_A, erreurs):
     # --- le dossier de l'élève et les retours ---
     p.click('.tableau-classe th a'); p.wait_for_selector('.question-prof')
     qz = p.inner_text('#vue')
-    ok('dossier : les quiz, scores et questions ratées', 'Quiz de compréhension' in qz and 'meilleur score 8/10' in qz and 'Tu as 20 minutes de préparation' in qz and 'pas encore fait' in qz, qz[:400])
+    ok('dossier : les quiz, scores et questions ratées', 'Quiz de compréhension' in qz and 'meilleur score 8/10' in qz and ratees[0]['q'] in qz and ratees[1]['q'] in qz and 'pas encore fait' in qz, qz[:400])
+    ok('dossier : le nombre de questions différentes déjà vues', '10 questions différentes déjà vues sur 20' in qz)
+    ok('dossier : le voyant, en tête', 'Sans visite depuis 20 jours' in p.inner_text('#vue .voyant'))
+    # le suivi : jours de visite et hauts faits datés, puis l'export en Markdown
+    p.goto(p.url + '/suivi'); p.wait_for_selector('.frise')
+    sv = p.inner_text('#vue')
+    ok('suivi : jours actifs sur 7 et 30 jours, depuis le début, et « depuis le … »', p.locator('.chiffres-suivi li').first.text_content() == '1 sur les 7 derniers jours' and 'L’historique des visites commence le' in sv, sv[:600])
+    ok('suivi : la frise, avec son texte lisible', p.locator('.frise li.vu').count() == 1 and 'Jours de visite : le ' in sv)
+    ok('suivi : les hauts faits, avec leur date', p.locator('.hf-chrono li').count() >= 1 and 'Hello, world' in p.inner_text('.hf-chrono'))
+    P.large('p2-suivi')
+    with p.expect_download() as dl:
+        p.click('[data-pa=md-eleve]')
+    md = open(dl.value.path(), encoding='utf-8').read()
+    ok('Markdown d’un·e élève : son dossier, sans code', dl.value.suggested_filename.endswith('.md') and '# Dossier de Grand oral · Inès B.' in md and 'Le cloud est-il écologique ?' in md and code_eleve not in md, md[:300])
+    p.check('#md-eleve-code')
+    with p.expect_download() as dl:
+        p.click('[data-pa=md-eleve]')
+    ok('Markdown d’un·e élève : le code, sur demande', ('Code : ' + code_eleve) in open(dl.value.path(), encoding='utf-8').read())
+    p.goto(p.url.rsplit('/', 1)[0]); p.wait_for_selector('.question-prof')
     ok('dossier : le plan, avec les repères', 'P1' in p.inner_text('.question-prof') and 'Un centre de données consomme' in p.inner_text('.question-prof'))
     p.locator('.pt [data-pa=commenter]').first.click(); ecrire('Donne un chiffre précis.'); attendre('Retour envoyé.', '#toasts')
     p.click('[data-pa=valider][data-v=validee]'); ecrire('Question claire.'); attendre('Retour envoyé.', '#toasts')
@@ -129,6 +164,16 @@ def essais(nav, Appareil, ok, base, prof, URL, CODE_PROF_A, classe_A, erreurs):
         p.locator('[data-pa=exporter-classe]').first.click()
     ex = json.load(open(dl.value.path(), encoding='utf-8'))
     ok('export de la classe (JSON)', ex['ok'] and ex['classes'][0]['eleves'][0]['pseudo'] == 'Inès L.')
+    with p.expect_download() as dl:
+        p.click('[data-pa=md-classe]')
+    md = open(dl.value.path(), encoding='utf-8').read()
+    nouveau_code = ex['classes'][0]['eleves'][0]['code_affiche']
+    ok('toute la classe en Markdown : une section par élève, sans les codes', md.startswith('# Classe Terminale NSI B') and '## Inès L.' in md and 'Le cloud est-il écologique ?' in md and nouveau_code not in md and 'Donne un chiffre précis.' not in md, md[:300])
+    p.check('#md-classe-retours'); p.check('#md-classe-codes')
+    with p.expect_download() as dl:
+        p.click('[data-pa=md-classe]')
+    md = open(dl.value.path(), encoding='utf-8').read()
+    ok('toute la classe en Markdown : retours et codes sur demande', nouveau_code in md and 'Donne un chiffre précis.' in md)
     p.fill('#prof-renommer-classe', 'TNSI B'); p.click('[data-pa=renommer-classe]'); attendre('Classe renommée.', '#toasts')
     p.click('[data-pa=inscriptions]'); attendre('fermées', '.lien-classe')
     s2, rr = base.appel('go_inscription', {'p_code_classe': code_classe, 'p_pseudo': 'Léo P.'})

@@ -9,10 +9,10 @@
   // worker et les caches de Hello GO effacés, puis la page rechargée à une adresse neuve), puis on explique, avec les détails
   // techniques à recopier. Le dossier de l'élève (localStorage) n'est jamais touché. Le même message est écrit dans
   // index.html (HG_PANNE), pour le cas où ce fichier-ci ne peut pas s'exécuter : les deux textes vont ensemble.
-  const VERSION_APP = '1.4.0'; // la même que HG_VERSION (index.html), sw.js et les ?v= de index.html (tests/versions.test.js)
+  const VERSION_APP = '1.5.0'; // la même que HG_VERSION (index.html), sw.js et les ?v= de index.html (tests/versions.test.js)
   window.HG_VERSION_APP = VERSION_APP;
   const MODULES = [['HGDonnees', 'js/donnees.js'], ['HGDecouvertes', 'js/decouvertes.js'], ['HGAnalyse', 'js/coach.js'],
-    ['HGRetours', 'js/retours.js'], ['HGEnLigne', 'js/en-ligne.js'], ['HGProf', 'js/prof.js']];
+    ['HGRetours', 'js/retours.js'], ['HGExport', 'js/export.js'], ['HGEnLigne', 'js/en-ligne.js'], ['HGProf', 'js/prof.js']];
   const CLE_REPARATION = 'hellogo:reparation', BASE = new URL('./', location.href).href;
   function oublierHelloGo() {
     // Le service worker et les caches de Hello GO seulement : ceux des autres applications de babash.github.io restent.
@@ -189,8 +189,9 @@
     if (!A.dossierValide(distant) || (fusion && !A.dossierValide(fusion))) { montrerEtat('erreur'); return; }
     const prenom = d.profil.prenom, s = EL.session();
     d = Object.assign(dossierNeuf(), JSON.parse(JSON.stringify(fusion || distant))); d.profil = Object.assign({}, d.profil, { vu: true, prenom: (s && s.pseudo) || prenom });
+    const visite = noterVisite(); // le dossier du compte n'a pas encore le jour d'aujourd'hui (premier chargement sur cet appareil)
     garderBase(distant); ecrire(true);
-    const encore = !!fusion && JSON.stringify(fusion) !== JSON.stringify(distant);
+    const encore = (!!fusion && JSON.stringify(fusion) !== JSON.stringify(distant)) || visite;
     EL.majSession({ version: version, attente: encore }); montrerEtat(encore ? 'attente' : 'ok'); if (encore) planifierEnvoi();
     if (!appliquerRetours()) { if (forcer) rendre(); else rendreSiLibre(); }
   }
@@ -524,6 +525,7 @@
         <button class="ajouter" data-a="plus-pt" data-q="${q.id}" data-partie="${p.id}">+ Ajouter un point</button></section>`).join('')}
       <p class="bas"><button data-a="plus-axe" data-q="${q.id}">+ Ajouter un axe</button>
         <button class="principal" data-a="pdf" data-q="${q.id}">Télécharger en PDF</button></p>
+      ${blocMarkdown()}
       <p class="bas"><button class="discret danger" data-a="suppr-question" data-q="${q.id}">Supprimer cette question</button></p>`;
   };
 
@@ -581,7 +583,10 @@
     return `<h1>Mes hauts faits</h1><p class="chapo">${n} sur ${A.HAUTS_FAITS.length}. Ils récompensent les bonnes habitudes, pas la quantité.</p>
     ${groupes.map((g) => `<h2>${e(g)}</h2><ul class="hf">${A.HAUTS_FAITS.filter((h) => h.g === g).map((h) => { const ok = d.hf[h.id];
       return `<li class="${ok ? 'gagne' : ''}"><span class="medaille" aria-hidden="true">${ok ? '★' : h.cache ? '?' : '☆'}</span><div><b>${ok || !h.cache ? e(h.titre) : '???'}</b>
-        <p>${ok ? e(h.pourquoi) : e(h.cache ? h.indice : h.cond)}</p></div></li>`; }).join('')}</ul>`).join('')}`;
+        <p>${ok ? e(h.pourquoi) : e(h.cache ? h.indice : h.cond)}</p>${ok ? `<p class="note">${/^[0-9]{4}-[0-9]{2}-[0-9]{2}/.test(ok) ? 'Gagné le ' + e(dateLongue(ok)) : 'Date inconnue'}</p>` : ''}</div></li>`; }).join('')}</ul>`).join('')}`;
+  };
+  // « 2026-11-17 » devient « 17 novembre 2026 ».
+  function dateLongue(j) { const p = String(j).slice(0, 10).split('-'); return new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
   };
 
   // L'évaluation de l'enseignant·e se montre après l'auto-évaluation complète : l'élève se juge d'abord, puis compare.
@@ -654,7 +659,7 @@
         <ul><li>coefficient 8, et non plus 10 ;</li><li>10 minutes d’exposé, puis 10 minutes d’échange ;</li><li>deux questions qui ne portent pas sur la même spécialité.</li></ul>
         <p>En cas de différence, c’est ${ici ? 'cette page' : 'la page <a href="#/aide/epreuve">« Comprendre l’épreuve »</a>'} qui fait foi.</p></div></div>`; };
   const boutonQuiz = (id) => { const z = D.COMPRENDRE.find((x) => x.id === id), r = (d.comprendre || {})[id];
-    return `<p><a class="bouton" href="#/comprendre/${id}">${e(z.titre)}</a> <span class="note">${quizEnCours && quizEnCours.id === id && !quizEnCours.fini ? 'en cours' : r && r.essais ? 'meilleur score : ' + r.meilleur + ' sur ' + z.questions.length : '10 questions'}</span></p>`; };
+    return `<p><a class="bouton" href="#/comprendre/${id}">${e(z.titre)}</a> <span class="note">${quizEnCours && quizEnCours.id === id && !quizEnCours.fini ? 'en cours' : r && r.essais ? 'meilleur score : ' + r.meilleur + ' sur ' + A.surSalve(z) : A.surSalve(z) + ' questions'}</span></p>`; };
   vues.aide = (cible) => `<h1>Aide et méthode</h1>
     <section class="carte" id="epreuve"${cible === 'epreuve' ? ' data-cible' : ''}><h2>Comprendre l’épreuve (session 2027)</h2><ul>
       <li><b>Avant :</b> tu prépares deux questions avec tes enseignant·e·s. Elles ne portent pas sur la même spécialité ; une question peut être transversale.</li>
@@ -682,7 +687,12 @@
   // Échappé, avec une espace fine insécable avant « ? ! : ; » et après « (le signe ne part pas seul à la ligne).
   const typo = (t) => e(t).replace(/ ([?!:;»])/g, '&#x202F;$1').replace(/« /g, '«&#x202F;');
   function melanger(n) { const l = [...Array(n).keys()]; for (let i = n - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [l[i], l[j]] = [l[j], l[i]]; } return l; }
-  function etatQuiz(z) { const r = (d.comprendre || {})[z.id]; return r && r.essais ? `Meilleur score : ${r.meilleur} sur ${z.questions.length} · dernier : ${r.dernier} sur ${z.questions.length} · ${pluriel(r.essais, 'essai')}` : 'Pas encore fait'; }
+  function etatQuiz(z) { const r = (d.comprendre || {})[z.id], t = A.surSalve(z); return r && r.essais ? `Meilleur score : ${r.meilleur} sur ${t} · dernier : ${r.dernier} sur ${t} · ${pluriel(r.essais, 'essai')}` : 'Pas encore fait'; }
+  // Combien de questions de la banque l'élève a déjà vues, et par où commencera le prochain essai.
+  function noteVues(z) { const v = A.suiviQuiz(d, z).nVues, t = z.questions.length;
+    return `<p class="note">Questions déjà vues : ${v} sur ${t}${v ? (v < t ? ' : le prochain essai commence par celles que tu n’as pas encore vues.' : ' : le prochain essai commence par celles que tu as ratées.') : '.'}</p>`; }
+  // Les questions qu'une salve tire : celles de l'essai en cours, dans l'ordre de la salve.
+  const questionsDe = (Q, z) => Q.ids.map((k) => z.questions.find((q) => q.id === k)).filter(Boolean);
   function blocComprendre() {
     if (D.COMPRENDRE.every((z) => A.quizEssaye(d, z.id))) return '';
     return `<section class="carte"><h2>Vérifie que tu as compris</h2><p>Deux quiz de 10 questions, avec une explication après chaque réponse. Ce n’est pas noté.</p>
@@ -692,20 +702,21 @@
     const z = leQuiz(id);
     if (!z) return `<h1>Vérifie que tu as compris</h1><p class="chapo">Deux quiz de 10 questions. Après chaque réponse, une explication. Ce n’est pas noté : refais-les autant que tu veux.</p>
       ${D.COMPRENDRE.map((x) => `<a class="carte lien-carte" href="#/comprendre/${x.id}"><p class="gros">${typo(x.titre)}</p><p class="note">${e(etatQuiz(x))}</p></a>`).join('')}`;
-    const tete = `<p class="retour"><a href="#/comprendre">← Les quiz</a></p><h1>${typo(z.titre)}</h1>`, n = z.questions.length, Q = quizEnCours;
+    const tete = `<p class="retour"><a href="#/comprendre">← Les quiz</a></p><h1>${typo(z.titre)}</h1>`, Q = quizEnCours;
     if (!Q || Q.id !== id) return tete + `<p class="chapo">${e(z.chapo)}</p>${id === 'epreuve' ? blocVideo(false) : ''}
-      <section class="carte"><p class="sur-titre">Tes résultats</p><p>${e(etatQuiz(z))}</p></section>
+      <section class="carte"><p class="sur-titre">Tes résultats</p><p>${e(etatQuiz(z))}</p>${noteVues(z)}</section>
       <p><button class="principal" data-a="quiz-commencer" data-q="${id}">${A.quizEssaye(d, id) ? 'Refaire le quiz' : 'Commencer'}</button></p>`;
+    const qs = questionsDe(Q, z), n = qs.length;
     if (Q.fini) {
-      const juste = Q.reponses.filter((k, i) => k === z.questions[i].b).length, rates = z.questions.filter((q, i) => Q.reponses[i] !== q.b);
+      const juste = Q.reponses.filter((k, i) => k === qs[i].b).length, rates = qs.filter((q, i) => Q.reponses[i] !== q.b);
       const mot = juste === n ? 'Sans faute : tu as tout compris. Bravo !' : juste >= 7 ? 'Presque tout est clair. Revois les points ci-dessous, puis refais le quiz quand tu veux.'
         : 'Ce quiz sert à repérer ce qui reste flou : revois les points ci-dessous, puis refais-le quand tu veux.';
       const autre = D.COMPRENDRE.find((x) => x.id !== id && !A.quizEssaye(d, x.id));
-      return tete + `<section class="carte action" id="quiz-fin"><p class="sur-titre">Ton résultat</p><p class="score" tabindex="-1">${juste} sur ${n}</p><p>${mot}</p></section>
+      return tete + `<section class="carte action" id="quiz-fin"><p class="sur-titre">Ton résultat</p><p class="score" tabindex="-1">${juste} sur ${n}</p><p>${mot}</p>${noteVues(z)}</section>
         ${rates.length ? `<h2>Les points à revoir</h2><ul class="liste">${rates.map((q) => `<li class="carte"><p><b>${e(q.q)}</b></p><p>La bonne réponse : ${e(q.o[q.b][0])}</p><p class="note">${e(pourquoiJuste(q))}</p><p><a href="${q.r[0]}">Revoir : ${e(q.r[1])}</a></p></li>`).join('')}</ul>` : ''}
         <p class="bas"><button class="principal" data-a="quiz-commencer" data-q="${id}">Refaire le quiz</button>${autre ? `<a class="bouton" href="#/comprendre/${autre.id}">${e(autre.titre)}</a>` : '<a class="bouton" href="#/aide">Aide et méthode</a>'}</p>`;
     }
-    const q = z.questions[Q.i], rep = Q.reponses[Q.i], valide = rep !== undefined, ordre = Q.ordres[Q.i];
+    const q = qs[Q.i], rep = Q.reponses[Q.i], valide = rep !== undefined, ordre = Q.ordres[Q.i];
     const option = (k) => { const choisie = valide ? rep === k : Q.choix === k, bonne = k === q.b;
       const etat = valide ? (bonne ? ' juste' : choisie ? ' faux' : '') : '';
       const marque = valide && bonne ? '<b class="marque">Bonne réponse · </b>' : valide && choisie ? '<b class="marque">Ta réponse · </b>' : '';
@@ -715,7 +726,7 @@
         ${rep === q.b ? '' : `<p><b>La bonne réponse :</b> ${e(q.o[q.b][0])}</p><p>${e(pourquoiJuste(q))}</p>`}
         <p><a href="${q.r[0]}">Revoir : ${e(q.r[1])}</a></p></div>` : '';
     return tete + `<p class="sur-titre">Question ${Q.i + 1} sur ${n}</p><div class="avance" aria-hidden="true"><span style="width:${Math.round(100 * (Q.i + (valide ? 1 : 0)) / n)}%"></span></div>
-      <fieldset class="carte quiz-q"><legend id="quiz-question" tabindex="-1">${typo(q.q)}</legend>${ordre.map(option).join('')}</fieldset>
+      <fieldset class="carte quiz-q" data-qid="${e(q.id)}"><legend id="quiz-question" tabindex="-1">${typo(q.q)}</legend>${ordre.map(option).join('')}</fieldset>
       <div aria-live="polite">${retour}</div>
       <p class="bas"><span></span>${valide ? `<button class="principal" data-a="quiz-suivant">${Q.i + 1 < n ? 'Question suivante' : 'Voir mon résultat'}</button>` : '<button class="principal" data-a="quiz-valider">Valider ma réponse</button>'}</p>`;
   };
@@ -728,6 +739,10 @@
       <ul class="points lecture">${p.points.map((pt) => `<li class="pt"><div class="corps"><p>${e(pt[1])}</p><span class="etq">${e((D.ETIQUETTES.find((t) => t[0] === pt[0]) || ['', ''])[1])}</span></div></li>`).join('')}</ul></section>`).join('')}
     <h2>Le lexique</h2>${x.mots.map((m) => `<section class="carte"><b>${e(m.mot)}</b><p><span class="note">Source :</span> ${e(m.defSource)}</p><p><span class="note">Avec mes mots :</span> ${e(m.defMoi)}</p><p><span class="note">Image :</span> ${e(m.analogie)}</p></section>`).join('')}`; };
 
+  // Le dossier en Markdown (js/export.js) : un texte lisible tel quel, et une fois rendu. Sans les retours de
+  // l'enseignant·e, sauf si la case est cochée.
+  const blocMarkdown = () => `<div class="bloc-md"><p><button data-a="markdown">Télécharger mon dossier en Markdown</button></p>
+      ${enLigne() && retoursProf.items.length ? '<label class="coche"><input type="checkbox" id="md-retours"> Inclure les retours de mon enseignant·e</label>' : ''}</div>`;
   vues.reglages = () => { const s = EL.session(); return `<h1>Réglages</h1>
     ${s ? `<section class="carte"><h2>Mon compte</h2><p><b>${e(s.pseudo)}</b>, classe ${e(s.classe)} (${e(s.enseignant)}).</p>
       <p>Mon code : <span class="code-eleve petit" id="mon-code" hidden>${e(s.code)}</span> <button class="mini" data-a="voir-code" aria-controls="mon-code">Voir mon code</button></p>
@@ -737,7 +752,9 @@
     : `<section class="carte"><h2>Mon prénom</h2>${champ('profil.prenom', d.profil.prenom, 'maxlength="24" aria-label="Mon prénom"')}</section>${blocRejoindre()}`}
     <section class="carte"><h2>Mon dossier</h2>
       ${s ? '<p>Ton dossier est gardé en ligne et sur cet appareil. Tu peux aussi en télécharger une copie.</p>' : '<p>Ton dossier est gardé <b>sur cet appareil seulement</b>. Pour le sauvegarder ou le passer sur un autre appareil, télécharge-le, puis importe-le.</p>'}
-      <p><button data-a="exporter">Télécharger mon dossier</button> <label class="bouton fichier">Importer un dossier<input type="file" id="import" accept="application/json,.json"></label></p></section>
+      <p><button data-a="exporter">Télécharger mon dossier</button> <label class="bouton fichier">Importer un dossier<input type="file" id="import" accept="application/json,.json"></label></p>
+      <p class="note">Ce fichier (JSON) sert à sauvegarder ton dossier et à l’importer. Pour le lire, le relire ou le partager, prends plutôt le Markdown :</p>
+      ${blocMarkdown()}</section>
     ${s ? '' : `<section class="carte"><h2>Tout effacer</h2><p>Pour effacer ton dossier de cet appareil, écris EFFACER, puis valide. C’est définitif.</p>
       <input type="text" id="confirmer" aria-label="Écris EFFACER pour confirmer" autocomplete="off"><button class="danger" data-a="effacer">Effacer mon dossier</button></section>`}
     <p class="note">Hello GO, version ${window.HG_VERSION}.</p>`; };
@@ -882,7 +899,7 @@
 
   // ---------- Les actions ----------
   const actions = {
-    demarrer() { d.profil.prenom = ($('#prenom').value || '').trim().slice(0, 24); d.profil.vu = true; enregistrer(true); location.hash = '#/'; rendre(false); },
+    demarrer() { d.profil.prenom = ($('#prenom').value || '').trim().slice(0, 24); d.profil.vu = true; noterVisite(); enregistrer(true); location.hash = '#/'; rendre(false); },
     'autre-savoir'() { d.vus.decalage = (d.vus.decalage || 0) + 1; enregistrer(); rendre(); },
     reagir(b) { d.decouverte.reactions[b.dataset.n] = +b.dataset.v; delete d.vus.suite; enregistrer(true); rendre(false); focusCarte(); },
     'suite-cartes'() { d.vus.suite = 1; enregistrer(); rendre(false); focusCarte(); },
@@ -916,6 +933,11 @@
     lier(b) { ouvrirLiens(b.dataset.q, b.dataset.p, b.dataset.t); },
     'fermer-dialogue'() { $('#dialogue').close('annuler'); },
     pdf(b) { faireLePdf(laQuestion(b.dataset.q), b); },
+    markdown() { ecrire(); const avec = !!($('#md-retours') && $('#md-retours').checked);
+      const t = window.HGExport.dossier(d, { retours: retoursProf, avecRetours: avec });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([t], { type: 'text/markdown;charset=utf-8' }));
+      a.download = 'hello-go-' + nomDeFichier(d.profil.prenom || 'dossier') + '-' + new Date().toISOString().slice(0, 10) + '.md'; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000); toast('Ton dossier en Markdown est téléchargé.'); },
     exporter() { ecrire(); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(d, null, 1)], { type: 'application/json' }));
       a.download = 'hello-go-' + nomDeFichier(d.profil.prenom || 'dossier') + '-' + new Date().toISOString().slice(0, 10) + '.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); },
     effacer() { if ($('#confirmer').value.trim() !== 'EFFACER') return toast('Écris EFFACER dans la case pour confirmer.'); d = dossierNeuf(); ecrire(); location.hash = '#/'; rendre(false); },
@@ -973,18 +995,16 @@
       const su = d.suivi = d.suivi || {}; su.ressources = su.ressources || {}; su.ressources[x.id] = 'ajoutee'; enregistrer(true); rendre(); toast('Ajoutée à tes sources : note ce que tu en retiens.'); },
     'ressource-plus-tard'(b) { const su = d.suivi = d.suivi || {}; su.ressources = su.ressources || {}; su.ressources[b.dataset.r] = 'plus-tard'; enregistrer(true); rendre(); },
     'effacer-a-part'() { try { localStorage.removeItem(CLE_APART); } catch (x) { /* rien */ } location.hash = '#/'; },
-    'quiz-commencer'(b) { const z = leQuiz(b.dataset.q); quizEnCours = { id: z.id, i: 0, choix: null, reponses: [], ordres: z.questions.map(() => melanger(4)), fini: false };
+    'quiz-commencer'(b) { const z = leQuiz(b.dataset.q), ids = A.tirerSalve(d, z); quizEnCours = { id: z.id, ids: ids, i: 0, choix: null, reponses: [], ordres: ids.map(() => melanger(4)), fini: false };
       rendre(false); focusQuiz('#quiz-question'); },
     'quiz-valider'() { const Q = quizEnCours; if (!Q) return; if (Q.choix === null) return toast('Choisis d’abord une réponse.');
       Q.reponses[Q.i] = Q.choix; rendre(); focusQuiz('#quiz-retour'); },
     'quiz-suivant'() { const Q = quizEnCours, z = Q && leQuiz(Q.id); if (!z) return;
       Q.i++; Q.choix = null;
-      if (Q.i < z.questions.length) { rendre(false); focusQuiz('#quiz-question'); return; }
+      const qs = questionsDe(Q, z);
+      if (Q.i < qs.length) { rendre(false); focusQuiz('#quiz-question'); return; }
       Q.fini = true;
-      const juste = Q.reponses.filter((k, i) => k === z.questions[i].b).length, avant = (d.comprendre || {})[z.id] || {};
-      d.comprendre = d.comprendre || {};
-      d.comprendre[z.id] = { meilleur: Math.max(avant.meilleur || 0, juste), dernier: juste, le: new Date().toISOString().slice(0, 10), essais: (avant.essais || 0) + 1,
-        rates: z.questions.filter((q, i) => Q.reponses[i] !== q.b).map((q) => q.id) };
+      A.noterSalve(d, z, qs.map((q) => q.id), qs.map((q, i) => Q.reponses[i] === q.b));
       enregistrer(true); rendre(false); focusQuiz('#quiz-fin .score'); },
     logo() { const t = Date.now(); touches = t - dernier < 600 ? touches + 1 : 1; dernier = t; if (touches >= 7) { touches = 0; secret(); } },
   };
@@ -999,7 +1019,7 @@
     else if (!garderLocal && dossierRempli()) { const t = R.textesAbsents(d, {}); if (t.length) mettreDeCote(t); }
     if (!garderLocal) d = dossierNeuf();
     if (neuf || !d.profil.prenom) d.profil.prenom = r.pseudo;
-    d.profil.vu = true; sessionExpiree = false; retoursProf = R.vides(); EL.garderRetours(null);
+    d.profil.vu = true; noterVisite(); sessionExpiree = false; retoursProf = R.vides(); EL.garderRetours(null);
     if (!(avant && avant.code === r.code_affiche)) garderBase(null);
     ecrire(true); if (EL.session().attente) envoyer();
   }
@@ -1094,13 +1114,18 @@
   // Une adresse vers une fiche ou une section (#/aide/<id>, liens « Revoir » des quiz) : elle est ouverte, montrée et prend le focus.
   window.addEventListener('hashchange', () => { rendre(false); window.scrollTo(0, 0); $('#vue').focus({ preventScroll: true });
     const c = $('#vue [data-cible]'); if (c) { const t = $('summary, h2', c); if (t) { t.tabIndex = t.tagName === 'SUMMARY' ? 0 : -1; t.focus({ preventScroll: true }); } c.scrollIntoView({ block: 'start' }); } });
+  // Le jour de visite, pour l'historique que voit l'enseignant·e (d.visites, version 1.5.0) : noté à l'ouverture et au
+  // retour sur la page (elle peut rester ouverte d'un jour à l'autre), jamais depuis l'espace de l'enseignant·e.
+  function noterVisite() { return d.profil.vu && !/^#\/prof/.test(location.hash) && A.noterVisite(d); }
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && window.HG_DEMARRE && noterVisite()) enregistrer(true); });
   // Un jour de travail de plus (sans jamais rien retirer : pas de série à tenir).
   // Un haut fait gagné au chargement (« Nage droit devant », au 5e jour) est annoncé comme les autres, et enregistré.
   try {
     const nouveauJour = (function () { const jour = Math.floor(Date.now() / 864e5); if (d.vus.jour !== jour) { d.vus.jour = jour; d.compteurs.jours = (d.compteurs.jours || 0) + 1; return true; } return false; })();
+    const visite = noterVisite();
     const gagnes = A.majHautsFaits(d); rendre(false);
     window.HG_DEMARRE = true; try { sessionStorage.removeItem(CLE_REPARATION); } catch (x) { /* rien */ }
-    if (d.profil.vu && (nouveauJour || gagnes.length)) ecrire();
+    if (d.profil.vu && (nouveauJour || visite || gagnes.length)) ecrire();
     if (d.profil.vu) gagnes.forEach((h) => toast('Haut fait débloqué : ' + h.titre, '#/hauts-faits', 'Voir'));
     if (EL.session()) { if (EL.session().attente) montrerEtat('attente'); reprendre().then(interroger); }
     if (!memoireOk) toast('Ce navigateur ne garde pas ton dossier.');

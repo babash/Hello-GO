@@ -12,9 +12,16 @@
   const CLE_CODE = 'hellogo:prof:code', CLE_VUS = 'hellogo:prof:vus';
   const date = (x) => x ? new Date(x).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'jamais';
   const lien = () => location.origin + location.pathname + '#/classe/';
+  // Le suivi (version 1.5.0). Une date du dossier (AAAA-MM-JJ) ou du résumé (AAMMJJ, compacte), relue avant d'être montrée.
+  const jourDe = (x) => { const s = String(x || ''), m = /^([0-9]{4})-([0-9]{2})-([0-9]{2})$/.exec(s) || (/^([0-9]{2})([0-9]{2})([0-9]{2})$/.test(s) ? ['', '20' + s.slice(0, 2), s.slice(2, 4), s.slice(4, 6)] : null);
+    return m && +m[2] >= 1 && +m[2] <= 12 && +m[3] >= 1 && +m[3] <= 31 ? m[1] + '-' + m[2] + '-' + m[3] : null; };
+  const dateJour = (j, long) => { const x = jourDe(j); if (!x) return 'date inconnue'; const p = x.split('-');
+    return new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString('fr-FR', long ? { day: 'numeric', month: 'long', year: 'numeric' } : { day: 'numeric', month: 'short', year: 'numeric' }); };
+  const titreHf = (id) => { const h = A.HAUTS_FAITS.find((x) => x.id === id); return h ? h.titre : null; };
+  const pl = (n, un, plusieurs) => n + ' ' + (n > 1 ? plusieurs : un);
 
   // ---------- L'état de la page ----------
-  const P = { code: null, ouvert: null, classe: null, eleve: null, nouveauCode: null, charge: {}, ia: null, codesVus: false };
+  const P = { code: null, ouvert: null, classe: null, eleve: null, nouveauCode: null, charge: {}, ia: null, codesVus: false, filtre: 'tous', tri: 'nom' };
   function lireCode() { try { return sessionStorage.getItem(CLE_CODE) || localStorage.getItem(CLE_CODE); } catch (x) { return null; } }
   function garderCode(code, resterConnecte) {
     try { sessionStorage.setItem(CLE_CODE, code); if (resterConnecte) localStorage.setItem(CLE_CODE, code); else if (localStorage.getItem(CLE_CODE) !== null) localStorage.setItem(CLE_CODE, code); } catch (x) { /* mémoire de la page seulement */ }
@@ -112,7 +119,13 @@
   function vueClasse() {
     const c = P.classe;
     if (c.erreur) return `<p class="retour"><a href="#/prof">← Mon espace</a></p><p class="erreur">${e(c.erreur)}</p>`;
-    const k = c.classe, v = vus(), l = lien() + k.code;
+    const k = c.classe, v = vus(), l = lien() + k.code, maintenant = new Date();
+    // Le voyant : plus de 14 jours sans visite (d'après la base), ou jamais revenu·e depuis l'inscription.
+    const lignes = c.eleves.map((x) => ({ x: x, a: A.absence(x.vu_le, x.cree_le, maintenant) }));
+    const absents = lignes.filter((y) => y.a.alerte).length, jamais = lignes.filter((y) => y.a.jamaisRevenu).length, aRelancer = lignes.filter((y) => y.a.alerte || y.a.jamaisRevenu);
+    let montres = P.filtre === 'relancer' ? aRelancer : lignes.slice();
+    if (P.tri === 'visite') montres = montres.slice().sort((a, b) => (b.a.jours === null ? 1e9 : b.a.jours) - (a.a.jours === null ? 1e9 : a.a.jours) || String(a.x.pseudo).localeCompare(String(b.x.pseudo), 'fr'));
+    else montres = montres.slice().sort((a, b) => String(a.x.pseudo).localeCompare(String(b.x.pseudo), 'fr'));
     return `<p class="retour"><a href="#/prof">← Mon espace</a></p>
     <h1>${e(k.nom)}</h1>
     <section class="carte lien-classe"><h2>Le lien de la classe</h2>
@@ -121,20 +134,31 @@
         <p><button class="mini" data-pa="copier-lien">Copier le lien</button></p>
         <p>Inscriptions ${k.ouverte ? '<b>ouvertes</b>' : '<b>fermées</b>'} <button class="mini" data-pa="inscriptions" data-v="${k.ouverte ? '0' : '1'}">${k.ouverte ? 'Fermer' : 'Ouvrir'} les inscriptions</button></p></div></div></section>
     <h2>Les élèves (${c.eleves.length})</h2>
-    ${c.eleves.length ? `<p><button class="mini" data-pa="voir-codes">${P.codesVus ? 'Masquer les codes' : 'Voir tous les codes'}</button> <button class="mini" data-pa="imprimer-codes">Imprimer les codes</button></p>
-    <div class="tableau-classe"><table><thead><tr><th scope="col">Élève</th><th scope="col">Avancement</th><th scope="col">Dernière visite</th><th scope="col">Code</th><th scope="col">Actions</th></tr></thead><tbody>
-    ${c.eleves.map((x) => { const r = x.resume || {}, neuf = x.dossier_version > (v[x.id] || 0);
-      return `<tr><th scope="row"><a href="#/prof/eleve/${e(x.id)}">${e(x.pseudo)}</a>${neuf ? ' <span class="nouveau">Nouveau travail</span>' : ''}</th>
-      <td>${resumeHtml(r)}</td><td>${e(date(x.vu_le))}</td>
+    ${c.eleves.length ? `<div class="carte ${absents || jamais ? 'alerte ' : ''}bilan-visites" role="status">${absents || jamais
+        ? `<p><span class="voyant-icone" aria-hidden="true">⚠</span> <b>${absents ? pl(absents, 'élève sans visite', 'élèves sans visite') + ' depuis plus de deux semaines' : ''}${absents && jamais ? ' · ' : ''}${jamais ? pl(jamais, 'élève jamais revenu·e', 'élèves jamais revenu·e·s') + ' depuis l’inscription' : ''}</b></p>`
+        : '<p><span aria-hidden="true">✓</span> Tous les élèves sont venu·e·s dans les deux dernières semaines.</p>'}
+      <div class="filtres" role="group" aria-label="Afficher et trier"><button class="mini" data-pa="filtre" data-v="tous" aria-pressed="${P.filtre !== 'relancer'}">Tous les élèves (${lignes.length})</button><button class="mini" data-pa="filtre" data-v="relancer" aria-pressed="${P.filtre === 'relancer'}">À relancer (${aRelancer.length})</button>
+        <button class="mini" data-pa="tri" data-v="nom" aria-pressed="${P.tri !== 'visite'}">Trier par prénom</button><button class="mini" data-pa="tri" data-v="visite" aria-pressed="${P.tri === 'visite'}">Trier par dernière visite</button></div></div>
+    <p><button class="mini" data-pa="voir-codes">${P.codesVus ? 'Masquer les codes' : 'Voir tous les codes'}</button> <button class="mini" data-pa="imprimer-codes">Imprimer les codes</button></p>
+    ${montres.length ? '' : '<p class="vide">Aucun·e élève à relancer.</p>'}
+    <div class="tableau-classe"><table><thead><tr><th scope="col">Élève</th><th scope="col">Avancement</th><th scope="col">Hauts faits</th><th scope="col">Dernière visite</th><th scope="col">Code</th><th scope="col">Actions</th></tr></thead><tbody>
+    ${montres.map((y) => { const x = y.x, r = x.resume || {}, neuf = x.dossier_version > (v[x.id] || 0);
+      return `<tr${y.a.alerte || y.a.jamaisRevenu ? ' class="a-relancer"' : ''}><th scope="row"><a href="#/prof/eleve/${e(x.id)}">${e(x.pseudo)}</a>${neuf ? ' <span class="nouveau">Nouveau travail</span>' : ''}</th>
+      <td>${resumeHtml(r)}</td><td>${hautsFaitsHtml(r)}</td><td>${visiteHtml(x, y.a, r, maintenant)}</td>
       <td><span class="code-masque" data-code="${e(x.id)}">${P.codesVus ? e(x.code_affiche) : '••••••'}</span> ${P.codesVus ? '' : `<button class="mini" data-pa="voir-code" data-e="${e(x.id)}" aria-label="Voir le code de ${e(x.pseudo)}">Voir</button>`}</td>
       <td class="actions"><a class="bouton mini" href="#/prof/eleve/${e(x.id)}">Dossier</a><button class="mini" data-pa="renommer-eleve" data-e="${e(x.id)}">Renommer</button>
         <button class="mini" data-pa="code-eleve" data-e="${e(x.id)}">Nouveau code</button><button class="mini danger" data-pa="supprimer-eleve" data-e="${e(x.id)}">Supprimer</button></td></tr>`; }).join('')}
-    </tbody></table></div>` : `<p class="vide">Aucun·e élève pour le moment. Donnez le lien ou le QR code de la classe.</p>`}
+    </tbody></table></div>
+    ${derniersHautsFaits(c.eleves)}` : `<p class="vide">Aucun·e élève pour le moment. Donnez le lien ou le QR code de la classe.</p>`}
     <section class="codes-impression" aria-hidden="true"><h1>${e(k.nom)} : les codes Hello GO</h1><p>Lien de la classe : ${e(l)}</p>
       <table><tbody>${c.eleves.map((x) => `<tr><td>${e(x.pseudo)}</td><td class="code-eleve petit">${e(x.code_affiche)}</td></tr>`).join('')}</tbody></table></section>
     <section class="carte"><h2>Réglages de la classe</h2>
       <div class="ligne-champ"><input type="text" id="prof-renommer-classe" maxlength="40" value="${e(k.nom)}" aria-label="Nom de la classe"><button data-pa="renommer-classe">Renommer</button></div>
-      <p><button data-pa="exporter-classe">Exporter cette classe (JSON)</button></p></section>
+      <p><button data-pa="exporter-classe">Exporter cette classe (JSON)</button></p>
+      <p><button data-pa="md-classe">Toute la classe en Markdown</button></p>
+      <label class="coche"><input type="checkbox" id="md-classe-retours"> Inclure mes retours</label>
+      <label class="coche"><input type="checkbox" id="md-classe-codes"> Inclure les codes des élèves</label>
+      <p class="note">Un seul fichier, une section par élève, lisible tel quel. Sans les codes, sauf si vous cochez la case.</p></section>
     <details class="carte"><summary>Supprimer la classe</summary><p>La classe, ses élèves et leurs dossiers seront effacés. C’est définitif. Exportez-la d’abord.</p>
       <p><button data-pa="exporter-classe">Télécharger l’export</button> <button class="danger" data-pa="supprimer-classe">Supprimer la classe</button></p></details>`;
   }
@@ -148,8 +172,34 @@
     const oraux = liste(r.oraux).filter((o) => o.criteres === 5).length;
     // Les quiz : les noms viennent de la page (D.COMPRENDRE), les scores du résumé, relus comme des nombres.
     const cq = r.comprendre && typeof r.comprendre === 'object' ? D.COMPRENDRE.filter((z) => r.comprendre[z.id] && typeof r.comprendre[z.id] === 'object')
-      .map((z) => `${e(z.court)} ${Math.min(n(r.comprendre[z.id].meilleur), z.questions.length)}/${z.questions.length}`) : [];
-    return `<span class="resume">${q || 'Pas encore de question'}<br>${n(r.mots_complets)}/${n(r.mots)} mots · ${n(r.sources)} sources · ${oraux} oral${oraux > 1 ? 's' : ''} évalué${oraux > 1 ? 's' : ''} · ${n(r.hauts_faits)} hauts faits<br>Quiz : ${cq.length ? cq.join(' · ') : 'pas encore faits'}</span>`;
+      .map((z) => `${e(z.court)} ${Math.min(n(r.comprendre[z.id].meilleur), A.surSalve(z))}/${A.surSalve(z)}`) : [];
+    return `<span class="resume">${q || 'Pas encore de question'}<br>${n(r.mots_complets)}/${n(r.mots)} mots · ${n(r.sources)} sources · ${oraux} oral${oraux > 1 ? 's' : ''} évalué${oraux > 1 ? 's' : ''}<br>Quiz : ${cq.length ? cq.join(' · ') : 'pas encore faits'}</span>`;
+  }
+
+  // Les hauts faits d'un·e élève dans le tableau : leur nombre et le dernier gagné (résumé, relu).
+  function hautsFaitsHtml(r) {
+    const n = r && typeof r.hauts_faits === 'number' && r.hauts_faits >= 0 ? Math.floor(r.hauts_faits) : 0;
+    const der = r && Array.isArray(r.hf_recents) ? r.hf_recents.find((h) => Array.isArray(h) && titreHf(h[0])) : null;
+    return `<span class="resume">${pl(n, 'haut fait', 'hauts faits')}${der ? `<br>Dernier : ${e(titreHf(der[0]))}, ${e(dateJour(der[1]))}` : ''}</span>`;
+  }
+  // La dernière visite (base), le voyant, et les jours actifs sur 30 jours (résumé, depuis la version 1.5.0 de l'élève).
+  function visiteHtml(x, a, r, maintenant) {
+    const v = r && r.visites && typeof r.visites === 'object' && Array.isArray(r.visites.jours) ? r.visites : null;
+    const auj = A.jourLocal(maintenant), j30 = v ? new Set(v.jours.map(jourDe).filter((j) => j && A.ecartJours(j, auj) >= 0 && A.ecartJours(j, auj) < 30)).size : null;
+    const voyant = a.alerte ? `<span class="voyant"><span aria-hidden="true">⚠</span> ${a.jours === null ? 'Aucune visite' : 'Sans visite depuis ' + pl(a.jours, 'jour', 'jours')}</span>`
+      : a.jamaisRevenu ? '<span class="voyant"><span aria-hidden="true">⚠</span> Jamais revenu·e depuis l’inscription</span>' : '';
+    const aussi = a.alerte && a.jamaisRevenu ? '<br><span class="note">Jamais revenu·e depuis l’inscription</span>' : '';
+    return `${voyant}${voyant ? '<br>' : ''}${e(date(x.vu_le))}${aussi}${j30 !== null ? `<br><span class="note">${pl(j30, 'jour actif', 'jours actifs')} sur 30</span>` : ''}`;
+  }
+  // « Derniers hauts faits » de la classe : qui, quoi, quand (les 30 plus récents). Rien n'est montré aux élèves.
+  function derniersHautsFaits(eleves) {
+    const l = [];
+    eleves.forEach((x) => { const r = x.resume || {}; (Array.isArray(r.hf_recents) ? r.hf_recents : []).forEach((h) => { if (Array.isArray(h) && titreHf(h[0]) && jourDe(h[1])) l.push({ x: x, id: h[0], le: jourDe(h[1]) }); }); });
+    l.sort((a, b) => (a.le < b.le ? 1 : a.le > b.le ? -1 : String(a.x.pseudo).localeCompare(String(b.x.pseudo), 'fr')));
+    return `<details class="carte" id="derniers-hf"><summary>Derniers hauts faits${l.length ? ' (' + Math.min(l.length, 30) + ')' : ''}</summary>
+      ${l.length ? `<ul class="simples">${l.slice(0, 30).map((y) => `<li><span><b>${e(dateJour(y.le))}</b> · <a href="#/prof/eleve/${e(y.x.id)}/suivi">${e(y.x.pseudo)}</a> · ${e(titreHf(y.id))}</span></li>`).join('')}</ul>
+      <p class="note">D’après le dernier enregistrement de chaque élève : un·e élève resté·e sur une version antérieure à la 1.5.0 n’y apparaît qu’après sa prochaine visite. Aucun classement, et rien n’est montré aux autres élèves.</p>`
+      : '<p class="vide">Aucun haut fait daté pour le moment.</p>'}</details>`;
   }
 
   // ---------- Le dossier d'un·e élève : lecture, retours, outils ----------
@@ -166,10 +216,13 @@
     const x = P.eleve;
     if (x.erreur) return `<p class="retour"><a href="#/prof">← Mon espace</a></p><p class="erreur">${e(x.erreur)}</p>`;
     const d = x.dossier, ret = `<p class="retour"><a href="#/prof/classe/${e(x.classe_id)}">← La classe</a></p>`;
+    const ab = A.absence(x.vu_le, x.cree_le);
     const entete = `${ret}<h1>${e(x.pseudo)}</h1><p class="note">Dernière visite : ${e(date(x.vu_le))} · dossier modifié : ${e(date(x.dossier_modifie_le))}</p>
-      <nav class="onglets" aria-label="Dossier">${[['', 'Plan'], ['mots', 'Mots et sources'], ['oraux', 'Oraux'], ['pistes', 'Pistes'], ['retours', 'Mes retours (' + x.retours.items.length + ')'], ['ia', 'Avec une IA']]
+      ${ab.alerte || ab.jamaisRevenu ? `<p class="voyant"><span aria-hidden="true">⚠</span> ${ab.alerte ? (ab.jours === null ? 'Aucune visite' : 'Sans visite depuis ' + pl(ab.jours, 'jour', 'jours')) : ''}${ab.alerte && ab.jamaisRevenu ? ' · ' : ''}${ab.jamaisRevenu ? 'Jamais revenu·e depuis l’inscription' : ''}</p>` : ''}
+      <nav class="onglets" aria-label="Dossier">${[['', 'Plan'], ['suivi', 'Suivi'], ['mots', 'Mots et sources'], ['oraux', 'Oraux'], ['pistes', 'Pistes'], ['retours', 'Mes retours (' + x.retours.items.length + ')'], ['ia', 'Avec une IA']]
         .map((o) => `<a href="#/prof/eleve/${e(x.id)}${o[0] ? '/' + o[0] : ''}"${(onglet || '') === o[0] ? ' aria-current="page"' : ''}>${o[1]}</a>`).join('')}</nav>`;
     if (!d) return entete + `<p class="vide">${x.illisible ? 'Ce dossier n’a pas une forme lisible par cette version de Hello GO.' : 'Aucun dossier enregistré pour le moment.'}</p>`;
+    if (onglet === 'suivi') return entete + vueSuivi(d);
     if (onglet === 'mots') return entete + vueMotsSources(d);
     if (onglet === 'oraux') return entete + vueOraux(d);
     if (onglet === 'pistes') return entete + vuePistes(d);
@@ -204,12 +257,46 @@
   // Les quiz « Vérifie que tu as compris » de l'élève (le dossier est déjà relu par dossierValide) : scores, date, essais,
   // et les questions ratées au dernier essai, avec leur texte (celui de la page, jamais celui du dossier).
   function blocQuiz(d) {
-    return `<section class="carte"><h2>Quiz de compréhension</h2>${D.COMPRENDRE.map((z) => { const r = (d.comprendre || {})[z.id], t = z.questions.length;
+    return `<section class="carte"><h2>Quiz de compréhension</h2>${D.COMPRENDRE.map((z) => { const r = (d.comprendre || {})[z.id], t = A.surSalve(z);
       if (!r || !r.essais) return `<p><b>${e(z.titre)}</b> <span class="note">pas encore fait</span></p>`;
-      const rates = (r.rates || []).map((id) => z.questions.find((q) => q.id === id)).filter(Boolean);
+      const rates = (Array.isArray(r.rates_toutes) ? r.rates_toutes : r.rates || []).map((id) => z.questions.find((q) => q.id === id)).filter(Boolean);
       // (un score d'une version qui aurait plus de questions est ramené au total de cette page)
-      return `<p><b>${e(z.titre)}</b> · meilleur score ${Math.min(r.meilleur, t)}/${t} · dernier ${Math.min(r.dernier, t)}/${t} · ${r.essais} essai${r.essais > 1 ? 's' : ''}${r.le ? ' · le ' + e(r.le) : ''}</p>
+      return `<p><b>${e(z.titre)}</b> · meilleur score ${Math.min(r.meilleur, t)}/${t} · dernier ${Math.min(r.dernier, t)}/${t} · ${r.essais} essai${r.essais > 1 ? 's' : ''}${r.le ? ' · le ' + e(r.le) : ''} · ${A.suiviQuiz(d, z).nVues} questions différentes déjà vues sur ${z.questions.length}</p>
         ${rates.length ? `<p class="note">Ratées au dernier essai :</p><ul class="quiz-rates">${rates.map((q) => `<li>${e(q.q)}</li>`).join('')}</ul>` : ''}`; }).join('')}</section>`;
+  }
+  // Le suivi d'un·e élève : ses jours de visite (notés par sa page depuis la version 1.5.0), en chiffres et mois par mois,
+  // et ses hauts faits dans l'ordre où ils ont été gagnés. Puis l'export de son dossier en Markdown.
+  const MOIS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+  const enListe = (l) => (l.length > 1 ? l.slice(0, -1).join(', ') + ' et ' + l[l.length - 1] : l.join(''));
+  function frise(st, maintenant) {
+    const auj = A.jourLocal(maintenant), fin = auj.slice(0, 7), vus = new Set(st.jours);
+    let [an, mo] = st.depuis.slice(0, 7).split('-').map(Number); const [anF, moF] = fin.split('-').map(Number);
+    if ((anF - an) * 12 + (moF - mo) > 12) { an = moF === 12 ? anF : anF - 1; mo = moF === 12 ? 1 : moF + 1; } // les 13 derniers mois au plus
+    const mois = [];
+    for (;;) { mois.push([an, mo]); if (an === anF && mo === moF) break; mo++; if (mo > 12) { mo = 1; an++; } }
+    return mois.reverse().map(([a, m]) => {
+      const nb = new Date(a, m, 0).getDate(), z = (k) => (k < 10 ? '0' : '') + k, cle = (j) => a + '-' + z(m) + '-' + z(j), jours = [];
+      for (let j = 1; j <= nb; j++) if (vus.has(cle(j))) jours.push(j);
+      return `<div class="mois"><h4>${MOIS[m - 1]} ${a} · ${pl(jours.length, 'jour', 'jours')}</h4>
+        <ol class="frise" aria-hidden="true">${Array.from({ length: nb }, (_, i) => i + 1).map((j) => `<li class="${vus.has(cle(j)) ? 'vu' : ''}${cle(j) === auj ? ' auj' : ''}${cle(j) > auj ? ' futur' : ''}">${j}</li>`).join('')}</ol>
+        <p class="note">${jours.length ? 'Jours de visite : ' + (jours.length === 1 ? 'le ' : 'les ') + enListe(jours.map(String)) + ' ' + MOIS[m - 1] + '.' : 'Aucune visite ce mois-ci.'}</p></div>`;
+    }).join('');
+  }
+  function vueSuivi(d) {
+    const x = P.eleve, maintenant = new Date(), st = A.statsVisites(d, maintenant), hf = A.hautsFaitsDates(d);
+    const visites = st.total ? `<ul class="chiffres-suivi"><li><b>${st.j7}</b> sur les 7 derniers jours</li><li><b>${st.j30}</b> sur les 30 derniers jours</li><li><b>${st.total}</b> depuis le ${e(dateJour(st.depuis, true))}</li></ul>
+        <p class="note">L’historique des visites commence le ${e(dateJour(st.depuis, true))}, avec la mise à jour de Hello GO (version 1.5.0) : les visites d’avant ne sont pas connues. Inscription : ${e(date(x.cree_le))}. Un jour compte dès que l’élève ouvre Hello GO, sur n’importe quel appareil.</p>
+        ${frise(st, maintenant)}`
+      : `<p class="vide">Aucun jour de visite noté pour le moment. L’historique commence avec la mise à jour de Hello GO (version 1.5.0), à la prochaine visite de l’élève. Inscription : ${e(date(x.cree_le))}.</p>`;
+    return `<section class="carte"><h2>Jours actifs</h2>${visites}</section>
+    <section class="carte"><h2>Hauts faits (${hf.length} sur ${A.HAUTS_FAITS.length})</h2>
+      ${hf.length ? `<ol class="simples hf-chrono">${hf.map((h) => `<li><span><b>${h.le ? e(dateJour(h.le, true)) : 'Date inconnue'}</b> · ${e(h.titre)}</span></li>`).join('')}</ol>
+        <p class="note">Dans l’ordre où ils ont été gagnés. Seul·e l’élève et vous les voyez : aucun classement.</p>` : '<p class="vide">Aucun haut fait pour le moment.</p>'}</section>
+    <section class="carte"><h2>Télécharger son dossier</h2>
+      <p><button data-pa="md-eleve">Son dossier en Markdown</button></p>
+      <label class="coche"><input type="checkbox" id="md-eleve-retours"> Inclure mes retours</label>
+      <label class="coche"><input type="checkbox" id="md-eleve-code"> Inclure son code</label>
+      <p class="note">Le PDF de chaque question est dans l’onglet « Plan ».</p></section>`;
   }
   function vueMotsSources(d) {
     const R0 = R.reperes(d), demandes = P.eleve.retours.items.filter((x) => x.type === 'definir');
@@ -372,6 +459,17 @@
       appel('go_prof_supprimer_classe', { p_classe: c.id }).then((r) => { if (!r.ok) return toast(r.message); P.ouvert = null; P.classe = null; location.hash = '#/prof'; toast('Classe supprimée.'); });
     },
     'voir-codes'() { P.codesVus = !P.codesVus; rendre(); },
+    filtre(b) { P.filtre = b.dataset.v; rendre(); const t = $('[data-pa=filtre][data-v="' + b.dataset.v + '"]'); if (t) t.focus(); },
+    tri(b) { P.tri = b.dataset.v; rendre(); const t = $('[data-pa=tri][data-v="' + b.dataset.v + '"]'); if (t) t.focus(); },
+    'md-eleve'() { const x = P.eleve; if (!x || !x.dossier) return;
+      const t = racine.HGExport.dossier(x.dossier, { titre: 'Dossier de Grand oral · ' + x.pseudo, retours: x.retours, avecRetours: $('#md-eleve-retours').checked, code: $('#md-eleve-code').checked ? x.code_affiche : null });
+      telecharger('hello-go-' + O().nomDeFichier(x.pseudo || 'eleve') + '-' + jour() + '.md', t, 'text/markdown;charset=utf-8'); toast('Dossier téléchargé en Markdown.'); },
+    'md-classe'(b) { const k = P.classe.classe, avecRetours = $('#md-classe-retours').checked, avecCodes = $('#md-classe-codes').checked; b.disabled = true;
+      appel('go_prof_export', { p_classe: k.id }).then((r) => { b.disabled = false; if (!r.ok) return toast(r.message);
+        const c = (r.classes || []).find((y) => y.id === k.id) || { eleves: [] };
+        const eleves = (c.eleves || []).map((y) => ({ pseudo: y.pseudo, code: y.code_affiche, dossier: y.dossier && A.dossierValide(y.dossier) ? y.dossier : null, retours: R.nettoyer(y.retours) }));
+        telecharger('hello-go-' + O().nomDeFichier(k.nom || 'classe') + '-' + jour() + '.md', racine.HGExport.classe(k.nom, eleves, { avecRetours: avecRetours, avecCodes: avecCodes }), 'text/markdown;charset=utf-8');
+        toast(avecCodes ? 'Classe téléchargée en Markdown, avec les codes : gardez ce fichier pour vous.' : 'Classe téléchargée en Markdown.'); }); },
     'voir-code'(b) { const x = P.classe.eleves.find((y) => y.id === b.dataset.e), z = $('[data-code="' + b.dataset.e + '"]'); if (x && z) { z.textContent = x.code_affiche; b.remove(); } },
     'imprimer-codes'() { document.body.classList.add('impression-codes'); window.print(); setTimeout(() => document.body.classList.remove('impression-codes'), 500); },
     'renommer-eleve'(b) { const x = P.classe.eleves.find((y) => y.id === b.dataset.e);
