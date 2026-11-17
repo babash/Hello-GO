@@ -8,6 +8,7 @@ conflit de version, hors ligne puis retour, retours de l'enseignant·e, correcti
 envoyé à l'inscription, puis l'espace de l'enseignant·e.
 """
 import functools, http.server, json, os, re, socketserver, sys, threading, time
+sys.dont_write_bytecode = True  # pas de __pycache__ dans le dépôt
 from playwright.sync_api import sync_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from base_locale import BaseLocale
