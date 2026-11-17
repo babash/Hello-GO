@@ -173,7 +173,10 @@
     // Les quiz : les noms viennent de la page (D.COMPRENDRE), les scores du résumé, relus comme des nombres.
     const cq = r.comprendre && typeof r.comprendre === 'object' ? D.COMPRENDRE.filter((z) => r.comprendre[z.id] && typeof r.comprendre[z.id] === 'object')
       .map((z) => `${e(z.court)} ${Math.min(n(r.comprendre[z.id].meilleur), A.surSalve(z))}/${A.surSalve(z)}`) : [];
-    return `<span class="resume">${q || 'Pas encore de question'}<br>${n(r.mots_complets)}/${n(r.mots)} mots · ${n(r.sources)} sources · ${oraux} oral${oraux > 1 ? 's' : ''} évalué${oraux > 1 ? 's' : ''}<br>Quiz : ${cq.length ? cq.join(' · ') : 'pas encore faits'}</span>`;
+    // La culture (version 1.6.0 de l'élève) : des nombres, relus comme des nombres.
+    const cu = r.culture && typeof r.culture === 'object' ? r.culture : null;
+    const culture = cu ? `<br>Culture : ${pl(n(cu.videos), 'vidéo', 'vidéos')} · ${pl(n(cu.infox), 'infox vue', 'infox vues')} (${n(cu.reussies)} réussies) · ${pl(n(cu.accroches), 'accroche', 'accroches')}` : '';
+    return `<span class="resume">${q || 'Pas encore de question'}<br>${n(r.mots_complets)}/${n(r.mots)} mots · ${n(r.sources)} sources · ${oraux} oral${oraux > 1 ? 's' : ''} évalué${oraux > 1 ? 's' : ''}<br>Quiz : ${cq.length ? cq.join(' · ') : 'pas encore faits'}${culture}</span>`;
   }
 
   // Les hauts faits d'un·e élève dans le tableau : leur nombre et le dernier gagné (résumé, relu).
@@ -282,6 +285,20 @@
         <p class="note">${jours.length ? 'Jours de visite : ' + (jours.length === 1 ? 'le ' : 'les ') + enListe(jours.map(String)) + ' ' + MOIS[m - 1] + '.' : 'Aucune visite ce mois-ci.'}</p></div>`;
     }).join('');
   }
+  // La culture de l'élève (version 1.6.0) : les vidéos regardées (titres et liens de la page, notes du dossier, échappées),
+  // « Info ou infox ? » en chiffres, les accroches gardées (formulation de la page) et leur usage dans un plan.
+  function blocCulture(d) {
+    const C = window.HGCulture, cu = d.culture || {}, v = cu.videos || {}, acc = cu.accroches || {}, ch = A.chiffresCulture(d);
+    const lien = (url, t) => (R.lienSur(url) ? `<a href="${e(url)}" target="_blank" rel="noopener noreferrer">${t}</a>` : t);
+    const vues = A.vuesVideos(d).map((k) => [A.laVideo(k), v[k]]).sort((a, b) => String(b[1].vue).localeCompare(String(a[1].vue)));
+    const gardees = C.INFOX.filter((a) => acc[a.id]);
+    return `<section class="carte"><h2>Culture : vidéos et « Info ou infox ? »</h2>
+      <p>${pl(ch.videos, 'vidéo regardée', 'vidéos regardées')} (${ch.notes} avec une note) · ${pl(ch.infox, 'affirmation vue', 'affirmations vues')} sur ${C.INFOX.length}, ${ch.reussies} réussie${ch.reussies > 1 ? 's' : ''} la dernière fois · ${pl(ch.salves, 'salve', 'salves')} · ${pl(ch.accroches, 'accroche gardée', 'accroches gardées')}, ${ch.utilisees} dans un plan</p>
+      ${vues.length ? `<h3>Vidéos regardées</h3><ul class="simples">${vues.map((x) => `<li><div><p><b>${lien(x[0].url, e(x[0].titre))}</b> <span class="note">(${e(x[0].chaine)}${/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(x[1].vue) ? ', le ' + e(dateJour(x[1].vue, true)) : ''})</span></p>
+        ${String(x[1].retiens || '').trim() ? `<p><span class="note">Ce qu’il ou elle en retient :</span> ${e(x[1].retiens)}</p>` : ''}${String(x[1].intrigue || '').trim() ? `<p><span class="note">Ce qui l’a intrigué·e :</span> ${e(x[1].intrigue)}</p>` : ''}
+        ${x[1].piste ? '<p class="note">Devenue une piste.</p>' : ''}</div></li>`).join('')}</ul>` : ''}
+      ${gardees.length ? `<h3>Accroches gardées</h3><ul class="simples">${gardees.map((a) => `<li><div><p>${e(String(a.accroche).replace(/^«\s*|\s*»$/g, ''))}</p><p class="note">${lien(a.source.url, e(a.source.titre))}${acc[a.id].p ? ' · utilisée dans un plan' : ''}</p></div></li>`).join('')}</ul>` : ''}</section>`;
+  }
   function vueSuivi(d) {
     const x = P.eleve, maintenant = new Date(), st = A.statsVisites(d, maintenant), hf = A.hautsFaitsDates(d);
     const visites = st.total ? `<ul class="chiffres-suivi"><li><b>${st.j7}</b> sur les 7 derniers jours</li><li><b>${st.j30}</b> sur les 30 derniers jours</li><li><b>${st.total}</b> depuis le ${e(dateJour(st.depuis, true))}</li></ul>
@@ -292,6 +309,7 @@
     <section class="carte"><h2>Hauts faits (${hf.length} sur ${A.HAUTS_FAITS.length})</h2>
       ${hf.length ? `<ol class="simples hf-chrono">${hf.map((h) => `<li><span><b>${h.le ? e(dateJour(h.le, true)) : 'Date inconnue'}</b> · ${e(h.titre)}</span></li>`).join('')}</ol>
         <p class="note">Dans l’ordre où ils ont été gagnés. Seul·e l’élève et vous les voyez : aucun classement.</p>` : '<p class="vide">Aucun haut fait pour le moment.</p>'}</section>
+    ${blocCulture(d)}
     <section class="carte"><h2>Télécharger son dossier</h2>
       <p><button data-pa="md-eleve">Son dossier en Markdown</button></p>
       <label class="coche"><input type="checkbox" id="md-eleve-retours"> Inclure mes retours</label>

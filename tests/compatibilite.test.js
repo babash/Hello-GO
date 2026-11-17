@@ -28,7 +28,7 @@ const anciens = VERSIONS.map((ver) => {
   assert.strictEqual(typeof M.dossierValide, 'function', ver.v + ' : dossierValide absent');
   return { v: ver.v, valide: M.dossierValide };
 });
-ok(anciens.length === 8, 'sept versions publiées, et la 1.4.0 avant sa pré-validation');
+ok(anciens.length === 9, 'sept versions publiées, la 1.4.0 avant sa pré-validation, et la 1.5.0 (branche)');
 
 // Ce que fait la version actuelle à l'ouverture (app.js : Object.assign(dossierNeuf(), dossier)), puis à l'usage.
 const neuf = () => ({ v: 1, profil: { prenom: '', vu: false }, quiz: { reponses: {}, fait: false }, interets: ['', '', ''], ponts: [''], pistes: [], questions: [],
@@ -49,19 +49,30 @@ Object.keys(DOSSIERS).forEach((v) => {
   // 2. utilisé sans perte
   const d = utiliser(F);
   ok(A.dossierValide(d), v + ' : le dossier utilisé est refusé par la version actuelle');
-  Object.keys(F).filter((k) => !['comprendre', 'hf'].includes(k)).forEach((k) => assert.deepStrictEqual(d[k], F[k], v + ' : le champ « ' + k + ' » a changé'));
+  Object.keys(F).filter((k) => !['comprendre', 'hf', 'visites', 'banque'].includes(k)).forEach((k) => assert.deepStrictEqual(d[k], F[k], v + ' : le champ « ' + k + ' » a changé'));
+  // visites et banque (1.5.0) ne font que s'enrichir : rien de ce qui y était n'est perdu
+  Object.keys(F.visites || {}).forEach((j) => ok(d.visites[j], v + ' : jour de visite ' + j + ' perdu'));
+  Object.keys(F.banque || {}).forEach((z) => Object.keys(F.banque[z].vues || {}).forEach((q) => ok(d.banque[z].vues[q] >= F.banque[z].vues[q], v + ' : question vue ' + q + ' perdue')));
   Object.keys(F.hf).forEach((k) => ok(d.hf[k] === F.hf[k], v + ' : haut fait ' + k + ' perdu ou redaté'));
   Object.keys(F.comprendre || {}).forEach((k) => { const a = F.comprendre[k], b = d.comprendre[k];
     ok(b.essais === a.essais + 1 && b.meilleur >= a.meilleur && b.meilleur <= 10 && b.dernier <= 10, v + ' : résultat du quiz ' + k + ' mal repris');
     ok(b.rates.every((q) => D.COMPRENDRE.find((z) => z.id === k).questions.slice(0, 10).some((x) => x.id === q)), v + ' : « rates » cite une question inconnue de la 1.4.0'); });
-  ok(Object.keys(d.visites).length === 2 && d.banque.epreuve && d.banque.plan, v + ' : visites ou banque absentes');
+  ok(Object.keys(d.visites).length >= 2 && d.banque.epreuve && d.banque.plan, v + ' : visites ou banque absentes');
   // résumé et export : sans erreur, et le résumé reste sous les 4 000 caractères
-  const r = R.resume(d); ok(JSON.stringify(r).length <= 4000 && r.hauts_faits === Object.keys(d.hf).length, v + ' : résumé');
+  const r = R.resume(d); ok(JSON.stringify(r).length <= 4000 && r.hauts_faits === A.hautsFaitsDates(d).length, v + ' : résumé');
   ok(X.dossier(d).length > 200 && X.dossier(F).length > 200, v + ' : export Markdown');
   // 3. accepté par chaque version publiée
-  anciens.forEach((x) => ok(x.valide(d), v + ' utilisé en 1.5.0 : refusé par la version ' + x.v));
+  anciens.forEach((x) => ok(x.valide(d), v + ' utilisé en 1.6.0 : refusé par la version ' + x.v));
+  // la culture (1.6.0) : regarder une vidéo, jouer une salve, garder une accroche et l'ajouter au plan, sans rien perdre
+  const c = copie(d); A.cultureDe(c).videos['ia-langue'] = { vue: '2026-11-19', retiens: 'Des listes de nombres', intrigue: '' };
+  A.tirerInfox(c, 7, () => 0.3).forEach((k, i) => A.noterInfox(c, k, i % 2 === 0, '2026-11-19')); A.noterSalveInfox(c, 4, 7); A.garderAccroche(c, 'arpanet-lo', '2026-11-19');
+  A.majHautsFaits(c, '2026-11-19');
+  ok(A.dossierValide(c) && JSON.stringify(R.resume(c)).length <= 4000, v + ' avec la culture : valide, résumé court');
+  Object.keys(d).filter((k) => !['culture', 'hf'].includes(k)).forEach((k) => assert.deepStrictEqual(c[k], d[k], v + ' avec la culture : le champ « ' + k + ' » a changé'));
+  anciens.forEach((x) => ok(x.valide(c), v + ' avec la culture : refusé par la version ' + x.v));
+  ok(X.dossier(c).includes('Ma culture'), v + ' avec la culture : export Markdown');
   // la fusion à trois (deux appareils) garde les visites des deux côtés
-  const autre = copie(F); autre.visites = { '2026-11-19': 1 };
+  const autre = copie(F); autre.visites = Object.assign({}, F.visites, { '2026-11-19': 1 });
   const f = R.fusionner(copie(F), d, autre);
   ok(!f.conflit && f.resultat.visites['2026-11-17'] && f.resultat.visites['2026-11-19'] && A.dossierValide(f.resultat), v + ' : fusion des visites');
   anciens.forEach((x) => ok(x.valide(f.resultat), v + ' fusionné : refusé par la version ' + x.v));

@@ -51,6 +51,17 @@ def essais(nav, Appareil, ok, base, prof, URL, CODE_PROF_A, classe_A, erreurs):
         if i in (2, 5): ratees.append(q)
         S.p.locator('label.option:has([value="%d"])' % ((q['b'] + 1) % 4 if i in (2, 5) else q['b'])).click(); S.p.click('[data-a=quiz-valider]'); S.p.click('[data-a=quiz-suivant]')
     S.p.wait_for_selector('.score')
+    # la culture (1.6.0) : une vidéo regardée, avec une note piégée (affichée échappée), une salve « Info ou infox ? », une accroche
+    S.p.goto(URL + '#/explorer/videos'); S.p.wait_for_selector('[data-a=video-vue]')
+    vid = S.p.get_attribute('ul.liste .video [data-a=video-vue]', 'data-v'); S.p.click('ul.liste .video [data-a=video-vue]')
+    S.p.locator('[data-f="cv.%s.retiens"]' % vid).first.type('<img src=x onerror=alert(1)> retenu'); S.p.wait_for_timeout(500)
+    video = S.p.evaluate('(k) => HGCulture.VIDEOS.find((v) => v.id === k)', vid)
+    S.p.goto(URL + '#/explorer/infox'); S.p.click('[data-a=infox-commencer]')
+    for k in range(7):
+        S.p.wait_for_selector('.infox-carte'); S.p.keyboard.press('ArrowRight'); S.p.wait_for_selector('#infox-retour')
+        if k == 0: S.p.click('#infox-retour [data-a=infox-garder]')
+        S.p.click('[data-a=infox-suivante]')
+    S.p.wait_for_selector('#infox-fin')
     S.etat('Enregistré')
     # --- le tableau de la classe ---
     p.reload(); p.wait_for_selector('.tableau-classe')
@@ -58,8 +69,9 @@ def essais(nav, Appareil, ok, base, prof, URL, CODE_PROF_A, classe_A, erreurs):
     ok('tableau : l’élève, son résumé, nouveau travail', 'Inès B.' in ligne and 'Le cloud est-il écologique ?' in ligne and 'Nouveau travail' in ligne)
     ok('tableau : les codes sont masqués par défaut', code_eleve not in ligne)
     ok('tableau : le score du quiz (résumé)', 'Quiz : Épreuve 8/10' in ligne, ligne)
-    ok('tableau : les hauts faits, leur nombre et le dernier gagné', '1 haut fait' in ligne and 'Dernier : Hello, world' in ligne, ligne.replace('\n', ' | '))
+    ok('tableau : les hauts faits, leur nombre et le dernier gagné', '2 hauts faits' in ligne and 'Dernier : Silence, ça tourne' in ligne, ligne.replace('\n', ' | '))
     ok('tableau : les jours actifs sur 30 jours', '1 jour actif sur 30' in ligne, ligne)
+    ok('tableau : la culture (vidéos, infox, accroches)', re.search(r'Culture : 1 vidéo · 7 infox vues \(\d réussies\) · 1 accroche', ligne), ligne.replace('\n', ' | '))
     ok('tableau : personne à relancer', 'Tous les élèves sont venu·e·s dans les deux dernières semaines.' in p.inner_text('.bilan-visites') and p.locator('.tableau-classe .voyant').count() == 0)
     p.click('#derniers-hf summary')
     ok('derniers hauts faits de la classe : qui, quoi, quand', 'Inès B.' in p.inner_text('#derniers-hf') and 'Hello, world' in p.inner_text('#derniers-hf'), p.inner_text('#derniers-hf'))
@@ -89,10 +101,13 @@ def essais(nav, Appareil, ok, base, prof, URL, CODE_PROF_A, classe_A, erreurs):
     ok('suivi : jours actifs sur 7 et 30 jours, depuis le début, et « depuis le … »', p.locator('.chiffres-suivi li').first.text_content() == '1 sur les 7 derniers jours' and 'L’historique des visites commence le' in sv, sv[:600])
     ok('suivi : la frise, avec son texte lisible', p.locator('.frise li.vu').count() == 1 and 'Jours de visite : le ' in sv)
     ok('suivi : les hauts faits, avec leur date', p.locator('.hf-chrono li').count() >= 1 and 'Hello, world' in p.inner_text('.hf-chrono'))
+    ok('suivi : la vidéo regardée, sa note échappée', video['titre'] in sv and '<img src=x onerror=alert(1)> retenu' in sv and p.locator('#vue img').count() == 0, sv[-800:])
+    ok('suivi : « Info ou infox ? » en chiffres, l’accroche gardée', '7 affirmations vues' in sv and '1 accroche gardée' in sv and 'Accroches gardées' in sv)
     P.large('p2-suivi')
     with p.expect_download() as dl:
         p.click('[data-pa=md-eleve]')
     md = open(dl.value.path(), encoding='utf-8').read()
+    ok('Markdown d’un·e élève : la culture, la note neutralisée', '## Ma culture' in md and video['url'] in md and '\\<img' in md)
     ok('Markdown d’un·e élève : son dossier, sans code', dl.value.suggested_filename.endswith('.md') and '# Dossier de Grand oral · Inès B.' in md and 'Le cloud est-il écologique ?' in md and code_eleve not in md, md[:300])
     p.check('#md-eleve-code')
     with p.expect_download() as dl:

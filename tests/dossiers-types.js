@@ -6,6 +6,8 @@
 const VERSIONS = [
   { v: '1.0.0', commit: 'da25fa5' }, { v: '1.1.0', commit: '6b45cf1' }, { v: '1.2.0', commit: 'd654f95' },
   { v: '1.3.0', commit: 'ffdbd76' }, { v: '1.3.1', commit: 'df87f84' }, { v: '1.3.2', commit: 'ef8b049' }, { v: '1.4.0 (branche)', commit: '66dce00' }, { v: '1.4.0', commit: '5c92a5d' },
+  // La 1.5.0 n'est pas encore publiée sur main : son commit sur la branche atelier/t79-suivi (à remplacer par celui de main).
+  { v: '1.5.0 (branche)', commit: 'b82d142' },
 ];
 
 const point = (id, texte, etiquette, mots, sources) => ({ id: id, texte: texte, etiquette: etiquette || '', mots: mots || [], sources: sources || [] });
@@ -30,5 +32,13 @@ function v130() { const d = v120(); d.suivi = { lus: { r1: 1 }, faits: { r2: 1 }
 // 1.4.0 : les quiz « Vérifie que tu as compris » (10 questions par quiz, toujours les mêmes).
 function v140() { const d = v130(); d.comprendre = { epreuve: { meilleur: 8, dernier: 8, le: '2026-11-17', essais: 1, rates: ['e3', 'e6'] }, plan: { meilleur: 10, dernier: 10, le: '2026-11-17', essais: 2, rates: [] } }; d.hf.accroc = '2026-11-17'; return d; }
 
-const DOSSIERS = { '1.0.0': v100, '1.1.0': v110, '1.2.0': v120, '1.3.0': v130, '1.3.1': v130, '1.3.2': v130, '1.4.0': v140 };
+// 1.5.0 : les jours de visite (visites), les questions vues et ratées de chaque quiz (banque, rates_toutes).
+function v150() { const d = v140(); d.visites = { '2026-11-16': 1, '2026-11-17': 1 }; d.banque = { epreuve: { le: '2026-11-17', vues: { e1: 1, e11: 1 }, ratees: { e11: 1 } } };
+  d.comprendre.epreuve.rates_toutes = ['e3', 'e6', 'e11']; return d; }
+// 1.6.0 : la culture (vidéos regardées et notes, « Info ou infox ? », accroches gardées, affirmation du jour).
+function v160() { const d = v150(); d.culture = { videos: { 'craquer-wordle': { vue: '2026-11-18', retiens: 'L’entropie mesure l’information', intrigue: 'Le meilleur premier mot', piste: 'pi1' }, 'terres-rares': { avis: -1 } },
+  infox: { 'bug-hopper': { v: 1, j: 1, d: 1, le: '2026-11-18' }, 'pacman-256': { v: 2, j: 1, d: 0, le: '2026-11-18' } }, accroches: { 'pacman-256': { le: '2026-11-18', q: 'q1', p: 'p1' } },
+  salves: 1, sansfaute: 0, jour: { j: '2026-11-18', id: 'bug-hopper' } }; d.hf.video1 = '2026-11-18'; return d; }
+
+const DOSSIERS = { '1.0.0': v100, '1.1.0': v110, '1.2.0': v120, '1.3.0': v130, '1.3.1': v130, '1.3.2': v130, '1.4.0': v140, '1.5.0': v150, '1.6.0': v160 };
 module.exports = { VERSIONS, DOSSIERS };

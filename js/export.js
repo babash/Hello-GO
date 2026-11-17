@@ -142,6 +142,23 @@
         L.push('- **' + texte(z.titre) + '** : meilleur score ' + r.meilleur + ' sur ' + t + ', dernier ' + r.dernier + ' sur ' + t + ', ' + r.essais + ' essai' + (r.essais > 1 ? 's' : '') + (dateLongue(r.le) ? ' (le dernier le ' + dateLongue(r.le) + ')' : '') + '.'); });
     }
 
+    // La culture (version 1.6.0) : vidéos regardées et notes, « Info ou infox ? », accroches gardées. Titres et liens de la page.
+    const C = racine.HGCulture || (typeof require !== 'undefined' ? require('./culture.js') : null), cu = d.culture || {}, ch = A.chiffresCulture(d);
+    if (C && (ch.videos || ch.infox || ch.accroches)) {
+      const v = cu.videos || {}, acc = cu.accroches || {};
+      bloc(); L.push(h(2, 'Ma culture : vidéos et « Info ou infox ? »'));
+      const vues = A.vuesVideos(d);
+      if (vues.length) { bloc(); L.push(h(3, 'Les vidéos que j’ai regardées')); bloc();
+        vues.forEach((k) => { const x = A.laVideo(k), n = v[k];
+          L.push('- ' + lien(x.titre, x.url) + ', ' + texte(x.chaine) + (dateLongue(n.vue) ? ' (le ' + dateLongue(n.vue) + ')' : ''));
+          if (String(n.retiens || '').trim()) L.push('  - Ce que j’en retiens : ' + texte(n.retiens));
+          if (String(n.intrigue || '').trim()) L.push('  - Ce qui m’a intrigué·e : ' + texte(n.intrigue)); }); }
+      if (ch.infox) { bloc(); L.push('« Info ou infox ? » : ' + ch.infox + ' affirmation' + (ch.infox > 1 ? 's' : '') + ' vue' + (ch.infox > 1 ? 's' : '') + ', dont ' + ch.reussies + ' réussie' + (ch.reussies > 1 ? 's' : '') + ' la dernière fois.'); }
+      const gardees = C.INFOX.filter((a) => acc[a.id]);
+      if (gardees.length) { bloc(); L.push(h(3, 'Mes accroches')); bloc();
+        gardees.forEach((a) => L.push('- ' + texte(String(a.accroche).replace(/^«\s*|\s*»$/g, '')) + ' (source : ' + lien(a.source.titre, a.source.url) + ')' + (acc[a.id].p ? ' : dans mon plan' : ''))); }
+    }
+
     // Les hauts faits, dans l'ordre où ils ont été gagnés
     const hf = A.hautsFaitsDates(d);
     if (hf.length) {

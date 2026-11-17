@@ -24,10 +24,13 @@ TYPES = os.path.join(RACINE, 'tests', 'dossiers')
 # Les versions publiées sur main, de la plus ancienne à la plus récente ; en_ligne : la version peut recevoir un dossier
 # de la base (un onglet resté ouvert le reprend), donc doit accepter celui des versions suivantes.
 PUBLIEES = [('1.0.0', 'da25fa5', False), ('1.1.0', '6b45cf1', False), ('1.2.0', 'd654f95', False),
-            ('1.3.0', 'ffdbd76', True), ('1.3.1', 'df87f84', True), ('1.3.2', 'ef8b049', True), ('1.4.0', '5c92a5d', True)]
+            ('1.3.0', 'ffdbd76', True), ('1.3.1', 'df87f84', True), ('1.3.2', 'ef8b049', True), ('1.4.0', '5c92a5d', True),
+            # la 1.5.0, pas encore sur main : son dernier commit sur atelier/t79-suivi (à remplacer par celui de main à sa publication)
+            ('1.5.0', 'b82d142', True)]
 PAGES = ['#/', '#/explorer/decouvrir', '#/explorer/quiz', '#/explorer/sujets', '#/explorer/pistes', '#/questions', '#/question/{q}',
          '#/question/{q}/echange', '#/mots', '#/sources', '#/oraux', '#/hauts-faits', '#/plus', '#/aide', '#/aide/exemple',
-         '#/comprendre', '#/comprendre/epreuve', '#/reglages', '#/a-part']
+         '#/comprendre', '#/comprendre/epreuve', '#/reglages', '#/a-part',
+         '#/explorer/videos', '#/explorer/infox', '#/conseils']
 CLE = 'hellogo:dossier:v1'
 erreurs, n = [], [0]
 
@@ -151,7 +154,8 @@ def nouveautes(p):
     """Ce que cette version ajoute au dossier, fait avec l'interface. À chaque version : y ajouter ses nouveautés.
     1.4.0 : les quiz « Vérifie que tu as compris » (l'un sans faute, l'autre avec deux erreurs), et leurs hauts faits.
     1.5.0 : les jours de visite (visites, notés à l'ouverture), et, par quiz, une salve de 10 questions tirées parmi 20
-    (banque, rates_toutes) : deux salves pour le second quiz, pour que des questions 11 à 20 soient ratées."""
+    (banque, rates_toutes) : deux salves pour le second quiz, pour que des questions 11 à 20 soient ratées.
+    1.6.0 : la culture (culture) : une vidéo regardée et notée, une salve « Info ou infox ? », une accroche gardée."""
     if not p.evaluate("!!(window.HGDonnees && HGDonnees.COMPRENDRE)"): return
     for i, z in enumerate(p.evaluate("HGDonnees.COMPRENDRE.map((z) => ({ id: z.id, b: Object.fromEntries(z.questions.map((q) => [q.id, q.b])), n: Math.min(10, z.questions.length) }))")):
         for _ in range(2 if i and len(z['b']) > 10 else 1):
@@ -160,6 +164,17 @@ def nouveautes(p):
                 qid = p.get_attribute('.quiz-q', 'data-qid'); b = z['b'][qid] if qid else list(z['b'].values())[k]
                 p.locator('label.option:has([value="%d"])' % ((b + 1) % 4 if i and k in (2, 5) else b)).click(); p.click('[data-a=quiz-valider]'); p.click('[data-a=quiz-suivant]')
             p.wait_for_selector('.score')
+    # 1.6.0 : la culture (d.culture) : une vidéo regardée et notée, une salve « Info ou infox ? », une accroche gardée.
+    if not p.evaluate("!!window.HGCulture"): return
+    p.goto(HOTE + 'neuf/index.html#/explorer/videos'); p.wait_for_selector('[data-a=video-vue]')
+    vid = p.get_attribute('ul.liste .video [data-a=video-vue]', 'data-v'); p.click('ul.liste .video [data-a=video-vue]')
+    p.locator('[data-f="cv.%s.retiens"]' % vid).first.type('Noté en 1.6.0'); p.wait_for_timeout(600)
+    p.goto(HOTE + 'neuf/index.html#/explorer/infox'); p.click('[data-a=infox-commencer]')
+    for k in range(7):
+        p.wait_for_selector('.infox-carte'); p.keyboard.press('ArrowLeft'); p.wait_for_selector('#infox-retour')
+        if k == 0: p.click('#infox-retour [data-a=infox-garder]')
+        p.click('[data-a=infox-suivante]')
+    p.wait_for_selector('#infox-fin')
 
 
 def journal(p, nom):
