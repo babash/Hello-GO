@@ -1,0 +1,1274 @@
+{
+  "genere_le": "2026-11-17",
+  "methode": "Chaque vidéo a été contrôlée par l'oEmbed de YouTube (titre et chaîne). Les contenus n'ont pas été visionnés : les accroches et les questions sont écrites à partir des titres. Les adresses des chaînes sont celles que renvoie oEmbed. Statuts : verifie ; verifie_titre_different ou verifie_chaine_differente (la vidéo existe, mais ne correspond pas exactement au libellé de l'enseignant) ; substitution ; non_verifie.",
+  "compte": {
+    "enseignant": 34,
+    "proposees": 10
+  },
+  "videos": [
+    {
+      "id": "histoire-info-condense",
+      "origine": "enseignant",
+      "titre": "Un condensé d'histoire de l'informatique (1er ep/5)",
+      "chaine": "Inria - Médiation Scientifique",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=xQHk4zQf_aY",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "De la machine à calculer au smartphone : toute l'histoire de l'informatique en accéléré.",
+      "interets": [
+        "histoire",
+        "sciences"
+      ],
+      "notions": [
+        "hist",
+        "materiel"
+      ],
+      "question": "En quoi l'histoire de l'informatique éclaire-t-elle les machines que nous utilisons aujourd'hui ?",
+      "libelle_enseignant": "Pixees Scienceparticipative : Un condensé d'histoire de l'informatique",
+      "note": "L'enseignant cite « Pixees Scienceparticipative » : la chaîne s'appelle aujourd'hui « Inria - Médiation Scientifique ». Premier épisode d'une série de 5."
+    },
+    {
+      "id": "notion-information-berry",
+      "origine": "enseignant",
+      "titre": "La notion d'information (Gérard Berry)",
+      "chaine": "Inria - Médiation Scientifique",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=Cgw2j4bENr4",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "Un texte, une photo, un son : et si tout cela n'était qu'une seule et même chose pour une machine ?",
+      "interets": [
+        "sciences"
+      ],
+      "notions": [
+        "donnees",
+        "hist"
+      ],
+      "question": "En quoi la notion d'information a-t-elle changé notre façon de voir le monde ?",
+      "libelle_enseignant": "Pixees Scienceparticipative : La notion d'Information (Gérard Berry)",
+      "note": "Chaîne renommée (anciennement Pixees)."
+    },
+    {
+      "id": "traders-lumiere-1",
+      "origine": "enseignant",
+      "titre": "Traders à la vitesse de la lumière - Heu?reka #9",
+      "chaine": "Heu?reka",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=O-SH-QPAicY",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "En bourse, des programmes achètent et vendent plus vite que tu ne clignes des yeux.",
+      "interets": [
+        "argent",
+        "societe"
+      ],
+      "notions": [
+        "prog",
+        "materiel"
+      ],
+      "question": "Faut-il laisser des algorithmes acheter et vendre à notre place ?"
+    },
+    {
+      "id": "traders-lumiere-2",
+      "origine": "enseignant",
+      "titre": "Trader à la vitesse de la lumière (le retour!) - Heu?reka #12",
+      "chaine": "Heu?reka",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=BuEyrskPUws",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "Quand gagner quelques millisecondes vaut des millions, on est prêt à tirer des câbles en ligne droite.",
+      "interets": [
+        "argent",
+        "societe"
+      ],
+      "notions": [
+        "materiel",
+        "prog"
+      ],
+      "question": "Dans quelle mesure la vitesse des réseaux est-elle devenue un enjeu économique ?"
+    },
+    {
+      "id": "crypto-pieges",
+      "origine": "enseignant",
+      "titre": "[PARTENARIAT] Crypto-investissements : éviter les pièges - Heu?reka & AMF",
+      "chaine": "Heu?reka",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=vCjPbij3gmw",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "Avant de mettre un euro dans une cryptomonnaie, apprends à reconnaître une arnaque.",
+      "interets": [
+        "argent",
+        "societe"
+      ],
+      "notions": [
+        "secu",
+        "donnees"
+      ],
+      "question": "Faut-il se méfier des cryptomonnaies ?",
+      "note": "Vidéo en partenariat avec l'AMF (Autorité des marchés financiers), comme l'indique son titre."
+    },
+    {
+      "id": "cables-sous-marins",
+      "origine": "enseignant",
+      "titre": "Câbles sous-marins : la guerre invisible - Le Dessous des cartes",
+      "chaine": "Le Dessous des Cartes - ARTE (d'après les résultats de recherche)",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=vqtCruSUM_8",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed refuse cet identifiant (erreur client : vidéo retirée, restreinte ou non intégrable, impossible de trancher). Le titre et l'adresse viennent des résultats de recherche YouTube du jour.",
+      "statut": "non_verifie",
+      "accroche": "Presque tout ce que tu fais en ligne passe par des câbles posés au fond des océans.",
+      "interets": [
+        "societe",
+        "histoire",
+        "transports"
+      ],
+      "notions": [
+        "web",
+        "materiel",
+        "secu"
+      ],
+      "question": "En quoi les câbles sous-marins sont-ils un enjeu de pouvoir ?",
+      "libelle_enseignant": "Le dessous des cartes : câbles fibres sous-marins",
+      "note": "À ouvrir à la main avant publication. Autre candidat, dans le même cas : « Câbles sous-marins : l'autre guerre ? - Le Dessous des cartes - L'essentiel », https://www.youtube.com/watch?v=EGWYbyvTF2Q. Une copie non officielle répond à oEmbed (chaîne « FFB », -qnFF1AeQpM) : à ne pas utiliser."
+    },
+    {
+      "id": "democratie-theorie-jeux",
+      "origine": "enseignant",
+      "titre": "La main invisible d'un mathématicien malveillant | Démocratie 1",
+      "chaine": "Science4All",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=fBYCoPAmpr4",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "Et si la façon de compter les voix décidait du gagnant autant que les voix elles-mêmes ?",
+      "interets": [
+        "societe",
+        "sciences"
+      ],
+      "notions": [
+        "prog",
+        "donnees"
+      ],
+      "question": "Dans quelle mesure un algorithme de vote peut-il être juste ?",
+      "libelle_enseignant": "Sciences4all : la démocratie sous l'angle de la théorie des jeux",
+      "note": "Première vidéo de la série « Démocratie » de Science4All (le titre porte « Démocratie 1 ») : l'enseignant cite la série, pas une vidéo précise."
+    },
+    {
+      "id": "terres-rares",
+      "origine": "enseignant",
+      "titre": "Les terres rares.",
+      "chaine": "Le Réveilleur",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=OAyYSlMhgI4",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "Ton téléphone contient des métaux dont tu n'as jamais entendu le nom.",
+      "interets": [
+        "climat",
+        "societe"
+      ],
+      "notions": [
+        "materiel"
+      ],
+      "question": "Le numérique peut-il se passer des terres rares ?"
+    },
+    {
+      "id": "predire-crimes",
+      "origine": "enseignant",
+      "titre": "Peut-on prédire les futurs crimes ?",
+      "chaine": "Fouloscopie",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=HHCiNPtR1NI",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "Des logiciels prétendent dire où aura lieu le prochain délit : science ou science-fiction ?",
+      "interets": [
+        "societe",
+        "cinema"
+      ],
+      "notions": [
+        "ia",
+        "donnees"
+      ],
+      "question": "Faut-il confier la prévention des crimes à des algorithmes ?"
+    },
+    {
+      "id": "amour-en-ligne",
+      "origine": "enseignant",
+      "titre": "L'amour en ligne – Avides de Recherche #23",
+      "chaine": "Avides de recherche",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=CbXGTo4Fob4",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "Derrière chaque « match », il y a des choix de conception et des chercheur·e·s qui les étudient.",
+      "interets": [
+        "reseaux",
+        "societe"
+      ],
+      "notions": [
+        "donnees",
+        "web"
+      ],
+      "question": "En quoi les applications de rencontre transforment-elles nos relations ?"
+    },
+    {
+      "id": "fourmi-langton",
+      "origine": "enseignant",
+      "titre": "La fourmi de Langton",
+      "chaine": "ScienceEtonnante",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=qZRYGxF6D3w",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "Deux règles toutes simples, une fourmi, et personne ne sait prédire ce qu'elle va faire.",
+      "interets": [
+        "sciences",
+        "jeux"
+      ],
+      "notions": [
+        "prog"
+      ],
+      "question": "En quoi des règles très simples peuvent-elles produire un comportement imprévisible ?"
+    },
+    {
+      "id": "ia-images",
+      "origine": "enseignant",
+      "titre": "Comment ces IA inventent-elles des images ?",
+      "chaine": "ScienceEtonnante",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=tdelUss-5hY",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "Une IA qui dessine part d'une image de pur bruit et la nettoie peu à peu.",
+      "interets": [
+        "art",
+        "cinema",
+        "sciences"
+      ],
+      "notions": [
+        "ia",
+        "donnees"
+      ],
+      "question": "Une IA qui génère des images est-elle créative ?"
+    },
+    {
+      "id": "ia-langue",
+      "origine": "enseignant",
+      "titre": "Comment les I.A. font-elles pour comprendre notre langue ?",
+      "chaine": "ScienceEtonnante",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=CsQNF9s78Nc",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "Pour une machine, un mot est une liste de nombres : et pourtant ça marche.",
+      "interets": [
+        "sciences",
+        "societe"
+      ],
+      "notions": [
+        "ia",
+        "donnees"
+      ],
+      "question": "Dans quelle mesure une machine comprend-elle ce qu'on lui dit ?"
+    },
+    {
+      "id": "codes-secrets",
+      "origine": "enseignant",
+      "titre": "Les codes secrets",
+      "chaine": "ScienceEtonnante",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=8BM9LPDjOw0",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "De César à ta messagerie, la même course entre qui cache et qui casse.",
+      "interets": [
+        "histoire",
+        "sciences"
+      ],
+      "notions": [
+        "secu",
+        "hist"
+      ],
+      "question": "En quoi la cryptographie protège-t-elle notre vie privée ?"
+    },
+    {
+      "id": "craquer-wordle",
+      "origine": "enseignant",
+      "titre": "JE CRAQUE WORDLE ! 🟩⬛🟨⬛🟨 (grâce aux maths)",
+      "chaine": "ScienceEtonnante",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=iw4_7ioHWF4",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "Le meilleur premier mot à Wordle se calcule, et le calcul s'appelle l'entropie.",
+      "interets": [
+        "jeux",
+        "sciences"
+      ],
+      "notions": [
+        "prog",
+        "donnees"
+      ],
+      "question": "En quoi la théorie de l'information permet-elle de mieux jouer ?"
+    },
+    {
+      "id": "jeu-de-la-vie",
+      "origine": "enseignant",
+      "titre": "Le Jeu de la Vie",
+      "chaine": "ScienceEtonnante",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=S-W0NX97DB0",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "substitution",
+      "accroche": "Des cases qui s'allument et s'éteignent, et soudain des « créatures » qui se déplacent toutes seules.",
+      "interets": [
+        "jeux",
+        "sciences"
+      ],
+      "notions": [
+        "prog"
+      ],
+      "question": "Le jeu de la vie est-il vraiment un jeu ?",
+      "libelle_enseignant": "Pass sciences : jeu de la vie",
+      "note": "L'enseignant cite « Pass sciences : jeu de la vie ». Aucune vidéo de Passe-Science portant ce titre n'a été trouvée ; la vidéo de ce titre est sur ScienceEtonnante (vérifiée). Passe-Science a des vidéos voisines, vérifiées ou vues en recherche : « Structures auto-répliquantes dans les automates cellulaires - Passe-science #27 » (CfRSVPhzN5M, vérifiée par oEmbed), « Les Automates Cellulaires réversibles - Passe-science #23 » (lkdnOuzHdFE, vue en recherche seulement). À trancher par l'enseignant."
+    },
+    {
+      "id": "bug-google-map",
+      "origine": "enseignant",
+      "titre": "Un bug géométrique dans Google Map ? - Micmaths",
+      "chaine": "Mickaël Launay (Micmaths)",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=ysx1888Y2Fo",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "Sur une carte, le chemin le plus court n'est pas toujours une ligne droite.",
+      "interets": [
+        "transports",
+        "sciences"
+      ],
+      "notions": [
+        "donnees",
+        "prog"
+      ],
+      "question": "Peut-on représenter fidèlement la Terre sur un écran ?"
+    },
+    {
+      "id": "p-vs-np",
+      "origine": "enseignant",
+      "titre": "P vs. NP and the Computational Complexity Zoo",
+      "chaine": "hackerdashery",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=YX40hbAHx3s",
+      "duree": null,
+      "langue": "en",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "Un million de dollars attend la personne qui résoudra cette question d'informatique.",
+      "interets": [
+        "sciences",
+        "argent"
+      ],
+      "notions": [
+        "prog",
+        "secu"
+      ],
+      "question": "Existe-t-il des problèmes qu'un ordinateur ne pourra jamais résoudre vite ?",
+      "note": "Vidéo en anglais (sous-titres à vérifier à la main)."
+    },
+    {
+      "id": "blockchain-comment",
+      "origine": "enseignant",
+      "titre": "La blockchain, comment ca marche?",
+      "chaine": "Radio-Canada Info",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=i6XQllJmKlk",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie_chaine_differente",
+      "accroche": "Un grand cahier de comptes que tout le monde peut lire et que personne ne peut raturer.",
+      "interets": [
+        "argent",
+        "societe"
+      ],
+      "notions": [
+        "secu",
+        "donnees"
+      ],
+      "question": "La blockchain peut-elle remplacer la confiance ?",
+      "libelle_enseignant": "Math adultes : blockchain comment ça marche",
+      "note": "L'enseignant cite « Math adultes » : la vidéo de ce titre est publiée par Radio-Canada Info. Aucune vidéo « blockchain » d'une chaîne « Maths Adultes » n'a été trouvée."
+    },
+    {
+      "id": "fake-news-coupables",
+      "origine": "enseignant",
+      "titre": "Fake news, tous coupables ? | Angle Droit | Le Vortex#44",
+      "chaine": "Le Vortex - ARTE",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=17cNUsu7coU",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "Partager une fausse information, est-ce déjà en être responsable ?",
+      "interets": [
+        "reseaux",
+        "societe"
+      ],
+      "notions": [
+        "web",
+        "donnees"
+      ],
+      "question": "Sommes-nous responsables de ce que nous partageons en ligne ?"
+    },
+    {
+      "id": "reseaux-deuil",
+      "origine": "enseignant",
+      "titre": "Réseaux sociaux, une nouvelle façon de faire son deuil ? | Le Vortex S06E11 | ARTE",
+      "chaine": "Le Vortex - ARTE",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=Db2Y4xyOm3w",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie_titre_different",
+      "accroche": "Que devient ton compte quand tu n'es plus là ?",
+      "interets": [
+        "reseaux",
+        "societe"
+      ],
+      "notions": [
+        "donnees",
+        "web"
+      ],
+      "question": "Nos données doivent-elles nous survivre ?",
+      "libelle_enseignant": "Vortex : réseaux sociaux une nouvelle facon de devenir immortel",
+      "note": "L'enseignant cite « réseaux sociaux une nouvelle façon de devenir immortel » : aucune vidéo du Vortex ne porte ce titre aujourd'hui. Celle-ci (saison 6, épisode 11) est la seule de la série sur les réseaux sociaux et la mort ; le titre a pu changer. Correspondance probable, à confirmer par l'enseignant."
+    },
+    {
+      "id": "corps-a-corps-robots",
+      "origine": "enseignant",
+      "titre": "Au corps à core avec les robots | Va Savoir #03",
+      "chaine": "Zeste de science, les séries originales du CNRS",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=TSt9F0w0jN8",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "Des chercheur·e·s apprennent aux robots à ne pas nous faire mal.",
+      "interets": [
+        "sante",
+        "sciences",
+        "sport"
+      ],
+      "notions": [
+        "materiel",
+        "ia"
+      ],
+      "question": "Dans quelle mesure peut-on faire confiance à un robot qui nous touche ?",
+      "note": "Titre recopié tel que YouTube le renvoie (« core »)."
+    },
+    {
+      "id": "youtube-money",
+      "origine": "enseignant",
+      "titre": "NOTRE ARGENT : La YouTube Money",
+      "chaine": "Stupid Economics",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=KIGOIfIXVjU",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "D'où vient l'argent d'une vidéo gratuite ?",
+      "interets": [
+        "argent",
+        "reseaux"
+      ],
+      "notions": [
+        "web",
+        "donnees"
+      ],
+      "question": "En quoi la publicité façonne-t-elle ce que nous regardons ?"
+    },
+    {
+      "id": "le-hack",
+      "origine": "enseignant",
+      "titre": "PAUSE PROCESS #48 Le Hack",
+      "chaine": "PAUSE PROCESS",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=qQcHkMvsQwA",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "Au cinéma, pirater prend dix secondes : et en vrai ?",
+      "interets": [
+        "jeux",
+        "cinema",
+        "societe"
+      ],
+      "notions": [
+        "secu"
+      ],
+      "question": "Le pirate informatique est-il forcément un·e délinquant·e ?"
+    },
+    {
+      "id": "erreur-excel",
+      "origine": "enseignant",
+      "titre": "L'erreur Excel qui a coûté la vie à 1500 personnes 💀",
+      "chaine": "Chat Sceptique",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=VubMw46DK0U",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "Un tableur mal utilisé, et des milliers de malades disparaissent des comptes.",
+      "interets": [
+        "sante",
+        "societe"
+      ],
+      "notions": [
+        "donnees",
+        "prog"
+      ],
+      "question": "Une erreur de format de données peut-elle coûter des vies ?",
+      "note": "Le chiffre est celui du titre de la vidéo, non vérifié ici."
+    },
+    {
+      "id": "algos-evolutionnaires",
+      "origine": "enseignant",
+      "titre": "Les algorithmes évolutionnaires expliqués à mon chat 🐈",
+      "chaine": "Chat Sceptique",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=7DMibr0J0c4",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "Faire évoluer des programmes comme des espèces : garder les meilleurs, les mélanger, recommencer.",
+      "interets": [
+        "sciences",
+        "jeux"
+      ],
+      "notions": [
+        "ia",
+        "prog"
+      ],
+      "question": "En quoi la nature inspire-t-elle les algorithmes ?",
+      "note": "L'enseignant écrit « algorithmes révolutionnaires » : le titre exact est « évolutionnaires »."
+    },
+    {
+      "id": "alan-turing",
+      "origine": "enseignant",
+      "titre": "Alan Turing - Enigma, ordinateur et pomme empoisonnée - LPPV.05 - e-penser",
+      "chaine": "e-penser 2.0",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=7dpFeXV_hqs",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "Il a aidé à gagner une guerre, imaginé l'ordinateur, et son pays l'a condamné.",
+      "interets": [
+        "histoire",
+        "societe"
+      ],
+      "notions": [
+        "hist",
+        "secu"
+      ],
+      "question": "En quoi Alan Turing a-t-il changé le cours de l'histoire ?"
+    },
+    {
+      "id": "reseaux-neurones",
+      "origine": "enseignant",
+      "titre": "Les réseaux de neurones | Intelligence artificielle 41",
+      "chaine": "Science4All",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=8qL2lSQd9L8",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie_chaine_differente",
+      "accroche": "Un « neurone » artificiel n'est qu'une addition et un seuil : c'est leur nombre qui fait tout.",
+      "interets": [
+        "sciences"
+      ],
+      "notions": [
+        "ia"
+      ],
+      "question": "Un réseau de neurones artificiels imite-t-il vraiment le cerveau ?",
+      "libelle_enseignant": "Etincelles, EPFL : Réseaux de neuronnes",
+      "note": "L'enseignant cite « Etincelles, EPFL : Réseaux de neurones ». La chaîne « Étincelles, EPFL » existe (vue en recherche), mais aucune vidéo de ce titre n'y a été trouvée ; cet identifiant renvoie à une vidéo de Science4All, dont l'auteur a travaillé à l'EPFL. Correspondance douteuse, à confirmer par l'enseignant."
+    },
+    {
+      "id": "bibliotheque-babel",
+      "origine": "enseignant",
+      "titre": "Trouver la DATE DE VOTRE MORT ? Bibliothèque de BABEL / Paradoxe du singe savant",
+      "chaine": "Balade Mentale",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=RoN8kHQvSX8",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "Une bibliothèque qui contient tous les textes possibles contient aussi ta biographie… et toutes ses versions fausses.",
+      "interets": [
+        "sciences",
+        "art"
+      ],
+      "notions": [
+        "donnees",
+        "prog"
+      ],
+      "question": "Avoir toute l'information, est-ce savoir quelque chose ?"
+    },
+    {
+      "id": "ada-lovelace-balade",
+      "origine": "enseignant",
+      "titre": "Ada lovelace & l'ORDINATEUR MÉCANIQUE / ft Florence Porcel",
+      "chaine": "Balade Mentale",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=-2604CHuIyk",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "Un siècle avant l'ordinateur, une femme écrit un programme pour une machine qui n'existe pas.",
+      "interets": [
+        "histoire",
+        "sciences"
+      ],
+      "notions": [
+        "hist",
+        "prog"
+      ],
+      "question": "Ada Lovelace est-elle la première programmeuse de l'histoire ?"
+    },
+    {
+      "id": "chatgpt-baratin",
+      "origine": "enseignant",
+      "titre": "ChatGPT : la philosophie du baratin",
+      "chaine": "Monsieur Phi",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=JcFRbecX6bk",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "Un texte peut sonner juste sans que son auteur se soucie du vrai : ça s'appelle du baratin.",
+      "interets": [
+        "societe",
+        "sciences"
+      ],
+      "notions": [
+        "ia"
+      ],
+      "question": "Peut-on faire confiance à ce que dit une IA ?"
+    },
+    {
+      "id": "chatgpt-comprend-rien",
+      "origine": "enseignant",
+      "titre": "La preuve définitive que ChatGPT ne comprend rien",
+      "chaine": "Monsieur Phi",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=_XJsAQsT0Bo",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "Comment prouver qu'une machine comprend, ou qu'elle ne comprend pas ?",
+      "interets": [
+        "societe",
+        "sciences"
+      ],
+      "notions": [
+        "ia"
+      ],
+      "question": "Dans quelle mesure une IA comprend-elle ce qu'elle écrit ?"
+    },
+    {
+      "id": "chatgpt-dissertations",
+      "origine": "enseignant",
+      "titre": "De l'art superflu d'écrire des dissertations à l'heure de ChatGPT",
+      "chaine": "Monsieur Phi",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=tzO_uqP1QKk",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie_titre_different",
+      "accroche": "Si une machine écrit ta dissertation, qu'est-ce que tu as appris ?",
+      "interets": [
+        "societe"
+      ],
+      "notions": [
+        "ia"
+      ],
+      "question": "Faut-il encore apprendre à écrire à l'heure des IA ?",
+      "libelle_enseignant": "Monsieur Phi : ChatGPT peut-il passer le bac de philo ?",
+      "note": "L'enseignant cite « ChatGPT peut-il passer le bac de philo ? » : aucune vidéo de Monsieur Phi ne porte ce titre aujourd'hui. Celle-ci est la seule trouvée sur sa chaîne à propos de ChatGPT et de la dissertation ; le titre a pu changer. Correspondance probable, à confirmer par l'enseignant."
+    },
+    {
+      "id": "secret-ia-explicabilite",
+      "origine": "enseignant",
+      "titre": "Dans le secret du fonctionnement des IA - Science En Questions",
+      "chaine": "Vasco",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=bsUeCRMFiH8",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "Une IA donne une réponse ; savoir pourquoi elle la donne est une autre affaire.",
+      "interets": [
+        "sciences",
+        "societe"
+      ],
+      "notions": [
+        "ia"
+      ],
+      "question": "Faut-il pouvoir expliquer les décisions d'une IA ?",
+      "note": "La chaîne s'appelle « Vasco » ; « Science En Questions » est le nom de l'émission."
+    },
+    {
+      "id": "parcoursup-mariage-stable",
+      "origine": "proposee",
+      "titre": "PARCOURSUP 👩🏽‍🎓🏫 et les algorithmes de mariage stable ❤️",
+      "chaine": "ScienceEtonnante",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=dO1pLi2Dedw",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "L'algorithme qui décide de ton année prochaine vient d'un problème de mariages.",
+      "interets": [
+        "societe",
+        "sciences"
+      ],
+      "notions": [
+        "prog",
+        "donnees"
+      ],
+      "question": "L'algorithme de Parcoursup est-il juste ?",
+      "note": "Date de mise en ligne donnée par TheTVDB : 9 janvier 2020.",
+      "pourquoi_elle_complete_la_liste": "Demande explicite de l'enseignant. Un algorithme au programme de la vie des élèves de terminale : sujet de Grand oral immédiat."
+    },
+    {
+      "id": "ia-image-5-litres",
+      "origine": "proposee",
+      "titre": "Créer une image IA c'est gaspiller 5 litres d'eau, vrai ou faux?",
+      "chaine": "RTS Info",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=QkYMPyavfjs",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "Un chiffre qui circule partout, repris et vérifié par une rédaction.",
+      "interets": [
+        "climat",
+        "societe"
+      ],
+      "notions": [
+        "ia",
+        "materiel"
+      ],
+      "question": "Dans quelle mesure l'intelligence artificielle pèse-t-elle sur l'eau et l'électricité ?",
+      "note": "Contenu non visionné : seuls le titre et la chaîne sont vérifiés. La date de publication n'a pas pu être lue ; à contrôler à la main (« source récente » demandée).",
+      "pourquoi_elle_complete_la_liste": "Thème « consommations du numérique » : part d'un chiffre comparatif et le vérifie (format vrai ou faux), par un média public (Radio Télévision Suisse). Chaîne nouvelle pour la liste."
+    },
+    {
+      "id": "dopamine-tiktok",
+      "origine": "proposee",
+      "titre": "TikTok | Dopamine | ARTE.tv Culture",
+      "chaine": "ARTE.tv Culture",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=oqYOTm7tOpA",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "Si tu n'arrives pas à poser ton téléphone, ce n'est pas un hasard : c'est conçu pour.",
+      "interets": [
+        "reseaux",
+        "sante",
+        "societe"
+      ],
+      "notions": [
+        "web",
+        "donnees",
+        "ia"
+      ],
+      "question": "Les réseaux sociaux sont-ils conçus pour nous rendre dépendant·e·s ?",
+      "note": "Mise en ligne officielle d'Arte. Le même épisode existe sur la chaîne « Courts Toujours » sous le titre « Tiktok | Dopamine | Saison 02 | Episode 04 | ARTE » (-pOWdBpVR3s, vérifié). L'identifiant CPFYyVcpfAc, fourni au départ, est refusé par oEmbed ; un autre, a4YDsz0h6B4 (« Dopamine, comment les applis piègent notre cerveau »), aussi. La page arte.tv de la série est bloquée depuis cette session : non vérifiée.",
+      "pourquoi_elle_complete_la_liste": "Thème « réseaux sociaux et attention », demandé par l'enseignant. Épisodes courts, une application par épisode : format idéal pour une accroche."
+    },
+    {
+      "id": "datagueule-flux",
+      "origine": "proposee",
+      "titre": "Réseaux sociaux : flux à lier - #DATAGUEULE 95",
+      "chaine": "Data Gueule",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=yWONYnuPfKY",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "En quelques minutes et beaucoup de chiffres : ce que les réseaux font de ton temps.",
+      "interets": [
+        "reseaux",
+        "societe",
+        "argent"
+      ],
+      "notions": [
+        "web",
+        "donnees"
+      ],
+      "question": "Dans quelle mesure notre attention est-elle devenue une marchandise ?",
+      "pourquoi_elle_complete_la_liste": "Thème « réseaux sociaux et attention » : l'enseignant veut Dopamine et DataGueule. La vidéo est toujours en ligne sur YouTube (vérifiée ce jour) : pas besoin de PeerTube ni de France Télévisions. Chaîne nouvelle, modèle de discours appuyé sur des données sourcées."
+    },
+    {
+      "id": "theorie-information-s4a",
+      "origine": "proposee",
+      "titre": "La théorie de l'information",
+      "chaine": "Science4All",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=hoUCWa2gkTw",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "Combien « pèse » une information ? Claude Shannon a trouvé comment la mesurer.",
+      "interets": [
+        "sciences"
+      ],
+      "notions": [
+        "donnees",
+        "hist"
+      ],
+      "question": "En quoi la théorie de l'information de Shannon a-t-elle rendu le numérique possible ?",
+      "note": "Chaîne déjà présente dans la liste de l'enseignant. Contenu non visionné.",
+      "pourquoi_elle_complete_la_liste": "Point de vue théorique sur l'information (bit, entropie, compression), au-delà de la conférence de Gérard Berry ; se relie à la vidéo Wordle déjà dans la liste."
+    },
+    {
+      "id": "quest-ce-qu-une-information",
+      "origine": "proposee",
+      "titre": "Qu'est-ce qu'une information?",
+      "chaine": "Palais de la découverte",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=4YsB_8eRe80",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "Avant de stocker ou d'envoyer une information, il faut savoir ce que c'est.",
+      "interets": [
+        "sciences"
+      ],
+      "notions": [
+        "donnees"
+      ],
+      "question": "Peut-on mesurer une information ?",
+      "note": "Contenu non visionné : niveau et durée à contrôler à la main.",
+      "pourquoi_elle_complete_la_liste": "Même thème, par un musée de sciences : chaîne nouvelle, institution de référence."
+    },
+    {
+      "id": "jeu-de-go-ia",
+      "origine": "proposee",
+      "titre": "Jeu de go et intelligence artificielle — À chaud ! #2",
+      "chaine": "ScienceEtonnante",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=P6eBraOUBLw",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "Le go a longtemps été le jeu où les machines perdaient.",
+      "interets": [
+        "jeux",
+        "sciences"
+      ],
+      "notions": [
+        "ia",
+        "hist"
+      ],
+      "question": "En quoi la victoire d'une machine au jeu de go a-t-elle marqué l'histoire de l'IA ?",
+      "pourquoi_elle_complete_la_liste": "Sujet « fun » cité par l'enseignant : le jeu comme porte d'entrée vers l'IA."
+    },
+    {
+      "id": "tas-cest-quoi",
+      "origine": "proposee",
+      "titre": "Le TAS, c'est quoi ?",
+      "chaine": "Laupok",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=uAbkEgriPKI",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "Finir un jeu en appuyant sur les touches image par image, mieux qu'aucune main humaine.",
+      "interets": [
+        "jeux"
+      ],
+      "notions": [
+        "prog",
+        "materiel"
+      ],
+      "question": "Le speedrun assisté par ordinateur est-il de la triche ou de l'informatique ?",
+      "note": "Contenu non visionné : sérieux et niveau à contrôler à la main.",
+      "pourquoi_elle_complete_la_liste": "Sujet « fun » : speedrun et glitchs, une entrée par le jeu vidéo vers la mémoire, les entrées-sorties et les bugs. Chaîne nouvelle."
+    },
+    {
+      "id": "autotune-cest-quoi",
+      "origine": "proposee",
+      "titre": "L'Auto-tune, c'est quoi ? - Muzicologik",
+      "chaine": "Muzicologik",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=3XMMdx1anso",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "La voix de tes artistes préféré·e·s passe par un algorithme avant d'arriver à tes oreilles.",
+      "interets": [
+        "musique",
+        "art"
+      ],
+      "notions": [
+        "donnees",
+        "prog"
+      ],
+      "question": "L'Auto-Tune dénature-t-il la musique ?",
+      "note": "Contenu non visionné : sérieux et niveau à contrôler à la main.",
+      "pourquoi_elle_complete_la_liste": "Sujet « fun » : la musique, absente de la liste de l'enseignant ; ouvre sur le traitement numérique du son. Chaîne nouvelle."
+    },
+    {
+      "id": "supprimer-ses-mails",
+      "origine": "proposee",
+      "titre": "Faut-il supprimer ses mails pour la planète? avec @lereveilleur",
+      "chaine": "La Biologie fait des vidéos",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/watch?v=UyGkxWA72tk",
+      "duree": null,
+      "langue": "fr",
+      "verifie_le": "2026-11-17",
+      "verifie_comment": "oEmbed YouTube (titre et chaîne renvoyés par youtube.com/oembed)",
+      "statut": "verifie",
+      "accroche": "On te dit de vider ta boîte de réception pour sauver la planète : est-ce que ça change vraiment quelque chose ?",
+      "interets": [
+        "climat",
+        "societe"
+      ],
+      "notions": [
+        "materiel",
+        "web",
+        "donnees"
+      ],
+      "question": "Faut-il supprimer ses courriels pour réduire son empreinte numérique ?",
+      "note": "Aucune vidéo vérifiée ne traite à la fois l'IA et le courriel. Contenu non visionné. Vidéos voisines, vérifiées par oEmbed : Le Réveilleur, « Faut-il vraiment culpabiliser en regardant YouTube en 4K ? » (ln5iQtd7XZI, vidéo en ligne) ; Le Temps, « E-mail, cloud, data center: ces clics qui polluent » (JvwiMNcg9sw) ; TF1 INFO, « Les mails polluent-ils autant que les avions ? » (F4d6BZjcQmo).",
+      "pourquoi_elle_complete_la_liste": "Thème « consommations du numérique », côté courriel et usages courants (l'enseignant veut l'IA et le courriel). Faite avec Le Réveilleur, déjà dans la liste pour son sérieux sur les sources ; chaîne nouvelle. Forme un duo avec la vidéo de RTS Info sur l'IA."
+    }
+  ],
+  "reperes_consommations": {
+    "avertissement": "Repères pour l'enseignant, pas pour l'activité « Info ou infox ? » : ces estimations varient beaucoup selon les études, les périmètres et les années. Chaque chiffre est celui de la page ouverte le 2026-11-17, avec sa date.",
+    "reperes": [
+      {
+        "objet": "Requête de texte à une IA (Gemini)",
+        "chiffre": "médiane : 0,24 Wh d'électricité, 0,26 mL d'eau (environ cinq gouttes), 0,03 g CO2e ; l'équivalent de moins de neuf secondes de télévision",
+        "date": "21 août 2025",
+        "source": "Google Cloud Blog, « Measuring the environmental impact of AI inference »",
+        "url": "https://cloud.google.com/blog/products/infrastructure/measuring-the-environmental-impact-of-ai-inference",
+        "limite": "Mesure publiée par l'entreprise elle-même, pour son propre service."
+      },
+      {
+        "objet": "Eau et IA à l'échelle mondiale",
+        "chiffre": "4,2 à 6,6 milliards de m3 d'eau prélevés en 2027 (projection) ; l'entraînement de GPT-3 peut évaporer 700 000 litres d'eau douce",
+        "date": "2023 (prépublication arXiv 2304.03271)",
+        "source": "Li, Yang, Islam et Ren, « Making AI Less \"Thirsty\" »",
+        "url": "https://arxiv.org/abs/2304.03271",
+        "limite": "Projection. Le chiffre « 50 cl pour 10 à 50 réponses » ne figure pas dans le résumé ouvert : non vérifié."
+      },
+      {
+        "objet": "Une heure de vidéo en ligne",
+        "chiffre": "environ 36 g CO2 et 0,077 kWh par heure (2019) ; une première estimation très reprise, 3,2 kg CO2 par heure, était faussée notamment par une confusion entre mégabits et mégaoctets",
+        "date": "11 décembre 2020 (AIE) ; 25 février 2020, mis à jour le 25 novembre 2020 (Carbon Brief)",
+        "source": "G. Kamiya, AIE, « The carbon footprint of streaming video: fact-checking the headlines » ; Carbon Brief, « Factcheck: What is the carbon footprint of streaming video on Netflix? »",
+        "url": "https://www.iea.org/commentaries/the-carbon-footprint-of-streaming-video-fact-checking-the-headlines",
+        "url_2": "https://www.carbonbrief.org/factcheck-what-is-the-carbon-footprint-of-streaming-video-on-netflix/",
+        "limite": "Bel exemple pour le Grand oral : une erreur d'unité (bit et octet) a multiplié un chiffre repris partout."
+      },
+      {
+        "objet": "Courriel et vidéo, repères ADEME",
+        "chiffre": "un an de courriels (2 600 courriels) : 0,27 kg CO2e ; un an de vidéo en ligne (364 heures) : 11,5 kg CO2e",
+        "date": "page sans date (Base Empreinte ADEME)",
+        "source": "Impact CO2 (ADEME), « Usages numérique »",
+        "url": "https://impactco2.fr/outils/usagenumerique",
+        "limite": "La page ne donne pas de chiffre pour l'IA. D'autres sources donnent pour un courriel « quelques grammes à quelques dizaines de grammes » (Wikipédia, d'après l'ADEME 2021 et le CNRS 2018) : l'écart entre sources est de un à cent."
+      },
+      {
+        "objet": "Numérique en France",
+        "chiffre": "environ 4 % de l'empreinte carbone nationale en 2022 ; en 2020, 66,5 % de l'empreinte carbone du numérique vient des terminaux",
+        "date": "2022 et 2020",
+        "source": "Arcep, « L'empreinte environnementale du numérique » ; Wikipédia (fr), « Impact environnemental du numérique », d'après l'étude ADEME-Arcep du 6 mars 2023",
+        "url": "https://www.arcep.fr/la-regulation/grands-dossiers-thematiques-transverses/lempreinte-environnementale-du-numerique.html",
+        "url_2": "https://fr.wikipedia.org/wiki/Impact_environnemental_du_numérique",
+        "limite": "Le second chiffre vient de Wikipédia, pas de l'étude elle-même."
+      },
+      {
+        "objet": "Centres de données dans le monde",
+        "chiffre": "240 à 340 TWh en 2022, soit environ 1 à 1,3 % de la demande mondiale d'électricité",
+        "date": "2022",
+        "source": "AIE, « Data Centres and Data Transmission Networks »",
+        "url": "https://www.iea.org/energy-system/buildings/data-centres-and-data-transmission-networks",
+        "limite": "Les pages de l'AIE sur 2024 (« Energy and AI ») n'ont pas pu être ouvertes : chiffre plus récent non vérifié."
+      }
+    ]
+  },
+  "introuvables": [
+    {
+      "demande": "Scilabus : Ada Lovelace",
+      "cherche": "Recherches YouTube « Scilabus Ada Lovelace » (deux formulations) et page Vikidia de Scilabus",
+      "trouve": "Aucune vidéo de Scilabus sur Ada Lovelace. La liste de l'enseignant contient déjà la vidéo de Balade Mentale sur Ada Lovelace (vérifiée) : confusion possible."
+    },
+    {
+      "demande": "Pass sciences : jeu de la vie",
+      "cherche": "Trois recherches YouTube « Passe-science jeu de la vie »",
+      "trouve": "Pas de vidéo de ce titre sur Passe-Science. Trouvé : ScienceEtonnante « Le Jeu de la Vie » (S-W0NX97DB0, vérifiée, proposée en substitution) et Passe-science #27 « Structures auto-répliquantes dans les automates cellulaires » (CfRSVPhzN5M, vérifiée)."
+    },
+    {
+      "demande": "Le dessous des cartes : câbles fibres sous-marins",
+      "cherche": "oEmbed sur vqtCruSUM_8 et EGWYbyvTF2Q ; recherche YouTube",
+      "trouve": "Les deux vidéos officielles apparaissent en recherche mais oEmbed les refuse (retirées, restreintes ou non intégrables). Gardée dans la liste avec le statut « non_verifie »."
+    },
+    {
+      "demande": "Math adultes : blockchain comment ça marche",
+      "cherche": "Recherche YouTube « Maths Adultes blockchain »",
+      "trouve": "Seule la vidéo de Radio-Canada Info porte ce titre (i6XQllJmKlk, vérifiée)."
+    },
+    {
+      "demande": "Etincelles, EPFL : Réseaux de neurones",
+      "cherche": "Deux recherches YouTube",
+      "trouve": "La chaîne « Étincelles, EPFL » existe ; pas de vidéo de ce titre trouvée. Seule correspondance : Science4All, « Les réseaux de neurones | Intelligence artificielle 41 » (8qL2lSQd9L8)."
+    },
+    {
+      "demande": "Vortex : réseaux sociaux, une nouvelle façon de devenir immortel",
+      "cherche": "Recherche YouTube et liste des épisodes de la saison 6 sur TheTVDB",
+      "trouve": "Titre actuel : « Réseaux sociaux, une nouvelle façon de faire son deuil ? » (S06E11, 5 octobre 2022 d'après TheTVDB)."
+    },
+    {
+      "demande": "Monsieur Phi : ChatGPT peut-il passer le bac de philo ?",
+      "cherche": "Deux recherches YouTube",
+      "trouve": "Pas de vidéo de ce titre. Proposée : « De l'art superflu d'écrire des dissertations à l'heure de ChatGPT » (tzO_uqP1QKk, vérifiée)."
+    },
+    {
+      "demande": "Complément : l'obsolescence logicielle",
+      "cherche": "Trois recherches YouTube en français",
+      "trouve": "Aucune vidéo de vulgarisation française centrée sur l'obsolescence logicielle n'a pu être vérifiée. Vues, sans les retenir : AFP, « L'obsolescence \"programmée\" » (H8qCGhVuQPA, vérifiée par oEmbed, mais sujet général et contenu non visionné) ; INCYBER, « Obsolescence des équipements et logiciels : véritable enjeu de résilience » (LpgntThhl-s, public professionnel). Thème non couvert."
+    },
+    {
+      "demande": "Complément : « Qui voit ce que j'écris sur le clavier de mon téléphone ? »",
+      "cherche": "Trois recherches YouTube en français (claviers, Gboard, traceurs, Exodus Privacy)",
+      "trouve": "Rien de sérieux et en français sur les claviers. Les vidéos trouvées sont en anglais ou des tutoriels sans source. Cash Investigation, « Nos données personnelles valent de l'or [Intégrale] » (fFKq2qOm39Q) est refusée par oEmbed. Thème non couvert."
+    },
+    {
+      "demande": "Complément : consommation électrique, comparaison d'une requête d'IA à une recherche ou à un courriel",
+      "cherche": "Trois recherches YouTube",
+      "trouve": "Aucune vidéo ne compare une requête d'IA à un courriel. Deux vidéos sont retenues, une par sujet : RTS Info (IA, eau) et La Biologie fait des vidéos avec Le Réveilleur (courriels). Vues, non retenues : Numerama, « Les data centers VS le golf ? » (format court, vjzXh0OkFkE, vérifiée) ; BBC Afrique, « Quelle est l'ampleur du problème de l'eau pour l'IA ? » (91u2036Bdks, vérifiée, à regarder : média public, public africain francophone) ; « ChatGPT vs Google : Quel est le pire pour la planète ? » (chaîne personnelle, écartée). Pour un chiffre comparatif sourcé, voir plutôt les faits de info-ou-infox.json."
+    },
+    {
+      "demande": "Comptes Instagram, TikTok ou podcasts",
+      "cherche": "Page France Inter du podcast « Le code a changé » et page arte.tv de « Dopamine »",
+      "trouve": "Les deux sites sont bloqués depuis cette session : adresses non vérifiées, donc non proposées. Aucun compte Instagram ou TikTok n'a pu être ouvert."
+    },
+    {
+      "demande": "Durées",
+      "cherche": "oEmbed",
+      "trouve": "oEmbed ne donne pas la durée : le champ « duree » est vide partout."
+    }
+  ],
+  "chaines": [
+    {
+      "nom": "ScienceEtonnante",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/@ScienceEtonnante",
+      "phrase": "Des questions de sciences prises au sérieux et expliquées pas à pas, avec beaucoup d'informatique et d'IA.",
+      "nouvelle": false
+    },
+    {
+      "nom": "Science4All",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/@le_science4all",
+      "phrase": "Maths et informatique qui touchent à la société : votes, IA, information.",
+      "nouvelle": false
+    },
+    {
+      "nom": "Monsieur Phi",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/@MonsieurPhi",
+      "phrase": "De la philosophie qui argumente : un modèle pour discuter de ce qu'une IA « comprend ».",
+      "nouvelle": false
+    },
+    {
+      "nom": "Inria - Médiation Scientifique",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/@Inria-MediationScientifique",
+      "phrase": "Les chercheur·e·s en informatique expliquent leur discipline (ancienne chaîne Pixees).",
+      "nouvelle": false
+    },
+    {
+      "nom": "Data Gueule",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/@datagueule",
+      "phrase": "Un sujet de société, des chiffres sourcés, quelques minutes : l'art de l'accroche par la donnée.",
+      "nouvelle": true
+    },
+    {
+      "nom": "ARTE.tv Culture",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/@artetvculture",
+      "phrase": "La chaîne où Arte publie la série « Dopamine », sur les mécanismes des applications.",
+      "nouvelle": true
+    },
+    {
+      "nom": "RTS Info",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/@RTSinfo",
+      "phrase": "L'information de la télévision publique suisse, avec des formats de vérification de chiffres.",
+      "nouvelle": true
+    },
+    {
+      "nom": "Palais de la découverte",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/@palaisdeladecouverte",
+      "phrase": "Les médiateurs et médiatrices d'un musée de sciences expliquent une notion à la fois.",
+      "nouvelle": true
+    },
+    {
+      "nom": "Wandida, EPFL",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/@Wandida",
+      "phrase": "De courts cours d'informatique et de maths d'une école d'ingénieur·e·s, pour aller plus loin (par exemple « L'entropie en théorie de l'information | Olivier Levêque », nAA7UyiCIOE, vérifiée).",
+      "nouvelle": true
+    },
+    {
+      "nom": "Passe-Science",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/@PasseScience",
+      "phrase": "Des maths et de l'informatique théorique en images : automates cellulaires, graphes, complexité.",
+      "nouvelle": false
+    },
+    {
+      "nom": "La Biologie fait des vidéos",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/@labiologiefaitdesvideos",
+      "phrase": "Une chaîne de biologie qui vérifie aussi les idées reçues sur l'environnement, ici avec Le Réveilleur.",
+      "nouvelle": true
+    },
+    {
+      "nom": "Laupok",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/@Laupok",
+      "phrase": "Le speedrun et ses techniques expliqués en français.",
+      "nouvelle": true
+    },
+    {
+      "nom": "Muzicologik",
+      "plateforme": "YouTube",
+      "url": "https://www.youtube.com/@muzicologik1227",
+      "phrase": "La musique expliquée, y compris ses outils numériques.",
+      "nouvelle": true
+    },
+    {
+      "nom": "Interstices",
+      "plateforme": "site web",
+      "url": "https://interstices.info/",
+      "phrase": "La revue en ligne pilotée par Inria pour comprendre la recherche en informatique : articles, animations, quiz (page ouverte ce jour).",
+      "nouvelle": true
+    }
+  ]
+}

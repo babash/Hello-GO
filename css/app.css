@@ -240,3 +240,21 @@ dialog::backdrop { background: rgba(0, 0, 0, .55); } dialog h2 { margin-top: 0; 
    overflow-wrap: anywhere de main ; le tableau défile dans son cadre s'il le faut. */
 .tableau-classe button, .tableau-classe .bouton, .tableau-classe .nouveau { white-space: nowrap; overflow-wrap: normal; } .tableau-classe .voyant { overflow-wrap: normal; }
 @media print { .filtres { display: none; } }
+
+/* La culture (version 1.6.0) : vidéos conseillées, « Info ou infox ? », conseils et « Pourquoi ? » */
+.video .gros a { font-weight: 700; }
+.pourquoi-video { border-left: 3px solid var(--accent); padding-left: 8px; }
+.boutons { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.apres-video { border-top: 1px solid var(--trait); margin-top: 8px; padding-top: 6px; }
+.video-accueil > .carte { margin-top: 4px; }
+.video-accueil > .sur-titre { margin-top: 12px; }
+.infox-jour { border-color: var(--accent); }
+.infox-carte { border-width: 2px; border-color: var(--accent); touch-action: pan-y; }
+.infox-carte .gros { font-size: 1.25rem; }
+.deux.grands button { min-height: 64px; font-size: 1.15rem; font-weight: 700; }
+.accroche-texte { font-weight: 700; }
+.accroches li, .chaines li { align-items: flex-start; }
+.pourquoi { margin: 8px 0; }
+.pourquoi summary { cursor: pointer; font-weight: 700; color: var(--accent); min-height: 44px; display: flex; align-items: center; }
+.conseil h3 { margin-top: 0; }
+.accroches li > div, .chaines li > div { flex: 1; min-width: 0; }

@@ -1,0 +1,1589 @@
+{
+  "genere_le": "2026-11-17",
+  "methode": "Chaque affirmation repose sur une page ouverte le 2026-11-17 ; les chiffres et les dates sont ceux de la page. Seuls des faits datés et documentés sont gardés (consigne de l'enseignant du 17/11) ; le reste est dans « ecartes ». Les pages Wikipédia servent d'encyclopédie de référence quand la page d'une institution n'a pas pu être ouverte.",
+  "compte": {
+    "total": 60,
+    "vraies": 32,
+    "fausses": 28
+  },
+  "affirmations": [
+    {
+      "id": "bug-hopper",
+      "affirmation": "Grace Hopper a inventé le mot « bug » le jour où elle a trouvé un insecte dans un ordinateur.",
+      "vrai": false,
+      "explication": "En 1947, des ingénieur·e·s ont bien trouvé une mite dans l'ordinateur Mark II de Harvard, et l'ont collée dans le carnet de bord. Mais le Smithsonian, qui conserve ce carnet, rappelle que les ingénieur·e·s parlaient de « bugs » depuis plus d'un siècle : Thomas Edison employait déjà le mot dans les années 1870. L'idée reçue est si répandue que des encyclopédies la reprennent encore.",
+      "accroche": "« Le premier bug de l'histoire est une vraie mite, conservée dans un musée ; mais le mot, lui, existait déjà depuis un siècle. »",
+      "source": {
+        "titre": "Smithsonian, National Museum of American History, « Log Book With Computer Bug »",
+        "url": "https://americanhistory.si.edu/collections/object/nmah_334663"
+      },
+      "interets": [
+        "histoire",
+        "sciences"
+      ],
+      "notions": [
+        "hist",
+        "prog"
+      ],
+      "sujets": [
+        "bug",
+        "Grace Hopper",
+        "erreurs logicielles",
+        "histoire de l'informatique"
+      ],
+      "sources_complementaires": [
+        {
+          "titre": "Encyclopædia Britannica, « Grace Hopper »",
+          "url": "https://www.britannica.com/biography/Grace-Hopper"
+        }
+      ]
+    },
+    {
+      "id": "internet-web",
+      "affirmation": "Internet et le Web, c'est la même chose.",
+      "vrai": false,
+      "explication": "Internet est le réseau : son ancêtre, ARPANET, transmet son premier message en 1969. Le Web est un service qui circule sur ce réseau : Tim Berners-Lee l'invente au CERN en 1989, vingt ans plus tard. Le courriel, par exemple, utilise Internet sans passer par le Web.",
+      "accroche": "« Internet avait déjà vingt ans quand le Web est né. »",
+      "source": {
+        "titre": "CERN, « A short history of the Web »",
+        "url": "https://home.cern/science/computing/birth-web/short-history-web"
+      },
+      "interets": [
+        "histoire",
+        "reseaux"
+      ],
+      "notions": [
+        "web",
+        "hist"
+      ],
+      "sujets": [
+        "Internet",
+        "Web",
+        "réseau",
+        "Tim Berners-Lee"
+      ],
+      "sources_complementaires": [
+        {
+          "titre": "Wikipedia (en), « ARPANET »",
+          "url": "https://en.wikipedia.org/wiki/ARPANET"
+        }
+      ]
+    },
+    {
+      "id": "mode-prive",
+      "affirmation": "La navigation privée te rend anonyme sur Internet.",
+      "vrai": false,
+      "explication": "Une fenêtre privée évite seulement de garder l'historique et les cookies sur ton appareil. Mozilla l'écrit noir sur blanc : elle ne cache ni ton adresse IP ni ta position, et ton activité reste visible des sites, des moteurs de recherche, de ton fournisseur d'accès ou du réseau de ton lycée.",
+      "accroche": "« La navigation privée cache ton historique à ta famille, pas à ton fournisseur d'accès. »",
+      "source": {
+        "titre": "Mozilla, Firefox Help, « How Private Windows protect you »",
+        "url": "https://support.mozilla.org/en-US/kb/common-myths-about-private-browsing"
+      },
+      "interets": [
+        "reseaux",
+        "societe"
+      ],
+      "notions": [
+        "web",
+        "secu",
+        "donnees"
+      ],
+      "sujets": [
+        "vie privée",
+        "navigation privée",
+        "traces numériques",
+        "adresse IP"
+      ]
+    },
+    {
+      "id": "ada-notes",
+      "affirmation": "En 1843, Ada Lovelace explique par écrit comment une machine pourrait calculer une suite de nombres, les nombres de Bernoulli.",
+      "vrai": true,
+      "explication": "En traduisant et en annotant un article sur la machine analytique de Charles Babbage, elle décrit comment la programmer pour ce calcul. C'est pourquoi on la présente souvent comme la première programmeuse.",
+      "accroche": "« Le premier programme publié date de 1843, et il est signé par une femme de 27 ans. »",
+      "source": {
+        "titre": "Encyclopædia Britannica, « Ada Lovelace »",
+        "url": "https://www.britannica.com/biography/Ada-Lovelace"
+      },
+      "interets": [
+        "histoire",
+        "sciences"
+      ],
+      "notions": [
+        "hist",
+        "prog"
+      ],
+      "sujets": [
+        "Ada Lovelace",
+        "premier programme",
+        "femmes en informatique",
+        "algorithme"
+      ]
+    },
+    {
+      "id": "machine-analytique",
+      "affirmation": "La machine analytique de Babbage, pour laquelle Ada Lovelace a écrit son programme, a fonctionné de son vivant.",
+      "vrai": false,
+      "explication": "Babbage n'en a construit qu'une petite partie. Le programme d'Ada Lovelace a donc été écrit pour une machine qui n'existait que sur le papier.",
+      "accroche": "« Ada Lovelace a programmé une machine qui n'a jamais été construite. »",
+      "source": {
+        "titre": "Encyclopædia Britannica, « Ada Lovelace »",
+        "url": "https://www.britannica.com/biography/Ada-Lovelace"
+      },
+      "interets": [
+        "histoire"
+      ],
+      "notions": [
+        "hist",
+        "materiel"
+      ],
+      "sujets": [
+        "Ada Lovelace",
+        "Charles Babbage",
+        "machine analytique"
+      ]
+    },
+    {
+      "id": "hedy-lamarr",
+      "affirmation": "Une actrice d'Hollywood a déposé en 1942 un brevet de communication radio par « saut de fréquence ».",
+      "vrai": true,
+      "explication": "Hedy Lamarr l'a déposé avec le compositeur George Antheil (brevet américain n° 2 292 387). Le saut de fréquence est aujourd'hui considéré comme une étape importante des communications sans fil.",
+      "accroche": "« Une star de cinéma des années 1940 figure au panthéon américain des inventeurs et inventrices. »",
+      "source": {
+        "titre": "National Inventors Hall of Fame, « Hedy Lamarr »",
+        "url": "https://www.invent.org/inductees/hedy-lamarr"
+      },
+      "interets": [
+        "cinema",
+        "histoire",
+        "sciences"
+      ],
+      "notions": [
+        "hist",
+        "materiel",
+        "secu"
+      ],
+      "sujets": [
+        "Hedy Lamarr",
+        "communications sans fil",
+        "femmes en informatique",
+        "brevet"
+      ]
+    },
+    {
+      "id": "hamilton-genie-logiciel",
+      "affirmation": "L'expression « génie logiciel » (software engineering) vient de la responsable du logiciel de bord des missions Apollo.",
+      "vrai": true,
+      "explication": "Margaret Hamilton dirigeait au MIT le développement du logiciel embarqué de l'ordinateur de guidage d'Apollo. Elle a employé « software engineering » pour faire reconnaître le logiciel comme une ingénierie à part entière ; elle a reçu la médaille présidentielle de la Liberté en 2016.",
+      "accroche": "« C'est une femme qui a dirigé le logiciel qui a posé des humains sur la Lune, et qui a donné son nom à tout un métier. »",
+      "source": {
+        "titre": "Wikipedia (en), « Margaret Hamilton (software engineer) »",
+        "url": "https://en.wikipedia.org/wiki/Margaret_Hamilton_(software_engineer)"
+      },
+      "interets": [
+        "histoire",
+        "sciences",
+        "transports"
+      ],
+      "notions": [
+        "hist",
+        "prog"
+      ],
+      "sujets": [
+        "Margaret Hamilton",
+        "Apollo",
+        "génie logiciel",
+        "femmes en informatique"
+      ]
+    },
+    {
+      "id": "katherine-johnson",
+      "affirmation": "En 1962, l'astronaute John Glenn a demandé qu'une mathématicienne refasse à la main les calculs de l'ordinateur avant de décoller.",
+      "vrai": true,
+      "explication": "La NASA le raconte : Glenn a demandé qu'on aille chercher Katherine Johnson pour qu'elle repasse les mêmes nombres dans les mêmes équations, sur sa machine à calculer de bureau. Il faisait plus confiance à elle qu'à l'ordinateur tout neuf.",
+      "accroche": "« En 1962, on a vérifié l'ordinateur avec une humaine, et non l'inverse. »",
+      "source": {
+        "titre": "NASA, « Katherine Johnson Biography »",
+        "url": "https://www.nasa.gov/centers-and-facilities/langley/katherine-johnson-biography/"
+      },
+      "interets": [
+        "histoire",
+        "sciences",
+        "transports"
+      ],
+      "notions": [
+        "hist",
+        "prog"
+      ],
+      "sujets": [
+        "Katherine Johnson",
+        "confiance dans les machines",
+        "NASA",
+        "femmes en informatique"
+      ]
+    },
+    {
+      "id": "hopper-compilateur",
+      "affirmation": "Grace Hopper, qui a conçu l'un des premiers compilateurs, a fini sa carrière avec le grade de contre-amirale.",
+      "vrai": true,
+      "explication": "Un compilateur traduit les instructions d'un·e programmeur·euse en code pour la machine. Grace Hopper en a conçu un des tout premiers, a défendu le langage COBOL, et a terminé sa carrière dans la marine américaine au grade de contre-amirale (rear admiral).",
+      "accroche": "« Sans compilateur, tu écrirais encore tes programmes en langage machine : merci à l'amirale Hopper. »",
+      "source": {
+        "titre": "Encyclopædia Britannica, « Grace Hopper »",
+        "url": "https://www.britannica.com/biography/Grace-Hopper"
+      },
+      "interets": [
+        "histoire",
+        "sciences"
+      ],
+      "notions": [
+        "hist",
+        "prog"
+      ],
+      "sujets": [
+        "Grace Hopper",
+        "compilateur",
+        "langages de programmation",
+        "femmes en informatique"
+      ]
+    },
+    {
+      "id": "enigma-polonais",
+      "affirmation": "Alan Turing a été le premier à casser le code de la machine Enigma.",
+      "vrai": false,
+      "explication": "Enigma a d'abord été cassée par des Polonais au début des années 1930. En 1939, ils transmettent leurs résultats aux Britanniques, dont l'équipe travaille ensuite sous la direction du mathématicien Alan Turing.",
+      "accroche": "« Avant Turing, il y a eu les mathématiciens polonais : la cryptanalyse d'Enigma est une course de relais. »",
+      "source": {
+        "titre": "Encyclopædia Britannica, « Enigma »",
+        "url": "https://www.britannica.com/topic/Enigma-German-code-device"
+      },
+      "interets": [
+        "histoire",
+        "societe"
+      ],
+      "notions": [
+        "hist",
+        "secu"
+      ],
+      "sujets": [
+        "Alan Turing",
+        "Enigma",
+        "cryptographie",
+        "Seconde Guerre mondiale"
+      ]
+    },
+    {
+      "id": "eniac-programmeuses",
+      "affirmation": "L'ENIAC, un des premiers ordinateurs électroniques, a été programmé par six femmes.",
+      "vrai": true,
+      "explication": "Betty Holberton, Kay McNulty, Marlyn Wescoff, Ruth Lichterman, Betty Jean Jennings et Fran Bilas ont programmé l'ENIAC. Leur rôle a longtemps été oublié.",
+      "accroche": "« Les premières personnes à programmer un ordinateur électronique étaient six femmes. »",
+      "source": {
+        "titre": "Wikipedia (en), « ENIAC »",
+        "url": "https://en.wikipedia.org/wiki/ENIAC"
+      },
+      "interets": [
+        "histoire",
+        "societe"
+      ],
+      "notions": [
+        "hist",
+        "prog"
+      ],
+      "sujets": [
+        "ENIAC",
+        "femmes en informatique",
+        "histoire de la programmation"
+      ]
+    },
+    {
+      "id": "eniac-bureau",
+      "affirmation": "L'ENIAC, terminé en 1946, tenait sur un bureau.",
+      "vrai": false,
+      "explication": "Il pesait plus de 27 tonnes, comptait plus de 17 000 tubes à vide et consommait 150 kW. Il occupait une salle entière.",
+      "accroche": "« Le grand-père de ton téléphone pesait 27 tonnes. »",
+      "source": {
+        "titre": "Wikipedia (en), « ENIAC »",
+        "url": "https://en.wikipedia.org/wiki/ENIAC"
+      },
+      "interets": [
+        "histoire",
+        "sciences"
+      ],
+      "notions": [
+        "hist",
+        "materiel"
+      ],
+      "sujets": [
+        "ENIAC",
+        "miniaturisation",
+        "histoire du matériel"
+      ]
+    },
+    {
+      "id": "webcam-cafetiere",
+      "affirmation": "La première webcam filmait une cafetière.",
+      "vrai": true,
+      "explication": "En 1991, à l'université de Cambridge, deux chercheurs pointent une caméra sur la cafetière du laboratoire d'informatique pour savoir si elle est pleine sans se déplacer. L'image est mise sur le Web en 1993 et la caméra est éteinte en 2001.",
+      "accroche": "« La première webcam du monde a été inventée par des informaticiens qui ne voulaient pas se lever pour rien. »",
+      "source": {
+        "titre": "Wikipedia (en), « Trojan Room coffee pot »",
+        "url": "https://en.wikipedia.org/wiki/Trojan_Room_coffee_pot"
+      },
+      "interets": [
+        "histoire",
+        "sciences"
+      ],
+      "notions": [
+        "web",
+        "hist",
+        "materiel"
+      ],
+      "sujets": [
+        "webcam",
+        "Web",
+        "invention",
+        "objets connectés"
+      ]
+    },
+    {
+      "id": "arpanet-lo",
+      "affirmation": "Le premier message envoyé sur l'ancêtre d'Internet a fait planter le système au bout de deux lettres.",
+      "vrai": true,
+      "explication": "En 1969, la première liaison d'ARPANET relie l'université UCLA au Stanford Research Institute. Seules les lettres « lo » arrivent avant la panne ; le message complet passe environ une heure plus tard.",
+      "accroche": "« Le premier mot d'Internet, c'est \"lo\" : un plantage. »",
+      "source": {
+        "titre": "Wikipedia (en), « ARPANET »",
+        "url": "https://en.wikipedia.org/wiki/ARPANET"
+      },
+      "interets": [
+        "histoire",
+        "reseaux"
+      ],
+      "notions": [
+        "web",
+        "hist"
+      ],
+      "sujets": [
+        "ARPANET",
+        "Internet",
+        "réseau",
+        "panne"
+      ]
+    },
+    {
+      "id": "arobase",
+      "affirmation": "L'arobase des adresses de courriel a été choisie en 1971 parce que ce signe n'apparaissait dans aucun nom.",
+      "vrai": true,
+      "explication": "Ray Tomlinson met au point en 1971 l'envoi de messages d'un ordinateur à un autre. Il sépare le nom de la personne et celui de la machine par @, un symbole absent des noms et du langage des ordinateurs de l'époque.",
+      "accroche": "« Le @ de ton adresse a plus de cinquante ans, et il a été choisi parce que personne ne s'en servait. »",
+      "source": {
+        "titre": "Encyclopædia Britannica, « Ray Tomlinson »",
+        "url": "https://www.britannica.com/biography/Ray-Tomlinson"
+      },
+      "interets": [
+        "histoire",
+        "reseaux"
+      ],
+      "notions": [
+        "web",
+        "hist"
+      ],
+      "sujets": [
+        "courriel",
+        "arobase",
+        "Ray Tomlinson",
+        "adresses"
+      ]
+    },
+    {
+      "id": "satellites",
+      "affirmation": "L'essentiel des échanges Internet entre continents passe par des satellites.",
+      "vrai": false,
+      "explication": "Ils passent par des câbles posés au fond des mers. D'après les données du régulateur américain citées par TeleGeography, les satellites ne représentent que 0,37 % de la capacité internationale des États-Unis.",
+      "accroche": "« Internet ne tombe pas du ciel : il passe sous la mer. »",
+      "source": {
+        "titre": "TeleGeography, « Submarine Cable FAQs »",
+        "url": "https://www2.telegeography.com/submarine-cable-faqs-frequently-asked-questions"
+      },
+      "interets": [
+        "societe",
+        "transports",
+        "histoire"
+      ],
+      "notions": [
+        "web",
+        "materiel"
+      ],
+      "sujets": [
+        "câbles sous-marins",
+        "infrastructure d'Internet",
+        "satellites",
+        "géopolitique"
+      ]
+    },
+    {
+      "id": "cable-tuyau",
+      "affirmation": "Un câble sous-marin d'Internet a, sur l'essentiel de son trajet, le diamètre d'un tuyau d'arrosage.",
+      "vrai": true,
+      "explication": "Les fibres de verre qui transportent la lumière y sont fines comme un cheveu. Début 2026, TeleGeography comptait plus de 1,5 million de kilomètres de câbles sous-marins en service.",
+      "accroche": "« Tes vidéos traversent l'océan dans un tuyau d'arrosage. »",
+      "source": {
+        "titre": "TeleGeography, « Submarine Cable FAQs »",
+        "url": "https://www2.telegeography.com/submarine-cable-faqs-frequently-asked-questions"
+      },
+      "interets": [
+        "sciences",
+        "transports"
+      ],
+      "notions": [
+        "web",
+        "materiel"
+      ],
+      "sujets": [
+        "câbles sous-marins",
+        "fibre optique",
+        "infrastructure d'Internet"
+      ]
+    },
+    {
+      "id": "mayotte-satellite",
+      "affirmation": "Mayotte n'est reliée à Internet que par satellite.",
+      "vrai": false,
+      "explication": "Depuis 2012, le câble sous-marin LION2 dessert Mayotte : il prolonge le câble LION depuis Madagascar jusqu'à Mombasa, au Kenya.",
+      "accroche": "« Internet arrive à Mayotte par le fond du canal du Mozambique. »",
+      "source": {
+        "titre": "Wikipédia (fr), « Lower Indian Ocean Network »",
+        "url": "https://fr.wikipedia.org/wiki/Lower_Indian_Ocean_Network"
+      },
+      "interets": [
+        "societe",
+        "histoire"
+      ],
+      "notions": [
+        "web",
+        "materiel"
+      ],
+      "sujets": [
+        "Mayotte",
+        "océan Indien",
+        "câbles sous-marins",
+        "fracture numérique"
+      ]
+    },
+    {
+      "id": "deux-africa",
+      "affirmation": "Un câble sous-marin de 45 000 kilomètres fait le tour de l'Afrique.",
+      "vrai": true,
+      "explication": "Le câble 2Africa relie 33 pays ; il est financé par un consortium de huit entreprises, dont Meta, Orange et Vodafone. Le cœur du système a été achevé en 2025 ; il touche notamment le Kenya, le Mozambique et Madagascar.",
+      "accroche": "« Le plus grand chantier d'Internet de ces dernières années fait le tour de l'Afrique. »",
+      "source": {
+        "titre": "Wikipedia (en), « 2Africa »",
+        "url": "https://en.wikipedia.org/wiki/2Africa"
+      },
+      "interets": [
+        "societe",
+        "argent"
+      ],
+      "notions": [
+        "web",
+        "materiel"
+      ],
+      "sujets": [
+        "Afrique",
+        "câbles sous-marins",
+        "GAFAM",
+        "infrastructure d'Internet"
+      ]
+    },
+    {
+      "id": "m-pesa",
+      "affirmation": "Un service qui permet d'envoyer de l'argent avec un simple téléphone a été lancé au Kenya dès 2007.",
+      "vrai": true,
+      "explication": "M-Pesa, lancé par Vodafone et Safaricom, permet de transférer de l'argent et de payer par téléphone mobile. Fin 2011, il comptait déjà 17 millions d'abonné·e·s au Kenya.",
+      "accroche": "« Le paiement par téléphone s'est imposé au Kenya bien avant de se banaliser en Europe. »",
+      "source": {
+        "titre": "Wikipedia (en), « M-Pesa »",
+        "url": "https://en.wikipedia.org/wiki/M-Pesa"
+      },
+      "interets": [
+        "argent",
+        "societe"
+      ],
+      "notions": [
+        "web",
+        "donnees"
+      ],
+      "sujets": [
+        "Afrique",
+        "paiement mobile",
+        "M-Pesa",
+        "innovation"
+      ]
+    },
+    {
+      "id": "apollo-memoire",
+      "affirmation": "L'ordinateur de bord des missions Apollo avait environ 2 000 mots de mémoire vive.",
+      "vrai": true,
+      "explication": "L'Apollo Guidance Computer disposait de 2 048 mots de mémoire vive et de 36 864 mots de mémoire morte, des mots de 15 bits, et il pesait 32 kg. C'est infiniment moins que le moindre téléphone actuel.",
+      "accroche": "« On est allé sur la Lune avec moins de mémoire qu'il n'en faut pour une seule photo. »",
+      "source": {
+        "titre": "Wikipedia (en), « Apollo Guidance Computer »",
+        "url": "https://en.wikipedia.org/wiki/Apollo_Guidance_Computer"
+      },
+      "interets": [
+        "histoire",
+        "sciences",
+        "transports"
+      ],
+      "notions": [
+        "hist",
+        "materiel"
+      ],
+      "sujets": [
+        "Apollo",
+        "mémoire",
+        "miniaturisation",
+        "matériel"
+      ]
+    },
+    {
+      "id": "disque-dur-tonne",
+      "affirmation": "Le premier disque dur vendu, en 1956, pesait plus d'une tonne pour moins de 4 mégaoctets.",
+      "vrai": true,
+      "explication": "L'unité de disques du système IBM 305 RAMAC empilait cinquante disques de 61 cm (24 pouces) et stockait l'équivalent de 3,75 Mo, soit à peu près une photo d'aujourd'hui.",
+      "accroche": "« En 1956, stocker une seule photo aurait demandé une machine d'une tonne. »",
+      "source": {
+        "titre": "Computer History Museum, « 1956: First commercial hard disk drive shipped »",
+        "url": "https://www.computerhistory.org/storageengine/first-commercial-hard-disk-drive-shipped/"
+      },
+      "interets": [
+        "histoire",
+        "sciences"
+      ],
+      "notions": [
+        "hist",
+        "materiel",
+        "donnees"
+      ],
+      "sujets": [
+        "stockage",
+        "disque dur",
+        "miniaturisation",
+        "IBM"
+      ]
+    },
+    {
+      "id": "moore",
+      "affirmation": "La loi de Moore est une loi de la physique.",
+      "vrai": false,
+      "explication": "C'est une prédiction faite en 1965 par l'ingénieur Gordon Moore sur le nombre de transistors par puce, révisée en 1975 (doublement tous les deux ans). Elle a longtemps été vérifiée, ce qui l'a fait prendre pour une loi inévitable, mais elle décrit un rythme industriel, pas la nature.",
+      "accroche": "« La loi de Moore n'est pas une loi : c'est un pari d'ingénieur qui a tenu cinquante ans. »",
+      "source": {
+        "titre": "Encyclopædia Britannica, « Moore's law »",
+        "url": "https://www.britannica.com/technology/Moores-law"
+      },
+      "interets": [
+        "histoire",
+        "sciences",
+        "argent"
+      ],
+      "notions": [
+        "hist",
+        "materiel"
+      ],
+      "sujets": [
+        "loi de Moore",
+        "transistor",
+        "miniaturisation",
+        "limites physiques"
+      ]
+    },
+    {
+      "id": "bluetooth",
+      "affirmation": "Le Bluetooth porte le surnom d'un roi viking du Xe siècle.",
+      "vrai": true,
+      "explication": "Le roi Harald « à la dent bleue » a uni le Danemark et la Norvège ; en 1996, un ingénieur d'Intel propose son surnom comme nom de code provisoire pour une technologie censée unir les appareils. Le logo assemble les deux runes de ses initiales.",
+      "accroche": "« Chaque fois que tu connectes tes écouteurs, tu invoques un roi viking. »",
+      "source": {
+        "titre": "Bluetooth SIG, « Origin of the name »",
+        "url": "https://www.bluetooth.com/about-us/bluetooth-origin/"
+      },
+      "interets": [
+        "histoire",
+        "musique"
+      ],
+      "notions": [
+        "materiel",
+        "hist"
+      ],
+      "sujets": [
+        "Bluetooth",
+        "communications sans fil",
+        "normes",
+        "histoire des techniques"
+      ]
+    },
+    {
+      "id": "souris-bois",
+      "affirmation": "La première souris d'ordinateur était en bois.",
+      "vrai": true,
+      "explication": "Douglas Engelbart imagine la souris au début des années 1960 ; l'ingénieur Bill English en construit le premier prototype, en bois.",
+      "accroche": "« La première souris était un bloc de bois, bien avant Apple et Microsoft. »",
+      "source": {
+        "titre": "Computer History Museum, « The Mouse »",
+        "url": "https://www.computerhistory.org/revolution/input-output/14/350"
+      },
+      "interets": [
+        "histoire",
+        "sciences"
+      ],
+      "notions": [
+        "hist",
+        "materiel"
+      ],
+      "sujets": [
+        "souris",
+        "interface humain-machine",
+        "Douglas Engelbart"
+      ]
+    },
+    {
+      "id": "pong-premier",
+      "affirmation": "Pong est le premier jeu vidéo de l'histoire.",
+      "vrai": false,
+      "explication": "Dès le 18 octobre 1958, le physicien William Higinbotham présente « Tennis for Two » au laboratoire de Brookhaven : un jeu de tennis sur un écran d'oscilloscope, relié à un calculateur analogique. Pong n'arrive qu'après.",
+      "accroche": "« Le premier jeu de tennis sur écran a été bricolé par un physicien nucléaire pour une journée portes ouvertes. »",
+      "source": {
+        "titre": "Brookhaven National Laboratory, « The First Video Game? »",
+        "url": "https://www.bnl.gov/about/history/firstvideo.php"
+      },
+      "interets": [
+        "jeux",
+        "histoire"
+      ],
+      "notions": [
+        "hist",
+        "materiel"
+      ],
+      "sujets": [
+        "jeux vidéo",
+        "histoire des jeux vidéo",
+        "Pong"
+      ]
+    },
+    {
+      "id": "tetris-nintendo",
+      "affirmation": "Tetris a été créé au Japon par Nintendo.",
+      "vrai": false,
+      "explication": "Tetris a été créé au milieu des années 1980 par Alexey Pajitnov, un ingénieur soviétique du centre de calcul de l'Académie des sciences. Son nom mêle « tetra » (quatre) et le tennis, son sport préféré.",
+      "accroche": "« Le jeu vidéo le plus célèbre du monde vient d'un laboratoire soviétique. »",
+      "source": {
+        "titre": "Wikipedia (en), « Tetris »",
+        "url": "https://en.wikipedia.org/wiki/Tetris"
+      },
+      "interets": [
+        "jeux",
+        "histoire"
+      ],
+      "notions": [
+        "hist",
+        "prog"
+      ],
+      "sujets": [
+        "Tetris",
+        "jeux vidéo",
+        "URSS"
+      ]
+    },
+    {
+      "id": "pacman-256",
+      "affirmation": "Le niveau 256 de Pac-Man est impossible à finir à cause d'un dépassement d'entier.",
+      "vrai": true,
+      "explication": "Dans le jeu de 1980, un dépassement de capacité fait charger le 256e niveau de travers : c'est l'« écran de la mort ». Avec 8 bits, on ne compte que jusqu'à 255.",
+      "accroche": "« Pac-Man a une fin : le jeu se casse au niveau 256, parce qu'un octet ne sait pas compter plus loin. »",
+      "source": {
+        "titre": "Wikipedia (en), « Pac-Man »",
+        "url": "https://en.wikipedia.org/wiki/Pac-Man"
+      },
+      "interets": [
+        "jeux",
+        "histoire"
+      ],
+      "notions": [
+        "donnees",
+        "prog",
+        "hist"
+      ],
+      "sujets": [
+        "Pac-Man",
+        "dépassement d'entier",
+        "représentation des nombres",
+        "bugs"
+      ]
+    },
+    {
+      "id": "gandhi-nucleaire",
+      "affirmation": "Dans le premier Civilization, un bug de dépassement d'entier rendait Gandhi fou de bombes nucléaires.",
+      "vrai": false,
+      "explication": "C'est une légende : elle n'apparaît qu'en 2012, sur un wiki, 21 ans après la sortie du jeu, et le créateur du jeu, Sid Meier, a confirmé en 2020 que ce bug était inventé. L'histoire est belle parce que ce genre de bug existe vraiment ailleurs.",
+      "accroche": "« Le bug le plus célèbre du jeu vidéo n'a jamais existé. »",
+      "source": {
+        "titre": "Wikipedia (en), « Nuclear Gandhi »",
+        "url": "https://en.wikipedia.org/wiki/Nuclear_Gandhi"
+      },
+      "interets": [
+        "jeux",
+        "societe"
+      ],
+      "notions": [
+        "prog",
+        "donnees"
+      ],
+      "sujets": [
+        "légende urbaine",
+        "désinformation",
+        "dépassement d'entier",
+        "jeux vidéo"
+      ]
+    },
+    {
+      "id": "deep-blue",
+      "affirmation": "En 1997, un ordinateur a battu le champion du monde d'échecs en match.",
+      "vrai": true,
+      "explication": "Deep Blue, conçu par IBM, a battu Garry Kasparov 3,5 à 2,5 : deux victoires et trois nulles pour la machine.",
+      "accroche": "« En 1997, le meilleur joueur d'échecs du monde a perdu contre une machine. »",
+      "source": {
+        "titre": "Encyclopædia Britannica, « Deep Blue »",
+        "url": "https://www.britannica.com/topic/Deep-Blue"
+      },
+      "interets": [
+        "jeux",
+        "sport",
+        "histoire"
+      ],
+      "notions": [
+        "ia",
+        "hist"
+      ],
+      "sujets": [
+        "Deep Blue",
+        "échecs",
+        "IA et jeux",
+        "Kasparov"
+      ]
+    },
+    {
+      "id": "alphago-toutes",
+      "affirmation": "En 2016, le programme AlphaGo a gagné toutes ses parties contre le champion de go Lee Sedol.",
+      "vrai": false,
+      "explication": "AlphaGo a gagné le match 4 à 1, à Séoul, du 9 au 15 mars 2016 : Lee Sedol a remporté la quatrième partie.",
+      "accroche": "« Contre AlphaGo, l'humain a sauvé l'honneur : une partie sur cinq. »",
+      "source": {
+        "titre": "Wikipedia (en), « AlphaGo versus Lee Sedol »",
+        "url": "https://en.wikipedia.org/wiki/AlphaGo_versus_Lee_Sedol"
+      },
+      "interets": [
+        "jeux",
+        "sport",
+        "histoire"
+      ],
+      "notions": [
+        "ia",
+        "hist"
+      ],
+      "sujets": [
+        "AlphaGo",
+        "jeu de go",
+        "IA et jeux",
+        "apprentissage automatique"
+      ]
+    },
+    {
+      "id": "ia-recent",
+      "affirmation": "L'expression « intelligence artificielle » date des années 2010.",
+      "vrai": false,
+      "explication": "Elle remonte à 1956 : cet été-là, un atelier de recherche organisé par John McCarthy à l'université de Dartmouth porte déjà ce nom.",
+      "accroche": "« L'intelligence artificielle a l'âge de nos grands-parents : son nom date de 1956. »",
+      "source": {
+        "titre": "Dartmouth College, « Artificial Intelligence (AI) Coined at Dartmouth »",
+        "url": "https://home.dartmouth.edu/about/artificial-intelligence-ai-coined-dartmouth"
+      },
+      "interets": [
+        "histoire",
+        "sciences"
+      ],
+      "notions": [
+        "ia",
+        "hist"
+      ],
+      "sujets": [
+        "intelligence artificielle",
+        "histoire de l'IA",
+        "Dartmouth"
+      ]
+    },
+    {
+      "id": "eliza-chatbot",
+      "affirmation": "Les premiers programmes capables de converser avec un humain datent des années 2010.",
+      "vrai": false,
+      "explication": "ELIZA, créé au MIT par Joseph Weizenbaum, date de 1966 : il imitait un psychothérapeute. Son auteur a été surpris de voir des personnes, dont sa secrétaire, prêter des sentiments au programme.",
+      "accroche": "« Dès 1966, des gens se confiaient à un programme. »",
+      "source": {
+        "titre": "Wikipedia (en), « ELIZA »",
+        "url": "https://en.wikipedia.org/wiki/ELIZA"
+      },
+      "interets": [
+        "histoire",
+        "sante",
+        "societe"
+      ],
+      "notions": [
+        "ia",
+        "hist"
+      ],
+      "sujets": [
+        "agent conversationnel",
+        "ELIZA",
+        "test de Turing",
+        "anthropomorphisme"
+      ]
+    },
+    {
+      "id": "recaptcha",
+      "affirmation": "En recopiant des mots tordus pour prouver que tu n'es pas un robot, des internautes ont aidé à numériser les archives d'un journal.",
+      "vrai": true,
+      "explication": "Le système reCAPTCHA, conçu à l'université Carnegie Mellon pour la numérisation de livres, a aidé à numériser les archives du New York Times ; Google l'a ensuite utilisé pour ses livres.",
+      "accroche": "« Pendant des années, prouver qu'on était humain, c'était travailler gratuitement à numériser des livres. »",
+      "source": {
+        "titre": "Wikipedia (en), « reCAPTCHA »",
+        "url": "https://en.wikipedia.org/wiki/ReCAPTCHA"
+      },
+      "interets": [
+        "reseaux",
+        "societe",
+        "art"
+      ],
+      "notions": [
+        "web",
+        "secu",
+        "ia"
+      ],
+      "sujets": [
+        "CAPTCHA",
+        "travail du clic",
+        "numérisation",
+        "robots"
+      ]
+    },
+    {
+      "id": "python-serpent",
+      "affirmation": "Le langage Python doit son nom au serpent.",
+      "vrai": false,
+      "explication": "Guido van Rossum lisait les scénarios de la série comique britannique « Monty Python's Flying Circus » quand il a commencé le langage, fin 1989 : il voulait un nom court, unique et un peu mystérieux.",
+      "accroche": "« Python ne vient pas du serpent, mais d'une troupe de comiques anglais. »",
+      "source": {
+        "titre": "Python Software Foundation, « General Python FAQ »",
+        "url": "https://docs.python.org/3/faq/general.html"
+      },
+      "interets": [
+        "histoire",
+        "cinema"
+      ],
+      "notions": [
+        "prog",
+        "hist"
+      ],
+      "sujets": [
+        "Python",
+        "langages de programmation",
+        "Guido van Rossum"
+      ]
+    },
+    {
+      "id": "java-javascript",
+      "affirmation": "JavaScript est une version simplifiée de Java.",
+      "vrai": false,
+      "explication": "Ce sont deux langages différents : la documentation de Mozilla précise qu'ils se ressemblent par certains côtés mais sont fondamentalement différents par d'autres, par exemple dans leur modèle d'objets.",
+      "accroche": "« Java est à JavaScript ce que le chat est au chat-huant : le même début de mot. »",
+      "source": {
+        "titre": "MDN Web Docs (Mozilla), « JavaScript Guide: Introduction »",
+        "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Introduction"
+      },
+      "interets": [
+        "sciences"
+      ],
+      "notions": [
+        "prog",
+        "web"
+      ],
+      "sujets": [
+        "JavaScript",
+        "Java",
+        "langages de programmation",
+        "Web"
+      ]
+    },
+    {
+      "id": "supercalculateurs",
+      "affirmation": "Les plus puissants supercalculateurs du monde fonctionnent sous Windows.",
+      "vrai": false,
+      "explication": "Depuis novembre 2017, les 500 supercalculateurs du classement TOP500 utilisent tous un système fondé sur le noyau Linux, un logiciel libre.",
+      "accroche": "« Les 500 machines les plus puissantes du monde tournent toutes sous Linux. »",
+      "source": {
+        "titre": "Wikipedia (en), « TOP500 »",
+        "url": "https://en.wikipedia.org/wiki/TOP500"
+      },
+      "interets": [
+        "sciences",
+        "societe"
+      ],
+      "notions": [
+        "materiel",
+        "prog"
+      ],
+      "sujets": [
+        "Linux",
+        "logiciel libre",
+        "supercalculateur",
+        "systèmes d'exploitation"
+      ]
+    },
+    {
+      "id": "an-2038",
+      "affirmation": "Le 19 janvier 2038, certains ordinateurs risquent de se croire en 1901.",
+      "vrai": true,
+      "explication": "Beaucoup de systèmes comptent le temps en secondes depuis le 1er janvier 1970 dans un entier signé de 32 bits. Ce compteur déborde le 19 janvier 2038 à 03 h 14 min 07 s (UTC), et la date repasse alors au 13 décembre 1901.",
+      "accroche": "« Il existe un bug dont on connaît déjà la date à la seconde près : le 19 janvier 2038. »",
+      "source": {
+        "titre": "Wikipedia (en), « Year 2038 problem »",
+        "url": "https://en.wikipedia.org/wiki/Year_2038_problem"
+      },
+      "interets": [
+        "sciences",
+        "societe"
+      ],
+      "notions": [
+        "donnees",
+        "prog",
+        "materiel"
+      ],
+      "sujets": [
+        "représentation des entiers",
+        "dépassement de capacité",
+        "bug de l'an 2038",
+        "temps Unix"
+      ]
+    },
+    {
+      "id": "ariane-5",
+      "affirmation": "En 1996, la première Ariane 5 a été détruite à cause d'une conversion de nombre dans son logiciel.",
+      "vrai": true,
+      "explication": "Le 4 juin 1996, la fusée dévie 37 secondes après le décollage. Un logiciel repris d'Ariane 4 convertissait un nombre flottant de 64 bits en entier signé de 16 bits : la valeur était devenue trop grande. La perte dépasse 370 millions de dollars.",
+      "accroche": "« Une fusée a été détruite parce qu'un nombre ne tenait pas dans 16 bits. »",
+      "source": {
+        "titre": "Wikipedia (en), « Ariane flight V88 »",
+        "url": "https://en.wikipedia.org/wiki/Ariane_flight_V88"
+      },
+      "interets": [
+        "transports",
+        "sciences",
+        "argent"
+      ],
+      "notions": [
+        "donnees",
+        "prog"
+      ],
+      "sujets": [
+        "Ariane 5",
+        "représentation des nombres",
+        "bugs célèbres",
+        "logiciel embarqué"
+      ]
+    },
+    {
+      "id": "mars-orbiter",
+      "affirmation": "La NASA a perdu une sonde martienne parce que deux logiciels n'utilisaient pas les mêmes unités de mesure.",
+      "vrai": true,
+      "explication": "La sonde Mars Climate Orbiter est perdue le 23 septembre 1999 : le logiciel au sol calculait en unités anglo-saxonnes, celui de la sonde en unités métriques. La trajectoire l'a amenée trop près de Mars.",
+      "accroche": "« Une sonde spatiale a été perdue pour une histoire de conversion d'unités. »",
+      "source": {
+        "titre": "NASA Science, « Mars Climate Orbiter »",
+        "url": "https://science.nasa.gov/mission/mars-climate-orbiter/"
+      },
+      "interets": [
+        "transports",
+        "sciences"
+      ],
+      "notions": [
+        "donnees",
+        "prog"
+      ],
+      "sujets": [
+        "Mars Climate Orbiter",
+        "bugs célèbres",
+        "unités",
+        "spécification"
+      ]
+    },
+    {
+      "id": "therac",
+      "affirmation": "Dans les années 1980, des erreurs de programmation dans un appareil de radiothérapie ont causé la mort de patient·e·s.",
+      "vrai": true,
+      "explication": "Entre 1985 et 1987, le Therac-25, piloté par ordinateur, a délivré au moins six surdoses de rayons ; trois personnes en sont mortes. En cause : des erreurs de programmation concurrente.",
+      "accroche": "« Un bug peut tuer : c'est arrivé en radiothérapie dans les années 1980. »",
+      "source": {
+        "titre": "Wikipedia (en), « Therac-25 »",
+        "url": "https://en.wikipedia.org/wiki/Therac-25"
+      },
+      "interets": [
+        "sante",
+        "societe"
+      ],
+      "notions": [
+        "prog",
+        "secu"
+      ],
+      "sujets": [
+        "Therac-25",
+        "sûreté logicielle",
+        "bugs célèbres",
+        "santé"
+      ]
+    },
+    {
+      "id": "bitcoin-createur",
+      "affirmation": "On connaît l'identité de la personne qui a créé le Bitcoin.",
+      "vrai": false,
+      "explication": "Le texte fondateur a été publié en 2008 sous le pseudonyme de Satoshi Nakamoto, et l'identité de son auteur·e reste inconnue.",
+      "accroche": "« La monnaie numérique la plus célèbre a été inventée par quelqu'un dont personne ne connaît le nom. »",
+      "source": {
+        "titre": "Wikipedia (en), « Bitcoin »",
+        "url": "https://en.wikipedia.org/wiki/Bitcoin"
+      },
+      "interets": [
+        "argent",
+        "societe"
+      ],
+      "notions": [
+        "secu",
+        "donnees"
+      ],
+      "sujets": [
+        "Bitcoin",
+        "cryptomonnaie",
+        "anonymat",
+        "blockchain"
+      ]
+    },
+    {
+      "id": "bitcoin-pizzas",
+      "affirmation": "En 2010, un programmeur a payé deux pizzas 10 000 bitcoins.",
+      "vrai": true,
+      "explication": "Le 22 mai 2010, Laszlo Hanyecz achète deux pizzas pour 10 000 bitcoins.",
+      "accroche": "« Les deux pizzas les plus chères de l'histoire ont été payées en bitcoins. »",
+      "source": {
+        "titre": "Wikipedia (en), « Bitcoin »",
+        "url": "https://en.wikipedia.org/wiki/Bitcoin"
+      },
+      "interets": [
+        "argent",
+        "histoire"
+      ],
+      "notions": [
+        "donnees",
+        "secu"
+      ],
+      "sujets": [
+        "Bitcoin",
+        "cryptomonnaie",
+        "valeur",
+        "spéculation"
+      ]
+    },
+    {
+      "id": "youtube-google",
+      "affirmation": "YouTube a été créé par Google.",
+      "vrai": false,
+      "explication": "YouTube a été enregistré le 14 février 2005 par Steve Chen, Chad Hurley et Jawed Karim. Google l'a racheté en novembre 2006 pour 1,65 milliard de dollars en actions.",
+      "accroche": "« YouTube n'est pas né chez Google : Google l'a acheté à trois jeunes fondateurs, un an et demi après sa création. »",
+      "source": {
+        "titre": "Encyclopædia Britannica, « YouTube »",
+        "url": "https://www.britannica.com/topic/YouTube"
+      },
+      "interets": [
+        "reseaux",
+        "argent",
+        "histoire"
+      ],
+      "notions": [
+        "web",
+        "hist"
+      ],
+      "sujets": [
+        "YouTube",
+        "GAFAM",
+        "rachat",
+        "plateformes"
+      ]
+    },
+    {
+      "id": "premier-sms",
+      "affirmation": "Le premier SMS de l'histoire disait « Merry Christmas ».",
+      "vrai": true,
+      "explication": "Il a été envoyé le 3 décembre 1992 sur le réseau de Vodafone, au Royaume-Uni, par l'ingénieur Neil Papworth. Un SMS est limité à 160 caractères.",
+      "accroche": "« Le premier SMS souhaitait un joyeux Noël, avec trois semaines d'avance. »",
+      "source": {
+        "titre": "Wikipedia (en), « SMS »",
+        "url": "https://en.wikipedia.org/wiki/SMS"
+      },
+      "interets": [
+        "histoire",
+        "reseaux"
+      ],
+      "notions": [
+        "hist",
+        "materiel"
+      ],
+      "sujets": [
+        "SMS",
+        "téléphonie mobile",
+        "messagerie"
+      ]
+    },
+    {
+      "id": "premier-portable",
+      "affirmation": "Le premier appel public passé avec un téléphone portable date des années 1990.",
+      "vrai": false,
+      "explication": "Il date de 1973 : Martin Cooper, ingénieur chez Motorola, appelle le responsable du projet concurrent avec un prototype de 1,1 kg, présenté à New York le 3 avril 1973. Le premier modèle vendu sort en 1983, à 3 995 dollars.",
+      "accroche": "« Le premier téléphone portable pesait plus d'un kilo, et son premier appel a servi à narguer la concurrence. »",
+      "source": {
+        "titre": "Encyclopædia Britannica, « Martin Cooper »",
+        "url": "https://www.britannica.com/biography/Martin-Cooper"
+      },
+      "interets": [
+        "histoire",
+        "sciences"
+      ],
+      "notions": [
+        "hist",
+        "materiel"
+      ],
+      "sujets": [
+        "téléphone portable",
+        "téléphonie mobile",
+        "miniaturisation"
+      ]
+    },
+    {
+      "id": "gps-emet",
+      "affirmation": "Pour te localiser, ton téléphone envoie un signal aux satellites GPS.",
+      "vrai": false,
+      "explication": "C'est l'inverse : les satellites émettent, le récepteur écoute et calcule sa position. Le GPS ne demande à l'utilisateur ou l'utilisatrice de transmettre aucune donnée, et fonctionne sans réseau téléphonique ni Internet ; il faut voir au moins quatre satellites.",
+      "accroche": "« Le GPS ne sait pas où tu es : c'est ton téléphone qui le calcule en écoutant quatre satellites. »",
+      "source": {
+        "titre": "Wikipedia (en), « Global Positioning System »",
+        "url": "https://en.wikipedia.org/wiki/Global_Positioning_System"
+      },
+      "interets": [
+        "transports",
+        "sciences"
+      ],
+      "notions": [
+        "materiel",
+        "donnees"
+      ],
+      "sujets": [
+        "GPS",
+        "géolocalisation",
+        "vie privée",
+        "satellites"
+      ]
+    },
+    {
+      "id": "emoji-apple",
+      "affirmation": "Les émojis ont été inventés par Apple pour l'iPhone.",
+      "vrai": false,
+      "explication": "Les premiers jeux d'émojis viennent d'entreprises japonaises de téléphonie, à la fin des années 1990 ; le plus connu, 176 dessins créés par Shigetaka Kurita pour l'opérateur DoCoMo, date de 1999. Apple ne les ajoute à l'iPhone qu'en 2008, et Unicode les accepte en 2010.",
+      "accroche": "« Les émojis sont nés au Japon dans les années 1990, presque dix ans avant l'iPhone. »",
+      "source": {
+        "titre": "Wikipedia (en), « Emoji »",
+        "url": "https://en.wikipedia.org/wiki/Emoji"
+      },
+      "interets": [
+        "reseaux",
+        "art",
+        "histoire"
+      ],
+      "notions": [
+        "donnees",
+        "hist"
+      ],
+      "sujets": [
+        "émojis",
+        "Unicode",
+        "codage des caractères",
+        "Japon"
+      ]
+    },
+    {
+      "id": "mp3-chanson",
+      "affirmation": "Le format MP3 a été mis au point en testant la compression sur une chanson de Suzanne Vega chantée sans instrument.",
+      "vrai": true,
+      "explication": "Le MP3 a été développé en grande partie par la société Fraunhofer, en Allemagne, sous la direction de Karlheinz Brandenburg. Il se servait de « Tom's Diner », a cappella, pour vérifier que la voix humaine supportait la compression ; l'extension .mp3 est choisie le 14 juillet 1995.",
+      "accroche": "« Le MP3 a été réglé à l'oreille sur une seule chanson, chantée sans instrument. »",
+      "source": {
+        "titre": "Wikipedia (en), « MP3 »",
+        "url": "https://en.wikipedia.org/wiki/MP3"
+      },
+      "interets": [
+        "musique",
+        "histoire",
+        "sciences"
+      ],
+      "notions": [
+        "donnees",
+        "hist"
+      ],
+      "sujets": [
+        "MP3",
+        "compression",
+        "son numérique",
+        "musique"
+      ]
+    },
+    {
+      "id": "toy-story",
+      "affirmation": "Le premier long métrage entièrement réalisé en images de synthèse est sorti en 1995.",
+      "vrai": true,
+      "explication": "C'est « Toy Story », du studio Pixar, distribué par Disney.",
+      "accroche": "« En 1995, pour la première fois, un film entier est sorti d'un ordinateur. »",
+      "source": {
+        "titre": "Encyclopædia Britannica, « Toy Story »",
+        "url": "https://www.britannica.com/topic/Toy-Story"
+      },
+      "interets": [
+        "cinema",
+        "art",
+        "histoire"
+      ],
+      "notions": [
+        "hist",
+        "donnees"
+      ],
+      "sujets": [
+        "cinéma d'animation",
+        "images de synthèse",
+        "Pixar"
+      ]
+    },
+    {
+      "id": "ver-morris",
+      "affirmation": "Le premier grand ver informatique d'Internet, en 1988, a été écrit par un étudiant.",
+      "vrai": true,
+      "explication": "Robert Tappan Morris, étudiant à l'université Cornell, lance son ver le 2 novembre 1988. Il devient la première personne condamnée pour crime en vertu de la loi américaine de 1986 sur la fraude informatique.",
+      "accroche": "« La première grande attaque d'Internet est partie d'un étudiant, et elle lui a valu un procès. »",
+      "source": {
+        "titre": "Wikipedia (en), « Morris worm »",
+        "url": "https://en.wikipedia.org/wiki/Morris_worm"
+      },
+      "interets": [
+        "histoire",
+        "societe"
+      ],
+      "notions": [
+        "secu",
+        "hist"
+      ],
+      "sujets": [
+        "ver informatique",
+        "cybersécurité",
+        "droit du numérique"
+      ]
+    },
+    {
+      "id": "wannacry",
+      "affirmation": "En 2017, une attaque informatique a obligé des hôpitaux britanniques à refuser des urgences.",
+      "vrai": true,
+      "explication": "Le rançongiciel WannaCry se répand le 12 mai 2017 dans 150 pays. Une grande partie de sa diffusion vient d'organisations qui n'avaient pas installé les correctifs de sécurité disponibles.",
+      "accroche": "« Une mise à jour non faite, et des hôpitaux refusent des malades : c'est WannaCry, en 2017. »",
+      "source": {
+        "titre": "Wikipedia (en), « WannaCry ransomware attack »",
+        "url": "https://en.wikipedia.org/wiki/WannaCry_ransomware_attack"
+      },
+      "interets": [
+        "sante",
+        "societe"
+      ],
+      "notions": [
+        "secu"
+      ],
+      "sujets": [
+        "rançongiciel",
+        "mises à jour",
+        "cybersécurité",
+        "hôpitaux"
+      ]
+    },
+    {
+      "id": "phrase-de-passe",
+      "affirmation": "Pour la CNIL, une phrase de passe de sept mots vaut un mot de passe de douze caractères mêlant majuscules, minuscules, chiffres et symboles.",
+      "vrai": true,
+      "explication": "Dans sa recommandation du 14 octobre 2022, la CNIL raisonne en entropie (au moins 80 bits) et donne ces exemples comme équivalents, avec aussi 14 caractères sans symbole. Ce qui compte, c'est le nombre de combinaisons possibles, pas l'air compliqué.",
+      "accroche": "« Sept mots simples protègent aussi bien que douze caractères impossibles à retenir. »",
+      "source": {
+        "titre": "CNIL, « Mots de passe : recommandations pour maîtriser sa sécurité » (14 octobre 2022)",
+        "url": "https://www.cnil.fr/fr/mots-de-passe-une-nouvelle-recommandation-pour-maitriser-sa-securite"
+      },
+      "interets": [
+        "societe",
+        "reseaux"
+      ],
+      "notions": [
+        "secu",
+        "donnees"
+      ],
+      "sujets": [
+        "mots de passe",
+        "entropie",
+        "cybersécurité",
+        "CNIL"
+      ]
+    },
+    {
+      "id": "cookie-programme",
+      "affirmation": "Un cookie est un petit programme espion installé sur ton appareil.",
+      "vrai": false,
+      "explication": "Pour la CNIL, un cookie est un petit fichier, stocké par un serveur dans le terminal de l'utilisateur ou de l'utilisatrice et associé à un domaine web. Ce n'est pas un programme : il ne s'exécute pas. Il peut en revanche servir à te reconnaître et à suivre ta navigation.",
+      "accroche": "« Un cookie n'est pas un virus, c'est une étiquette : le problème, c'est qui la lit. »",
+      "source": {
+        "titre": "CNIL, « Cookie » (définition)",
+        "url": "https://www.cnil.fr/fr/definition/cookie"
+      },
+      "interets": [
+        "reseaux",
+        "societe"
+      ],
+      "notions": [
+        "web",
+        "donnees",
+        "secu"
+      ],
+      "sujets": [
+        "cookies",
+        "traceurs",
+        "vie privée",
+        "RGPD"
+      ]
+    },
+    {
+      "id": "google-premier",
+      "affirmation": "Google a été le premier moteur de recherche d'Internet.",
+      "vrai": false,
+      "explication": "Le premier, Archie, a été écrit en 1990 par Alan Emtage : il indexait des archives de fichiers (FTP) pour aider à retrouver un fichier précis.",
+      "accroche": "« Le premier moteur de recherche s'appelait Archie, et il cherchait des fichiers, pas des pages. »",
+      "source": {
+        "titre": "Wikipedia (en), « Archie (search engine) »",
+        "url": "https://en.wikipedia.org/wiki/Archie_(search_engine)"
+      },
+      "interets": [
+        "histoire",
+        "reseaux"
+      ],
+      "notions": [
+        "web",
+        "hist",
+        "donnees"
+      ],
+      "sujets": [
+        "moteur de recherche",
+        "indexation",
+        "histoire d'Internet"
+      ]
+    },
+    {
+      "id": "web-brevet",
+      "affirmation": "L'inventeur du Web touche des droits sur chaque site créé.",
+      "vrai": false,
+      "explication": "Tim Berners-Lee invente le Web au CERN en 1989, et le 30 avril 1993 le CERN met le code source du logiciel à disposition sans redevance. C'est ce qui a permis à chacun·e de créer des sites librement.",
+      "accroche": "« Le Web est gratuit parce que le CERN a renoncé à le faire payer, en 1993. »",
+      "source": {
+        "titre": "CERN, « A short history of the Web »",
+        "url": "https://home.cern/science/computing/birth-web/short-history-web"
+      },
+      "interets": [
+        "histoire",
+        "argent",
+        "societe"
+      ],
+      "notions": [
+        "web",
+        "hist"
+      ],
+      "sujets": [
+        "Web",
+        "logiciel libre",
+        "Tim Berners-Lee",
+        "biens communs"
+      ]
+    },
+    {
+      "id": "binaire-ordinateurs",
+      "affirmation": "Le système binaire a été inventé pour les ordinateurs.",
+      "vrai": false,
+      "explication": "Leibniz publie son « Explication de l'arithmétique binaire » en 1703, et des systèmes à deux symboles existaient bien avant, par exemple chez le savant indien Pingala (vers le IIe siècle avant notre ère). Les ordinateurs ont repris une idée vieille de plusieurs siècles.",
+      "accroche": "« Le binaire a trois siècles de plus que l'ordinateur. »",
+      "source": {
+        "titre": "Wikipedia (en), « Binary number »",
+        "url": "https://en.wikipedia.org/wiki/Binary_number"
+      },
+      "interets": [
+        "histoire",
+        "sciences"
+      ],
+      "notions": [
+        "donnees",
+        "hist"
+      ],
+      "sujets": [
+        "binaire",
+        "représentation des nombres",
+        "Leibniz"
+      ]
+    },
+    {
+      "id": "algorithme-grec",
+      "affirmation": "Le mot « algorithme » vient du grec.",
+      "vrai": false,
+      "explication": "Il vient du nom du mathématicien al-Khwarizmi (vers 780 - vers 850), rendu en latin par « Algoritmi ». Le mot « algèbre » vient lui aussi du titre d'un de ses ouvrages.",
+      "accroche": "« Le mot algorithme est le nom d'un savant de Bagdad du IXe siècle. »",
+      "source": {
+        "titre": "Encyclopædia Britannica, « al-Khwārizmī »",
+        "url": "https://www.britannica.com/biography/al-Khwarizmi"
+      },
+      "interets": [
+        "histoire",
+        "sciences"
+      ],
+      "notions": [
+        "prog",
+        "hist"
+      ],
+      "sujets": [
+        "algorithme",
+        "al-Khwarizmi",
+        "histoire des mathématiques",
+        "étymologie"
+      ]
+    },
+    {
+      "id": "robot-theatre",
+      "affirmation": "Le mot « robot » vient d'une pièce de théâtre.",
+      "vrai": true,
+      "explication": "Il vient du tchèque « robota », travail forcé, employé dans la pièce « R.U.R. » de Karel Čapek, en 1920.",
+      "accroche": "« Avant d'être une machine, le robot a été un personnage de théâtre. »",
+      "source": {
+        "titre": "Encyclopædia Britannica, « Robot »",
+        "url": "https://www.britannica.com/technology/robot-technology"
+      },
+      "interets": [
+        "art",
+        "histoire",
+        "cinema"
+      ],
+      "notions": [
+        "hist",
+        "ia",
+        "materiel"
+      ],
+      "sujets": [
+        "robot",
+        "science-fiction",
+        "étymologie",
+        "travail"
+      ]
+    },
+    {
+      "id": "mot-ordinateur",
+      "affirmation": "Le mot « ordinateur » a été proposé en 1955 par un professeur de lettres.",
+      "vrai": true,
+      "explication": "IBM France cherchait un nom français pour ses machines : un responsable consulte son ancien professeur de lettres, Jacques Perret, qui propose un mot construit autour d'« ordonnateur ».",
+      "accroche": "« Le mot ordinateur a été inventé sur commande, par un professeur de lettres. »",
+      "source": {
+        "titre": "Wikipédia (fr), « Ordinateur »",
+        "url": "https://fr.wikipedia.org/wiki/Ordinateur"
+      },
+      "interets": [
+        "histoire",
+        "art"
+      ],
+      "notions": [
+        "hist"
+      ],
+      "sujets": [
+        "ordinateur",
+        "langue française",
+        "étymologie",
+        "IBM"
+      ]
+    }
+  ],
+  "ecartes": [
+    {
+      "sujet": "Consommations de l'IA, du courriel et de la vidéo en ligne (eau, électricité, CO2)",
+      "pourquoi": "Consigne de l'enseignant (17/11, 10:29) : estimations qui varient selon les études. Les repères vérifiés sont rangés dans videos.json (« reperes_consommations »), pas dans l'activité."
+    },
+    {
+      "sujet": "Part des centres de données dans l'électricité mondiale ; part du numérique dans l'empreinte carbone de la France (environ 4 % en 2022, Arcep) ; part des terminaux (66,5 % en 2020, étude ADEME-Arcep citée par Wikipédia)",
+      "pourquoi": "Estimations ; les pages de l'AIE sur 2024 n'ont pas pu être ouvertes."
+    },
+    {
+      "sujet": "Déchets électroniques (62 millions de tonnes en 2022, 22,3 % recyclés, Global E-waste Monitor 2024)",
+      "pourquoi": "Source ouverte et sérieuse, mais chiffre estimé : écarté dans le doute."
+    },
+    {
+      "sujet": "Nombre de personnes sans accès à Internet (2 milliards en 2026, UIT)",
+      "pourquoi": "Estimation annuelle, qui change avec chaque édition."
+    },
+    {
+      "sujet": "« Wi-Fi » serait l'abréviation de « Wireless Fidelity »",
+      "pourquoi": "La source ouverte (Wikipédia) dit que le point est disputé : l'idée reçue n'est pas clairement démentie."
+    },
+    {
+      "sujet": "Mot de passe le plus courant (« 123456 »)",
+      "pourquoi": "Dépend du classement choisi (SplashData, NordPass)."
+    },
+    {
+      "sujet": "Âge du consentement numérique (RGPD : 16 ans, abaissable à 13 ans)",
+      "pourquoi": "Règle exacte, mais lois nationales en cours d'évolution : risque de confusion avec les débats actuels sur l'âge d'accès aux réseaux sociaux."
+    },
+    {
+      "sujet": "Ada Lovelace « première programmeuse de l'histoire », dit comme un fait",
+      "pourquoi": "Britannica écrit « has been called » : l'affirmation retenue se limite à ce qu'elle a publié en 1843."
+    },
+    {
+      "sujet": "Nombre de machines touchées par le ver Morris (6 000) et par WannaCry",
+      "pourquoi": "Estimations ; pour Morris, la source dit que le chiffre vient d'une supposition."
+    },
+    {
+      "sujet": "« Tennis for Two » premier jeu vidéo, dit comme un fait",
+      "pourquoi": "Le titre de premier jeu vidéo est discuté : l'affirmation retenue dit seulement que Pong n'est pas le premier."
+    },
+    {
+      "sujet": "« Me at the zoo », première vidéo de YouTube (23 avril 2005)",
+      "pourquoi": "La page ouverte se contredit sur la durée ; remplacée par la création et le rachat de YouTube."
+    },
+    {
+      "sujet": "L'interface à fenêtres et la souris « inventées par Apple »",
+      "pourquoi": "La page du Computer History Museum sur le Xerox Alto ne parle pas d'Apple : démenti incomplet."
+    },
+    {
+      "sujet": "Nombre de caractères d'Unicode ; « Portrait d'Edmond de Belamy » vendu chez Christie's ; clavier QWERTY ; taille au sol de l'ENIAC",
+      "pourquoi": "Pages non ouvertes (redirection, site bloqué) ou sources en désaccord."
+    },
+    {
+      "sujet": "Faits liés à Mayotte au-delà de LION2 (station d'atterrissement, câble FLY-LION3)",
+      "pourquoi": "Absents de la page ouverte."
+    }
+  ]
+}

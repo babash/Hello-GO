@@ -6,6 +6,7 @@
   'use strict';
   const D = racine.HGDonnees || require('./donnees.js');
   const CARTES = racine.HGDecouvertes || require('./decouvertes.js');
+  const CU = racine.HGCulture || require('./culture.js');
 
   const SEC_PAR_POINT = 15; // 30 à 50 points pour 10 minutes (dossier de l'enseignant) : 12 à 20 s par point
 
@@ -235,6 +236,168 @@
     return juste;
   }
 
+  // ---------- La culture (version 1.6.0) : vidéos conseillées, « Info ou infox ? », conseils fondés sur des résultats ----------
+  // Tout est dans d.culture, une clé de premier niveau, facultative (absente : rien encore), faite d'objets à clés (deux
+  // appareils se fusionnent sans conflit) : videos { id: { vue, retiens, intrigue, avis, piste, source } }, infox
+  // { id: { v (vues), j (réussies), d (1 : réussie la dernière fois, 0 : ratée), le } }, accroches { id: { le, q, p } },
+  // salves et sansfaute (des nombres), jour { j, id } (l'affirmation du jour).
+  const cu = (d) => (d && d.culture && typeof d.culture === 'object' ? d.culture : {});
+  function cultureDe(d) {
+    d.culture = d.culture && typeof d.culture === 'object' && !Array.isArray(d.culture) ? d.culture : {};
+    ['videos', 'infox', 'accroches'].forEach(function (k) { if (!d.culture[k] || typeof d.culture[k] !== 'object') d.culture[k] = {}; });
+    return d.culture;
+  }
+  const VIDEOS = CU.VIDEOS, INFOX = CU.INFOX;
+  const laVideo = function (id) { return VIDEOS.find(function (v) { return v.id === id; }) || null; };
+  const lInfox = function (id) { return INFOX.find(function (a) { return a.id === id; }) || null; };
+  const enListe = function (l) { return l.length > 1 ? l.slice(0, -1).join(', ') + ' et ' + l[l.length - 1] : l.join(''); };
+  // Les goûts de l'élève, avec les mêmes poids que suggestions() : réponses de « Mes goûts », cartes « Ça m'intrigue »,
+  // et ce qui n'a pas plu (« Pas pour moi » sur une vidéo).
+  function gouteur(d) {
+    const p = profil((d.quiz || {}).reponses), g = gouts((d.decouverte || {}).reactions), refus = {}, vus = cu(d).videos || {};
+    Object.keys(vus).forEach(function (k) { const v = laVideo(k); if (v && vus[k] && vus[k].avis === -1) v.interets.concat(v.notions).forEach(function (t) { refus[t] = (refus[t] || 0) + 1; }); });
+    return { p: p, g: g, refus: refus, vide: !Object.keys(p.i).length && !Object.keys(p.n).length && !p.mots.length && !Object.keys(g.i).length && !Object.keys(g.n).length };
+  }
+  // Le score d'une vidéo ou d'une affirmation, et ses raisons : les étiquettes cochées (choisi) ou aimées dans les cartes.
+  function scorer(x, G, texte) {
+    let score = 0; const choisi = [], cartes = [];
+    [['i', x.interets], ['n', x.notions]].forEach(function (z) {
+      z[1].forEach(function (t) {
+        const nom = D.TAGS[z[0]][t];
+        if (G.p[z[0]][t]) { score += 1 + Math.min(G.p[z[0]][t], 3); if (choisi.indexOf(nom) < 0) choisi.push(nom); }
+        if (G.g[z[0]][t]) { score += Math.min(G.g[z[0]][t], 3); if (choisi.indexOf(nom) < 0 && cartes.indexOf(nom) < 0) cartes.push(nom); }
+        if (G.refus[t]) score -= Math.min(G.refus[t], 2);
+      });
+    });
+    G.p.mots.forEach(function (m) { if (m.re.test(texte)) { score += 4; const t = '« ' + m.texte + ' »'; if (choisi.indexOf(t) < 0) choisi.push(t); } });
+    return { score: score, choisi: choisi, cartes: cartes };
+  }
+  function pourquoiDe(r) {
+    if (r.score <= 0 || (!r.choisi.length && !r.cartes.length)) return '';
+    const a = r.choisi.slice(0, 2), b = r.cartes.slice(0, 2);
+    return a.length && b.length ? 'Parce que tu as choisi ' + enListe(a) + ', et que des cartes sur ' + enListe(b) + ' t’ont intrigué·e.'
+      : a.length ? 'Parce que tu as choisi ' + enListe(a) + '.' : 'Parce que des cartes sur ' + enListe(b) + ' t’ont intrigué·e.';
+  }
+  // Toutes les vidéos, de la plus pertinente à la moins pertinente : jamais vues d'abord ; à pertinence égale, celles de
+  // l'enseignant·e avant les compléments. Une vidéo écartée (« Pas pour moi ») n'est pas proposée.
+  function classerVideos(d) {
+    const G = gouteur(d), vus = cu(d).videos || {};
+    return VIDEOS.map(function (v, rang) {
+      const r = scorer(v, G, v.titre + ' ' + v.question), s = vus[v.id] || {};
+      return { video: v, score: r.score, choisi: r.score > 0 ? r.choisi.slice(0, 2) : [], cartes: r.score > 0 ? r.cartes.slice(0, 2) : [], pourquoi: pourquoiDe(r), vue: !!s.vue, non: s.avis === -1, rang: rang };
+    }).filter(function (x) { return !x.non; }).sort(function (a, b) {
+      return (a.vue - b.vue) || (b.score - a.score) || ((a.video.origine === 'enseignant' ? 0 : 1) - (b.video.origine === 'enseignant' ? 0 : 1)) || (a.rang - b.rang);
+    });
+  }
+  // n vidéos variées (jamais deux fois la même chaîne ni le même thème si possible), en commençant au rang « depart » parmi
+  // celles qui ne sont pas encore vues (« Une autre »). Sans réponse ni carte aimée : les vidéos d'entrée, variées.
+  function videosPour(d, n, depart) {
+    n = n || 3; depart = depart || 0;
+    const tout = classerVideos(d), G = gouteur(d);
+    let l;
+    if (G.vide) {
+      const e = CU.ENTREE.map(function (k) { return tout.find(function (x) { return x.video.id === k; }); }).filter(function (x) { return x && !x.vue; });
+      const reste = tout.filter(function (x) { return e.indexOf(x) < 0; }), k = e.length ? depart % e.length : 0;
+      l = e.slice(k).concat(e.slice(0, k), reste).map(function (x) { return Object.assign({}, x, { pourquoi: e.indexOf(x) >= 0 ? 'Pour commencer. Dis ce que tu aimes dans « Mes goûts » : les vidéos te ressembleront.' : '' }); });
+    } else {
+      const neuves = tout.filter(function (x) { return !x.vue; }), k = neuves.length ? depart % neuves.length : 0;
+      l = neuves.slice(k).concat(neuves.slice(0, k), tout.filter(function (x) { return x.vue; }));
+    }
+    const pris = [];
+    // Exigence 3 : en plus, chaque vidéo apporte une raison que les autres n'ont pas (la musique, puis l'IA…).
+    const raisons = function (x) { return x.choisi.concat(x.cartes); };
+    [3, 2, 1, 0].forEach(function (exigence) {
+      l.forEach(function (x) {
+        if (pris.length >= n || pris.indexOf(x) >= 0) return;
+        if (exigence >= 3 && (x.score <= 0 || !raisons(x).some(function (r) { return !pris.some(function (y) { return raisons(y).indexOf(r) >= 0; }); }))) return;
+        if (exigence >= 1 && pris.some(function (y) { return y.video.chaine === x.video.chaine; })) return;
+        if (exigence >= 2 && pris.some(function (y) { return y.video.interets[0] === x.video.interets[0]; })) return;
+        pris.push(x);
+      });
+    });
+    // L'ordre de la liste est gardé (la plus pertinente en tête, jamais une vidéo déjà vue avant une neuve).
+    pris.sort(function (a, b) { return l.indexOf(a) - l.indexOf(b); });
+    return pris.map(function (x) { return Object.assign({}, x, { pourquoi: x.pourquoi || 'Pour découvrir autre chose.' }); });
+  }
+  const vuesVideos = function (d) { const v = cu(d).videos || {}; return Object.keys(v).filter(function (k) { return laVideo(k) && v[k] && v[k].vue; }); };
+  // Le texte du sujet de l'élève (questions, points, pistes) et les étiquettes qui en viennent (sujets, cartes, vidéos d'origine).
+  function sujetDe(d, q) {
+    const qs = q ? [q] : (d.questions || []), titres = qs.map(function (x) { return x.titre || ''; }).concat((d.pistes || []).map(function (p) { return (p.titre || '') + ' ' + (p.candidates || []).join(' '); }));
+    const texte = titres.concat(qs.map(textePlan)).join('\n'), i = {}, n = {};
+    const ajoute = function (ii, nn) { (ii || []).forEach(function (t) { i[t] = 1; }); (nn || []).forEach(function (t) { n[t] = 1; }); };
+    const ts = titres.map(function (t) { return norm(t).trim(); }).filter(Boolean);
+    const dans = function (t) { const x = norm(t).trim(); return x && ts.some(function (y) { return y.indexOf(x) >= 0; }); };
+    D.SUJETS.forEach(function (s) { if (dans(s.t)) ajoute(s.i, s.n); });
+    CARTES.forEach(function (c) { if (dans(c.q)) ajoute(c.i, c.n); });
+    VIDEOS.forEach(function (v) { if (dans(v.question)) ajoute(v.interets, v.notions); });
+    return { texte: texte, i: i, n: n };
+  }
+  // La pertinence d'une affirmation : les goûts (comme les vidéos), plus les mots-clés « sujets » trouvés dans le sujet de
+  // l'élève et les étiquettes de son sujet.
+  function pertinenceInfox(a, G, S) {
+    let r = scorer(a, G, a.affirmation).score;
+    if (a.sujets.some(function (s) { return contient(S.texte, s); })) r += 4;
+    a.interets.forEach(function (t) { if (S.i[t]) r += 1; }); a.notions.forEach(function (t) { if (S.n[t]) r += 1; });
+    return r;
+  }
+  const SALVE_INFOX = 7;
+  // Une salve : d'abord jamais vues, puis ratées la dernière fois, puis les autres ; dans le meilleur rang, jusqu'à 4 qui
+  // collent aux goûts et au sujet, puis de quoi faire découvrir autre chose (une notion pas encore dans la salve).
+  function tirerInfox(d, n, alea) {
+    n = n || SALVE_INFOX; alea = alea || Math.random;
+    const st = cu(d).infox || {}, G = gouteur(d), S = sujetDe(d);
+    const L = INFOX.map(function (a) { const s = st[a.id]; return { a: a, rang: !s || !s.v ? 0 : s.d === 0 ? 1 : 2, rel: pertinenceInfox(a, G, S), x: alea() }; });
+    const meilleur = Math.min.apply(null, L.map(function (x) { return x.rang; }));
+    const pris = L.filter(function (x) { return x.rang === meilleur && x.rel > 0; }).sort(function (a, b) { return b.rel - a.rel || a.x - b.x; }).slice(0, Math.min(4, n)), notions = {};
+    pris.forEach(function (x) { x.a.notions.forEach(function (t) { notions[t] = 1; }); });
+    while (pris.length < n) {
+      const reste = L.filter(function (x) { return pris.indexOf(x) < 0; });
+      if (!reste.length) break;
+      const neuf = function (x) { return x.a.notions.some(function (t) { return !notions[t]; }) ? 0 : 1; };
+      const x = reste.sort(function (a, b) { return a.rang - b.rang || neuf(a) - neuf(b) || a.x - b.x; })[0];
+      pris.push(x); x.a.notions.forEach(function (t) { notions[t] = 1; });
+    }
+    for (let i = pris.length - 1; i > 0; i--) { const j = Math.floor(alea() * (i + 1)); const t = pris[i]; pris[i] = pris[j]; pris[j] = t; }
+    return pris.map(function (x) { return x.a.id; });
+  }
+  function noterInfox(d, id, juste, le) {
+    const c = cultureDe(d), s = c.infox[id] || {};
+    c.infox[id] = { v: (s.v || 0) + 1, j: (s.j || 0) + (juste ? 1 : 0), d: juste ? 1 : 0, le: le || jourLocal(new Date()) };
+  }
+  function noterSalveInfox(d, justes, n) { const c = cultureDe(d); c.salves = (c.salves || 0) + 1; if (n && justes === n) c.sansfaute = (c.sansfaute || 0) + 1; }
+  // Garder un fait comme accroche : seule sa formulation « accroche » (vraie, ou le démenti) sera reprise.
+  function garderAccroche(d, id, le) { const c = cultureDe(d); if (!lInfox(id)) return false; if (!c.accroches[id]) c.accroches[id] = { le: le || jourLocal(new Date()) }; return true; }
+  // Les accroches à piocher pour une question : d'abord les faits liés au sujet, puis ceux que l'élève a gardés.
+  function accrochesPour(d, q) {
+    const G = gouteur(d), S = sujetDe(d, q), gardees = cu(d).accroches || {};
+    return INFOX.map(function (a, rang) { return { a: a, rel: pertinenceInfox(a, G, S), gardee: !!gardees[a.id], rang: rang }; })
+      .sort(function (x, y) { return y.rel - x.rel || (y.gardee - x.gardee) || x.rang - y.rang; });
+  }
+  // L'affirmation du jour (accueil) : gardée pour la journée dans d.culture.jour, choisie parmi celles jamais vues.
+  function infoxDuJour(d, jour) {
+    jour = jour || jourLocal(new Date());
+    const c = cu(d), j = c.jour;
+    if (j && j.j === jour && lInfox(j.id)) return { a: lInfox(j.id), neuf: false };
+    const st = c.infox || {}, G = gouteur(d), S = sujetDe(d), h = function (t) { let x = 7; for (let i = 0; i < t.length; i++) x = (x * 31 + t.charCodeAt(i)) % 100003; return x; };
+    const l = INFOX.filter(function (a) { return !(st[a.id] && st[a.id].v); });
+    const pool = (l.length ? l : INFOX).map(function (a) { return { a: a, k: pertinenceInfox(a, G, S) * 1000 + h(a.id + jour) % 1000 }; }).sort(function (x, y) { return y.k - x.k; });
+    return { a: pool[0].a, neuf: true };
+  }
+  function chiffresCulture(d) {
+    const c = cu(d), v = c.videos || {}, st = c.infox || {}, acc = c.accroches || {};
+    const vues = vuesVideos(d), conn = Object.keys(st).filter(function (k) { return lInfox(k) && st[k] && st[k].v; });
+    return { videos: vues.length, notes: vues.filter(function (k) { return String(v[k].retiens || '').trim() || String(v[k].intrigue || '').trim(); }).length,
+      infox: conn.length, reussies: conn.filter(function (k) { return st[k].d === 1; }).length, accroches: Object.keys(acc).filter(lInfox).length,
+      salves: typeof c.salves === 'number' ? c.salves : 0, utilisees: Object.keys(acc).filter(function (k) { return lInfox(k) && acc[k] && acc[k].p; }).length };
+  }
+  // Les conseils du jour : les « à savoir » de la phase et les conseils fondés sur des résultats, en alternance.
+  function conseilsDuJour(d) {
+    const ph = phase(d), a = D.A_SAVOIR.filter(function (x) { return x.p === ph; }).map(function (x) { return { t: x.t }; });
+    const c = CU.CONSEILS.filter(function (x) { return x.phase === ph; }).map(function (x) { return { conseil: x }; }), l = [];
+    for (let i = 0; i < Math.max(a.length, c.length); i++) { if (c[i]) l.push(c[i]); if (a[i]) l.push(a[i]); }
+    return l;
+  }
+
   // ---------- Le suivi : les jours de visite, l'absence, les hauts faits datés (version 1.5.0) ----------
   // Une date du calendrier de l'appareil, sans heure : AAAA-MM-JJ.
   function jourLocal(t) { const x = t instanceof Date ? t : new Date(t); const z = function (n) { return (n < 10 ? '0' : '') + n; }; return x.getFullYear() + '-' + z(x.getMonth() + 1) + '-' + z(x.getDate()); }
@@ -300,6 +463,10 @@
     if (!d.quiz || !d.quiz.fait) if (!(d.pistes || []).length && !qs.length) return { texte: 'Dis ce que tu aimes, ce qui te tient à cœur et ce que tu préfères dans ta spécialité : tes sujets s’affinent.', bouton: 'Faire le questionnaire', vers: '#/explorer/quiz', duree: '3 min' };
     if (!qs.length) {
       const p = (d.pistes || [])[0];
+      // Au début du parcours (version 1.6.0) : « Info ou infox ? », puis une vidéo choisie pour l'élève, tant qu'il ou elle
+      // n'a pas de piste.
+      if (!p && !chiffresCulture(d).infox) return { texte: 'Info ou infox ? Sept affirmations sur l’histoire de l’informatique : vrai ou faux ? Tu y trouveras peut-être l’accroche de ton exposé.', bouton: 'Jouer', vers: '#/explorer/infox', duree: '5 min' };
+      if (!p && !chiffresCulture(d).videos) { const v = videosPour(d, 1)[0]; if (v) return { texte: 'Regarde une vidéo choisie pour toi : « ' + v.video.titre + ' » (' + v.video.chaine + '). Elle peut te donner une idée de sujet.', bouton: 'Voir la vidéo', vers: '#/explorer/videos', duree: '15 min' }; }
       if (!p) return { texte: 'Choisis une piste parmi les sujets proposés.', bouton: 'Voir les sujets', vers: '#/explorer/sujets', duree: '5 min' };
       if (!quizEssaye(d, 'epreuve')) return { texte: 'Avant de choisir ta question, vérifie que tu as compris les règles de l’épreuve : 10 questions, avec une explication après chaque réponse.', bouton: 'Faire le quiz', vers: '#/comprendre/epreuve', duree: '5 min' };
       if (!(p.candidates || []).length) return { texte: 'Transforme ta piste en question : écris une ou deux questions possibles.', bouton: 'Ouvrir mes pistes', vers: '#/explorer/pistes', duree: '5 min' };
@@ -383,6 +550,14 @@
     { id: 'video', g: 'Les oraux', titre: 'Sur grand écran', cond: 'Noter qu’une vidéo est déposée sur Pronote.', pourquoi: 'Se revoir, c’est repérer ce qu’on ne sent pas en parlant.', test: function (d) { return (d.oraux || []).some(function (o) { return o.video; }); } },
     { id: 'pdf', g: 'Les oraux', titre: 'Sauvegarde effectuée', cond: 'Télécharger ton dossier en PDF.', pourquoi: 'On sauvegarde toujours avant le boss final.', test: function (d) { return ((d.compteurs || {}).pdf || 0) >= 1; } },
 
+    // Version 1.6.0 : la culture (vidéos conseillées, « Info ou infox ? »). Ni classement ni série à tenir.
+    { id: 'video1', g: 'La culture', titre: 'Silence, ça tourne', cond: 'Regarder une vidéo conseillée et noter ce que tu en retiens.', pourquoi: 'Une bonne vidéo de vulgarisation, c’est une source, et souvent une idée de sujet.', test: function (d) { const v = cu(d).videos || {}; return vuesVideos(d).some(function (k) { return String(v[k].retiens || '').trim().length > 3 || String(v[k].intrigue || '').trim().length > 3; }); } },
+    { id: 'videos3', g: 'La culture', titre: 'Touche-à-tout', cond: 'Regarder des vidéos conseillées sur 3 thèmes différents.', pourquoi: 'Comme Léonard de Vinci : la culture scientifique se nourrit de curiosités variées.', test: function (d) { return new Set(vuesVideos(d).map(function (k) { return laVideo(k).interets[0]; })).size >= 3; } },
+    { id: 'videopiste', g: 'La culture', titre: 'Eurêka', cond: 'Faire d’une vidéo une piste.', pourquoi: 'Comme Archimède dans son bain : une idée de sujet peut surgir n’importe où.', test: function (d) { const v = cu(d).videos || {}; return Object.keys(v).some(function (k) { return laVideo(k) && v[k] && v[k].piste; }); } },
+    { id: 'infoxsf', g: 'La culture', titre: 'MythBusters', cond: 'Faire un sans-faute sur une salve de « Info ou infox ? ».', pourquoi: 'On teste, on vérifie, et on ne croit rien sur parole.', test: function (d) { return (cu(d).sansfaute || 0) >= 1; } },
+    { id: 'infox30', g: 'La culture', titre: 'Encyclopédiste', cond: 'Voir 30 affirmations de « Info ou infox ? ».', pourquoi: 'Diderot serait fier : ta culture informatique grandit, fait après fait.', test: function (d) { return chiffresCulture(d).infox >= 30; } },
+    { id: 'hamecon', g: 'La culture', titre: 'Hameçon', cond: 'Utiliser une accroche de « Info ou infox ? » dans un plan.', pourquoi: 'Un fait vrai, daté et sourcé : de quoi capter le jury dès la première phrase.', test: function (d) { const acc = cu(d).accroches || {}, pts = tous(d).map(function (p) { return p.id; }); return Object.keys(acc).some(function (k) { return lInfox(k) && acc[k] && pts.indexOf(acc[k].p) >= 0; }); } },
+
     { id: 'konami', g: 'Cachés', cache: true, indice: 'Haut, haut, bas, bas… (ou 7 touches sur le logo)', titre: 'Easter egg', cond: 'Trouver le passage secret.', pourquoi: 'La curiosité est une qualité de hacker.', test: function (d) { return ((d.compteurs || {}).secret || 0) >= 1; } },
     { id: 'canard', g: 'Cachés', cache: true, indice: 'Coin coin : lis la bonne fiche de méthode.', titre: 'Canard en plastique', cond: 'Lire la fiche « Expliquer à un non-spécialiste ».', pourquoi: 'Les programmeurs et programmeuses expliquent leur code à un canard pour trouver leurs erreurs.', test: function (d) { return ((d.compteurs || {}).canard || 0) >= 1; } },
   ];
@@ -460,12 +635,21 @@
       && sinon(n.suivi, function (o) { return objet(o) && Object.keys(o).every(function (k) { return ['lus', 'faits', 'def', 'ressources'].indexOf(k) >= 0; })
         && sinon(o.lus, function (x) { return cles(x) && valeurs(x, entier); }) && sinon(o.faits, function (x) { return cles(x) && valeurs(x, entier); })
         && sinon(o.def, function (x) { return cles(x) && valeurs(x, id); })
-        && sinon(o.ressources, function (x) { return cles(x) && valeurs(x, function (v) { return v === 'ajoutee' || v === 'plus-tard'; }); }); });
+        && sinon(o.ressources, function (x) { return cles(x) && valeurs(x, function (v) { return v === 'ajoutee' || v === 'plus-tard'; }); }); })
+      // Version 1.6.0, tout est facultatif : la culture. Un identifiant de vidéo ou d'affirmation d'une version plus récente
+      // est accepté (seule sa forme compte), et une clé inconnue de d.culture est gardée telle quelle, jamais lue.
+      && sinon(n.culture, function (o) { return objet(o)
+        && sinon(o.videos, function (x) { return cles(x) && valeurs(x, function (v) { return objet(v) && textes(v, ['vue', 'retiens', 'intrigue']) && sinon(v.avis, function (a) { return a === 1 || a === -1 || a === 0; }) && sinon(v.piste, id) && sinon(v.source, id); }); })
+        && sinon(o.infox, function (x) { return cles(x) && valeurs(x, function (v) { return objet(v) && sinon(v.v, entier) && sinon(v.j, entier) && sinon(v.d, function (a) { return a === 0 || a === 1; }) && texte(v.le); }); })
+        && sinon(o.accroches, function (x) { return cles(x) && valeurs(x, function (v) { return objet(v) && texte(v.le) && sinon(v.q, id) && sinon(v.p, id); }); })
+        && sinon(o.salves, entier) && sinon(o.sansfaute, entier) && sinon(o.decalage, entier)
+        && sinon(o.jour, function (j) { return objet(j) && texte(j.j) && sinon(j.id, id); }); });
   }
 
   const api = { choixDe, profil, gouts, prochaineCarte, surprises, CARTES, coach, coachMot, motComplet, coachSources, suggestions, questionsProbables, phase, prochaineAction, HAUTS_FAITS, majHautsFaits,
     tousLesPoints, ressemblance, contient, aChiffre, reference, dossierValide, SEC_PAR_POINT, quizEssaye, quizSansFaute,
-    surSalve, suiviQuiz, tirerSalve, noterSalve, jourLocal, ecartJours, noterVisite, statsVisites, moisFrise, absence, ABSENCE_MAX, VISITES_MAX, hautsFaitsDates };
+    surSalve, suiviQuiz, tirerSalve, noterSalve, CULTURE: CU, cultureDe, laVideo, lInfox, classerVideos, videosPour, vuesVideos, sujetDe, tirerInfox, noterInfox, noterSalveInfox,
+    garderAccroche, accrochesPour, infoxDuJour, chiffresCulture, conseilsDuJour, SALVE_INFOX, jourLocal, ecartJours, noterVisite, statsVisites, moisFrise, absence, ABSENCE_MAX, VISITES_MAX, hautsFaitsDates };
   racine.HGAnalyse = api;
   if (typeof module !== 'undefined') module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);
