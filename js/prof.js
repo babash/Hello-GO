@@ -175,7 +175,7 @@
       .map((z) => `${e(z.court)} ${Math.min(n(r.comprendre[z.id].meilleur), A.surSalve(z))}/${A.surSalve(z)}`) : [];
     // La culture (version 1.6.0 de l'élève) : des nombres, relus comme des nombres.
     const cu = r.culture && typeof r.culture === 'object' ? r.culture : null;
-    const culture = cu ? `<br>Culture : ${pl(n(cu.videos), 'vidéo', 'vidéos')} · ${pl(n(cu.infox), 'infox vue', 'infox vues')} (${n(cu.reussies)} réussies) · ${pl(n(cu.accroches), 'accroche', 'accroches')}` : '';
+    const culture = cu ? `<br>Culture : ${pl(n(cu.videos), 'vidéo', 'vidéos')} · ${pl(n(cu.infox), 'affirmation vue', 'affirmations vues')} (${pl(n(cu.reussies), 'réussie', 'réussies')}) · ${pl(n(cu.accroches), 'accroche', 'accroches')}` : '';
     return `<span class="resume">${q || 'Pas encore de question'}<br>${n(r.mots_complets)}/${n(r.mots)} mots · ${n(r.sources)} sources · ${oraux} oral${oraux > 1 ? 's' : ''} évalué${oraux > 1 ? 's' : ''}<br>Quiz : ${cq.length ? cq.join(' · ') : 'pas encore faits'}${culture}</span>`;
   }
 

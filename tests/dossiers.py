@@ -49,9 +49,12 @@ def version_cle(v): return tuple(int(x) for x in v.split('.'))
 # profil.vu (le pseudo de la classe remplace le prénom en ligne). Les hauts faits et les jours de visite ne font que
 # s'ajouter. Dans « banque » (1.5.0), la date et les questions ratées changent ; les questions vues ne font que monter.
 def pertes(avant, apres, chemin=''):
+    # 1.6.0 : dans « culture », l'affirmation du jour change chaque jour, et le dernier résultat d'une affirmation (d, le)
+    # change à chaque réponse ; les vues, les réussites, les salves et les sans-faute ne font que monter.
     if chemin in ('vus', 'profil.prenom', 'profil.vu') or re.match(r'^comprendre\.[^.]+\.(dernier|le|rates|rates_toutes)$', chemin) \
-            or re.match(r'^banque\.[^.]+\.(le|ratees)$', chemin): return []
-    if chemin.startswith('compteurs.') or re.match(r'^comprendre\.[^.]+\.(meilleur|essais)$', chemin) or re.match(r'^banque\.[^.]+\.vues\.[^.]+$', chemin):
+            or re.match(r'^banque\.[^.]+\.(le|ratees)$', chemin) or re.match(r'^culture\.jour(\..*)?$', chemin) or re.match(r'^culture\.infox\.[^.]+\.(d|le)$', chemin): return []
+    if chemin.startswith('compteurs.') or re.match(r'^comprendre\.[^.]+\.(meilleur|essais)$', chemin) or re.match(r'^banque\.[^.]+\.vues\.[^.]+$', chemin) \
+            or re.match(r'^culture\.(salves|sansfaute)$', chemin) or re.match(r'^culture\.infox\.[^.]+\.(v|j)$', chemin):
         return [] if isinstance(apres, int) and apres >= avant else ['%s : %r devenu %r' % (chemin, avant, apres)]
     if isinstance(avant, dict):
         if not isinstance(apres, dict): return ['%s : n’est plus un objet' % chemin]

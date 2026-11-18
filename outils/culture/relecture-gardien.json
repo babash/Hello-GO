@@ -1,0 +1,365 @@
+{
+ "le": "2026-11-18",
+ "relecture": "Relecture du Gardien (T80), le 18/11/2026 : « Info ou infox ? » ne porte que sur des faits établis (consigne de l’enseignant) ; une affirmation discutable, datée de façon ambiguë ou dont la bonne réponse dépend de la source est retirée de la banque (les autres gardent leur identifiant) ; ce qu’on peut garder comme accroche est toujours vrai ; un conseil n’exagère pas la portée d’une étude. Les fichiers de la recherche ne changent pas : outils/generer_culture.py applique ce fichier, et refuse une reformulation dont le texte d’origine (« avant ») a changé.",
+ "retraits": [
+  {
+   "id": "bug-hopper",
+   "pourquoi": "Les sources se contredisent : le Smithsonian, qui conserve le carnet, dit que les ingénieur·e·s parlaient déjà de « bugs » au temps d'Edison, mais l'Encyclopædia Britannica, source complémentaire de la fiche, écrit que Grace Hopper a inventé le mot. La bonne réponse dépend de la source."
+  },
+  {
+   "id": "hamilton-genie-logiciel",
+   "pourquoi": "La page Wikipédia de Margaret Hamilton dit qu'elle a inventé l'expression ; la page « Software engineering » la trouve dès juin 1965 (Computers and Automation) et en août 1966 (Anthony Oettinger, Communications of the ACM). La bonne réponse dépend de la source."
+  },
+  {
+   "id": "algorithme-grec",
+   "pourquoi": "Discutable : le mot vient bien du nom d'al-Khwarizmi, mais le Dictionnaire de l'Académie française (9e édition) précise que sa forme a été altérée « sous l'influence du grec arithmos, « nombre » ». Répondre « info » se défend en partie."
+  }
+ ],
+ "infox": [
+  {
+   "id": "internet-web",
+   "champ": "accroche",
+   "avant": "« Internet avait déjà vingt ans quand le Web est né. »",
+   "apres": "« L'ancêtre d'Internet avait déjà vingt ans quand le Web est né. »",
+   "pourquoi": "Internet au sens propre (TCP/IP) n'a pas vingt ans en 1989 : c'est son ancêtre, ARPANET (1969), comme le dit l'explication."
+  },
+  {
+   "id": "ada-notes",
+   "champ": "accroche",
+   "avant": "« Le premier programme publié date de 1843, et il est signé par une femme de 27 ans. »",
+   "apres": "« Dès 1843, Ada Lovelace, 27 ans, décrit comment programmer une machine à calculer. »",
+   "pourquoi": "« Le premier programme publié » est un titre discuté : la recherche avait écarté « première programmeuse » dit comme un fait (Britannica : « has been called »)."
+  },
+  {
+   "id": "hedy-lamarr",
+   "champ": "affirmation",
+   "avant": "Une actrice d'Hollywood a déposé en 1942 un brevet de communication radio par « saut de fréquence ».",
+   "apres": "Une actrice d'Hollywood a obtenu en 1942 un brevet de communication radio par « saut de fréquence ».",
+   "pourquoi": "Le brevet a été délivré en 1942 (National Inventors Hall of Fame : « issued in 1942 ») : « déposé en 1942 » datait mal le dépôt."
+  },
+  {
+   "id": "hopper-compilateur",
+   "champ": "accroche",
+   "avant": "« Sans compilateur, tu écrirais encore tes programmes en langage machine : merci à l'amirale Hopper. »",
+   "apres": "« Une pionnière des compilateurs a fini sa carrière contre-amirale dans la marine américaine. »",
+   "pourquoi": "« Sans compilateur, tu écrirais encore… : merci à l'amirale Hopper » attribuait les compilateurs à une seule personne."
+  },
+  {
+   "id": "enigma-polonais",
+   "champ": "explication",
+   "avant": "Enigma a d'abord été cassée par des Polonais au début des années 1930. En 1939, ils transmettent leurs résultats aux Britanniques, dont l'équipe travaille ensuite sous la direction du mathématicien Alan Turing.",
+   "apres": "Enigma a d'abord été cassée par des Polonais au début des années 1930. En 1939, ils transmettent leurs résultats aux Britanniques, dont l'équipe de cryptanalyse compte notamment le mathématicien Alan Turing.",
+   "pourquoi": "Turing a dirigé une partie de l'effort britannique, pas toute l'équipe : « notamment » est vrai quelle que soit la source."
+  },
+  {
+   "id": "eniac-programmeuses",
+   "champ": "affirmation",
+   "avant": "L'ENIAC, un des premiers ordinateurs électroniques, a été programmé par six femmes.",
+   "apres": "Les premières personnes chargées de programmer l'ENIAC, un des premiers ordinateurs électroniques, étaient six femmes.",
+   "pourquoi": "La source parle des six premières programmeuses de l'ENIAC (« the initial six programmers ») : « a été programmé par six femmes » pouvait se lire « seulement par elles »."
+  },
+  {
+   "id": "eniac-programmeuses",
+   "champ": "accroche",
+   "avant": "« Les premières personnes à programmer un ordinateur électronique étaient six femmes. »",
+   "apres": "« L'ENIAC, un des premiers ordinateurs électroniques, a eu six femmes pour premières programmeuses. »",
+   "pourquoi": "« Les premières personnes à programmer un ordinateur électronique » : d'autres machines électroniques ont été programmées avant l'ENIAC."
+  },
+  {
+   "id": "eniac-bureau",
+   "champ": "affirmation",
+   "avant": "L'ENIAC, terminé en 1946, tenait sur un bureau.",
+   "apres": "L'ENIAC, présenté au public en 1946, tenait sur un bureau.",
+   "pourquoi": "Wikipédia : l'ENIAC est terminé en 1945 et présenté au public le 14 février 1946 ; « terminé en 1946 » était faux."
+  },
+  {
+   "id": "arpanet-lo",
+   "champ": "accroche",
+   "avant": "« Le premier mot d'Internet, c'est \"lo\" : un plantage. »",
+   "apres": "« Le premier mot envoyé sur l'ancêtre d'Internet, c'est \"lo\" : un plantage. »",
+   "pourquoi": "Le message passe sur ARPANET, l'ancêtre d'Internet, comme le dit l'affirmation."
+  },
+  {
+   "id": "arobase",
+   "champ": "accroche",
+   "avant": "« Le @ de ton adresse a plus de cinquante ans, et il a été choisi parce que personne ne s'en servait. »",
+   "apres": "« Le @ de ton adresse a plus de cinquante ans, et il a été choisi parce qu'aucun nom ne l'utilisait. »",
+   "pourquoi": "« Parce que personne ne s'en servait » allait trop loin : Britannica dit seulement qu'il n'apparaissait ni dans les noms ni dans le langage des ordinateurs à temps partagé."
+  },
+  {
+   "id": "m-pesa",
+   "champ": "accroche",
+   "avant": "« Le paiement par téléphone s'est imposé au Kenya bien avant de se banaliser en Europe. »",
+   "apres": "« Au Kenya, on envoie de l'argent avec un simple téléphone depuis 2007. »",
+   "pourquoi": "La comparaison avec l'Europe (« bien avant de se banaliser en Europe ») n'est pas dans la source."
+  },
+  {
+   "id": "apollo-memoire",
+   "champ": "explication",
+   "avant": "L'Apollo Guidance Computer disposait de 2 048 mots de mémoire vive et de 36 864 mots de mémoire morte, des mots de 15 bits, et il pesait 32 kg. C'est infiniment moins que le moindre téléphone actuel.",
+   "apres": "L'Apollo Guidance Computer disposait de 2 048 mots de mémoire vive et de 36 864 mots de mémoire morte, des mots de 16 bits (dont 15 de données), et il pesait 32 kg. C'est infiniment moins que le moindre téléphone actuel.",
+   "pourquoi": "Wikipédia : « a 16-bit word length, with 15 data bits and one parity bit » ; « des mots de 15 bits » était inexact."
+  },
+  {
+   "id": "apollo-memoire",
+   "champ": "accroche",
+   "avant": "« On est allé sur la Lune avec moins de mémoire qu'il n'en faut pour une seule photo. »",
+   "apres": "« L'ordinateur de bord d'Apollo avait moins de mémoire qu'il n'en faut pour une seule photo d'aujourd'hui. »",
+   "pourquoi": "« On est allé sur la Lune avec… » : d'autres ordinateurs, au sol, ont aussi servi ; l'affirmation porte sur l'ordinateur de bord."
+  },
+  {
+   "id": "pong-premier",
+   "champ": "accroche",
+   "avant": "« Le premier jeu de tennis sur écran a été bricolé par un physicien nucléaire pour une journée portes ouvertes. »",
+   "apres": "« Dès 1958, un physicien a bricolé un jeu de tennis sur écran pour une journée portes ouvertes. »",
+   "pourquoi": "« Le premier jeu de tennis sur écran » : un titre de « premier » que la source elle-même pose en question (« The First Video Game? »), et que la recherche avait écarté comme fait."
+  },
+  {
+   "id": "tetris-nintendo",
+   "champ": "accroche",
+   "avant": "« Le jeu vidéo le plus célèbre du monde vient d'un laboratoire soviétique. »",
+   "apres": "« Tetris n'est pas né chez Nintendo, mais dans un centre de calcul soviétique. »",
+   "pourquoi": "« Le jeu vidéo le plus célèbre du monde » : un superlatif que rien ne mesure."
+  },
+  {
+   "id": "gandhi-nucleaire",
+   "champ": "accroche",
+   "avant": "« Le bug le plus célèbre du jeu vidéo n'a jamais existé. »",
+   "apres": "« Le célèbre bug du Gandhi nucléaire n'a jamais existé. »",
+   "pourquoi": "« Le bug le plus célèbre du jeu vidéo » : un superlatif que rien ne mesure."
+  },
+  {
+   "id": "bitcoin-createur",
+   "champ": "accroche",
+   "avant": "« La monnaie numérique la plus célèbre a été inventée par quelqu'un dont personne ne connaît le nom. »",
+   "apres": "« Le bitcoin a été inventé sous un pseudonyme, et l'on ne sait toujours pas par qui. »",
+   "pourquoi": "« Par quelqu'un dont personne ne connaît le nom » : son auteur·e peut être plusieurs personnes ; la source dit seulement que l'identité reste inconnue."
+  },
+  {
+   "id": "bitcoin-pizzas",
+   "champ": "accroche",
+   "avant": "« Les deux pizzas les plus chères de l'histoire ont été payées en bitcoins. »",
+   "apres": "« Le premier achat connu payé en bitcoins : deux pizzas, pour 10 000 bitcoins, en 2010. »",
+   "pourquoi": "« Les deux pizzas les plus chères de l'histoire » dépend du cours du bitcoin ; Wikipédia : « the first known commercial transaction using bitcoin »."
+  },
+  {
+   "id": "youtube-google",
+   "champ": "accroche",
+   "avant": "« YouTube n'est pas né chez Google : Google l'a acheté à trois jeunes fondateurs, un an et demi après sa création. »",
+   "apres": "« YouTube n'est pas né chez Google : Google l'a racheté en 2006, moins de deux ans après sa création. »",
+   "pourquoi": "Google a racheté une entreprise, pas « trois jeunes fondateurs » ; de février 2005 à novembre 2006, il y a vingt et un mois."
+  },
+  {
+   "id": "premier-portable",
+   "champ": "accroche",
+   "avant": "« Le premier téléphone portable pesait plus d'un kilo, et son premier appel a servi à narguer la concurrence. »",
+   "apres": "« Le premier téléphone portable pesait plus d'un kilo, et son premier appel a été pour le responsable du projet concurrent. »",
+   "pourquoi": "« Narguer la concurrence » est une interprétation : l'explication dit seulement qui a été appelé."
+  },
+  {
+   "id": "gps-emet",
+   "champ": "accroche",
+   "avant": "« Le GPS ne sait pas où tu es : c'est ton téléphone qui le calcule en écoutant quatre satellites. »",
+   "apres": "« Le GPS ne sait pas où tu es : c'est ton téléphone qui le calcule en écoutant au moins quatre satellites. »",
+   "pourquoi": "Au moins quatre, comme le dit l'explication."
+  },
+  {
+   "id": "mp3-chanson",
+   "champ": "affirmation",
+   "avant": "Le format MP3 a été mis au point en testant la compression sur une chanson de Suzanne Vega chantée sans instrument.",
+   "apres": "Le format MP3 a été mis au point en testant notamment la compression sur une chanson de Suzanne Vega chantée sans instrument.",
+   "pourquoi": "« Tom's Diner » était un test parmi d'autres : sans « notamment », la phrase pouvait se lire « seulement »."
+  },
+  {
+   "id": "mp3-chanson",
+   "champ": "accroche",
+   "avant": "« Le MP3 a été réglé à l'oreille sur une seule chanson, chantée sans instrument. »",
+   "apres": "« Le MP3 a été réglé à l'oreille, entre autres sur « Tom's Diner », une chanson chantée sans instrument. »",
+   "pourquoi": "« Sur une seule chanson » était faux."
+  },
+  {
+   "id": "toy-story",
+   "champ": "accroche",
+   "avant": "« En 1995, pour la première fois, un film entier est sorti d'un ordinateur. »",
+   "apres": "« En 1995, pour la première fois, un long métrage entier est sorti d'un ordinateur. »",
+   "pourquoi": "Des courts métrages entièrement en images de synthèse existaient avant 1995 : la source parle du premier long métrage."
+  },
+  {
+   "id": "ver-morris",
+   "champ": "accroche",
+   "avant": "« La première grande attaque d'Internet est partie d'un étudiant, et elle lui a valu un procès. »",
+   "apres": "« Le premier grand ver d'Internet a été écrit par un étudiant, et lui a valu une condamnation. »",
+   "pourquoi": "« La première grande attaque » prête une intention que la source ne dit pas : elle parle d'un ver et d'une condamnation."
+  },
+  {
+   "id": "phrase-de-passe",
+   "champ": "accroche",
+   "avant": "« Sept mots simples protègent aussi bien que douze caractères impossibles à retenir. »",
+   "apres": "« Pour la CNIL, une phrase de passe de sept mots protège aussi bien qu'un mot de passe de douze caractères compliqués. »",
+   "pourquoi": "La CNIL précise que des mots choisis dans une langue, plutôt qu'au hasard, protègent moins : « sept mots simples » allait trop loin."
+  },
+  {
+   "id": "web-brevet",
+   "champ": "accroche",
+   "avant": "« Le Web est gratuit parce que le CERN a renoncé à le faire payer, en 1993. »",
+   "apres": "« Personne ne paie de droits pour se servir du Web : en 1993, le CERN a mis son logiciel à disposition sans redevance. »",
+   "pourquoi": "« Le Web est gratuit » pouvait faire croire que l'accès à Internet l'est."
+  },
+  {
+   "id": "binaire-ordinateurs",
+   "champ": "accroche",
+   "avant": "« Le binaire a trois siècles de plus que l'ordinateur. »",
+   "apres": "« Le binaire est bien plus vieux que l'ordinateur : Leibniz l'expliquait dès 1703. »",
+   "pourquoi": "De 1703 aux premiers ordinateurs, il y a deux siècles et demi, pas « trois siècles »."
+  },
+  {
+   "id": "robot-theatre",
+   "champ": "accroche",
+   "avant": "« Avant d'être une machine, le robot a été un personnage de théâtre. »",
+   "apres": "« Avant de désigner des machines, le mot robot a désigné des personnages de théâtre. »",
+   "pourquoi": "C'est le mot qui vient du théâtre (« R.U.R. », 1920) : des automates existaient bien avant."
+  },
+  {
+   "id": "mot-ordinateur",
+   "champ": "accroche",
+   "avant": "« Le mot ordinateur a été inventé sur commande, par un professeur de lettres. »",
+   "apres": "« Le mot ordinateur a été proposé sur commande, en 1955, par un professeur de lettres. »",
+   "pourquoi": "La source dit que Jacques Perret a proposé un mot construit autour d'« ordonnateur » : « inventé » allait trop loin."
+  },
+  {
+   "id": "an-2038",
+   "champ": "explication",
+   "avant": "Beaucoup de systèmes comptent le temps en secondes depuis le 1er janvier 1970 dans un entier signé de 32 bits. Ce compteur déborde le 19 janvier 2038 à 03 h 14 min 07 s (UTC), et la date repasse alors au 13 décembre 1901.",
+   "apres": "Beaucoup de systèmes comptent le temps en secondes depuis le 1er janvier 1970 dans un entier signé de 32 bits. Ce compteur atteint sa valeur maximale le 19 janvier 2038 à 03 h 14 min 07 s (UTC) : à la seconde suivante, il déborde, et la date repasse au 13 décembre 1901.",
+   "pourquoi": "Wikipédia : 03:14:07 est la dernière heure représentable ; le débordement a lieu à la seconde suivante."
+  },
+  {
+   "id": "ia-recent",
+   "champ": "explication",
+   "avant": "Elle remonte à 1956 : cet été-là, un atelier de recherche organisé par John McCarthy à l'université de Dartmouth porte déjà ce nom.",
+   "apres": "Elle remonte aux années 1950 : à l'été 1956, un atelier de recherche organisé par John McCarthy à l'université de Dartmouth porte déjà ce nom.",
+   "pourquoi": "L'expression figure dans le projet de cet atelier, daté du 31 août 1955 : « elle remonte à 1956 » était inexact."
+  },
+  {
+   "id": "ia-recent",
+   "champ": "accroche",
+   "avant": "« L'intelligence artificielle a l'âge de nos grands-parents : son nom date de 1956. »",
+   "apres": "« L'intelligence artificielle a l'âge de nos grands-parents : son nom date des années 1950. »",
+   "pourquoi": "Même raison : le projet de l'atelier de Dartmouth, qui emploie l'expression, date de 1955."
+  },
+  {
+   "id": "cable-tuyau",
+   "champ": "accroche",
+   "avant": "« Tes vidéos traversent l'océan dans un tuyau d'arrosage. »",
+   "apres": "« Tes vidéos traversent l'océan dans un câble pas plus gros qu'un tuyau d'arrosage. »",
+   "pourquoi": "« Dans un tuyau d'arrosage » se lisait au pied de la lettre : TeleGeography dit « as wide as a garden hose »."
+  },
+  {
+   "id": "deux-africa",
+   "champ": "accroche",
+   "avant": "« Le plus grand chantier d'Internet de ces dernières années fait le tour de l'Afrique. »",
+   "apres": "« Le plus long câble sous-marin du monde fait le tour de l'Afrique. »",
+   "pourquoi": "« Le plus grand chantier d'Internet de ces dernières années » : un superlatif que rien ne mesure ; Wikipédia : « the largest subsea cable in the world »."
+  },
+  {
+   "id": "moore",
+   "champ": "accroche",
+   "avant": "« La loi de Moore n'est pas une loi : c'est un pari d'ingénieur qui a tenu cinquante ans. »",
+   "apres": "« La loi de Moore n'est pas une loi de la nature : c'est une prédiction d'ingénieur, qui s'est longtemps vérifiée. »",
+   "pourquoi": "« Un pari qui a tenu cinquante ans » : une durée que la source ne donne pas ; l'explication dit « longtemps vérifiée »."
+  },
+  {
+   "id": "bluetooth",
+   "champ": "accroche",
+   "avant": "« Chaque fois que tu connectes tes écouteurs, tu invoques un roi viking. »",
+   "apres": "« Chaque fois que tu connectes des écouteurs en Bluetooth, tu prononces le surnom d'un roi viking. »",
+   "pourquoi": "« Tu invoques un roi viking » se lisait comme une image ; et tous les écouteurs ne sont pas en Bluetooth."
+  },
+  {
+   "id": "deep-blue",
+   "champ": "accroche",
+   "avant": "« En 1997, le meilleur joueur d'échecs du monde a perdu contre une machine. »",
+   "apres": "« En 1997, le champion du monde d'échecs a perdu un match contre une machine. »",
+   "pourquoi": "« Le meilleur joueur du monde » : l'affirmation dit « le champion du monde » ; et Kasparov a perdu le match, pas toutes les parties."
+  },
+  {
+   "id": "wannacry",
+   "champ": "accroche",
+   "avant": "« Une mise à jour non faite, et des hôpitaux refusent des malades : c'est WannaCry, en 2017. »",
+   "apres": "« Des correctifs de sécurité non installés, et des hôpitaux doivent refuser des urgences : c'est WannaCry, en 2017. »",
+   "pourquoi": "Alignée sur l'affirmation (« refuser des urgences ») et sur l'explication (des correctifs disponibles non installés)."
+  },
+  {
+   "id": "google-premier",
+   "champ": "explication",
+   "avant": "Le premier, Archie, a été écrit en 1990 par Alan Emtage : il indexait des archives de fichiers (FTP) pour aider à retrouver un fichier précis.",
+   "apres": "Archie, écrit en 1990 par Alan Emtage, est considéré comme le premier moteur de recherche d'Internet : il indexait des archives de fichiers (FTP) pour aider à retrouver un fichier précis.",
+   "pourquoi": "La source dit « considered the first Internet search engine »."
+  },
+  {
+   "id": "google-premier",
+   "champ": "accroche",
+   "avant": "« Le premier moteur de recherche s'appelait Archie, et il cherchait des fichiers, pas des pages. »",
+   "apres": "« Dès 1990, bien avant Google, un moteur de recherche appelé Archie cherchait des fichiers, pas des pages. »",
+   "pourquoi": "Même raison : « le premier » est ce que l'on considère, pas un fait mesuré."
+  }
+ ],
+ "conseils": [
+  {
+   "id": "commence-tot",
+   "champ": "conseil",
+   "avant": "Fixe ta date de fin, puis avance-la franchement : tu mettras plus de temps que tu ne le crois. Décide aujourd'hui de la première petite étape.",
+   "apres": "Fixe ta date de fin, puis avance-la franchement : tu mettras sans doute plus de temps que tu ne le crois. Décide aujourd'hui de la première petite étape.",
+   "pourquoi": "« Tu mettras plus de temps » généralisait, comme une certitude, une étude sur 37 étudiant·e·s."
+  },
+  {
+   "id": "trac-invisible",
+   "champ": "conseil",
+   "avant": "Quand tu sens ton cœur battre, rappelle-toi que le jury ne le voit pas. Continue ta phrase.",
+   "apres": "Quand tu sens ton cœur battre, rappelle-toi que le jury le voit bien moins que tu ne le crois. Continue ta phrase.",
+   "pourquoi": "Les expériences montrent qu'on surestime ce que les autres devinent de nos émotions, pas qu'ils ne voient rien."
+  },
+  {
+   "id": "conditions-reelles",
+   "champ": "pourquoi",
+   "avant": "Dans une expérience célèbre, des plongeurs retenaient mieux sous l'eau les mots appris sous l'eau, et sur terre ceux appris sur terre ; et le jour de l'épreuve, tu seras debout pendant ton exposé.",
+   "apres": "Le jour de l'épreuve, tu seras debout pendant ton exposé, avec ta seule feuille : t'entraîner dans ces conditions t'évite les surprises. Une expérience célèbre de 1975 va dans ce sens (des plongeurs retenaient mieux sous l'eau les mots appris sous l'eau, et sur terre ceux appris sur terre), mais une réplication de 2021 n'a pas retrouvé cet effet.",
+   "pourquoi": "La réplication de J. Murre (Royal Society Open Science, 2021) n'a pas retrouvé l'effet de l'expérience des plongeurs : le présenter seul exagérait sa portée."
+  },
+  {
+   "id": "trac-normal",
+   "champ": "titre",
+   "avant": "Le trac est la règle",
+   "apres": "Le trac est fréquent",
+   "pourquoi": "64 %, c'est « la plupart », pas « la règle »."
+  },
+  {
+   "id": "trac-normal",
+   "champ": "conseil",
+   "avant": "Ne lis pas ton trac comme le signe que tu n'es pas prêt·e : presque tout le monde l'a. Parle-en avec tes camarades.",
+   "apres": "Ne lis pas ton trac comme le signe que tu n'es pas prêt·e : la plupart des gens l'ont. Parle-en avec tes camarades.",
+   "pourquoi": "64 %, c'est « la plupart », pas « presque tout le monde »."
+  },
+  {
+   "id": "trac-normal",
+   "champ": "pourquoi",
+   "avant": "Dans une étude de 2017 sur des étudiant·e·s d'une université américaine, 64 % disaient avoir peur de parler en public.",
+   "apres": "Dans une étude de 2017 sur 1 135 étudiant·e·s, 64 % disaient avoir peur de parler en public.",
+   "pourquoi": "Le résumé de l'article donne 1 135 étudiant·e·s et 63,9 %, sans dire le pays ; Wikipédia écrit « aux États-Unis », mais l'article figure dans le dépôt de l'université fédérale du Minas Gerais, au Brésil : dans le doute, on ne dit plus le pays."
+  },
+  {
+   "id": "quelques-euh",
+   "champ": "pourquoi",
+   "avant": "Les hésitations sont normales : elles peuvent représenter jusqu'à 20 % des « mots » d'une conversation, et peuvent même signaler à l'auditoire qu'une idée nouvelle ou complexe arrive.",
+   "apres": "Les hésitations sont normales : elles représentent parfois plus de 20 % des « mots » d'une conversation, et peuvent même signaler à l'auditoire qu'une idée nouvelle ou complexe arrive.",
+   "pourquoi": "Wikipédia : « upwards of 20% » (plus de 20 %), et non « jusqu'à 20 % »."
+  },
+  {
+   "id": "echange-pas-interro",
+   "champ": "pourquoi",
+   "avant": "La charte des jurys demande des questions brèves, ancrées dans ton propos, à un rythme qui te laisse « le temps de réfléchir » ; l'entretien évalue ta capacité à écouter et à préciser ta pensée, ce n'est pas un contrôle de connaissances.",
+   "apres": "La charte des jurys demande des questions brèves, ancrées dans ton propos, à un rythme qui te laisse « le temps de réfléchir » ; l'entretien évalue ta capacité à écouter et à préciser ta pensée. Ce n'est pas un contrôle de connaissances, même si le jury peut s'appuyer sur le programme.",
+   "pourquoi": "La charte dit aussi que le jury conduit l'entretien « en se référant notamment au programme du cycle terminal » ; c'est la formulation de la question e18 du quiz (T79)."
+  }
+ ]
+}

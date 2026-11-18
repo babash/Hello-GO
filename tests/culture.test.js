@@ -13,6 +13,13 @@ const alea = (g) => () => { g = (g * 16807) % 2147483647; return g / 2147483647;
 // ---------- 1. Les données ----------
 const RECH = path.join(__dirname, '..', 'outils', 'culture'), lire = (f) => JSON.parse(fs.readFileSync(path.join(RECH, f), 'utf8'));
 const V0 = lire('videos.json'), X0 = lire('info-ou-infox.json'), C0 = lire('conseils.json');
+// La relecture du Gardien (T80) : des affirmations retirées de la banque, des textes reformulés (texte d'origine et raison).
+const REL = lire('relecture-gardien.json'), RETIREES = new Set(REL.retraits.map((r) => r.id));
+const relu = (liste, id, champ, origine) => { const r = liste.find((x) => x.id === id && x.champ === champ); return r ? r.apres : origine; };
+REL.infox.concat(REL.conseils).forEach((r) => ok(r.avant && r.apres && r.apres !== r.avant && r.pourquoi && !RETIREES.has(r.id), 'relecture ' + r.id + ' : texte d’origine, nouveau texte et raison'));
+REL.infox.forEach((r) => ok(X0.affirmations.some((a) => a.id === r.id && a[r.champ] === r.avant), 'relecture ' + r.id + ' : le texte d’origine est celui de la recherche'));
+REL.conseils.forEach((r) => ok(C0.conseils.some((c) => c.id === r.id && c[r.champ] === r.avant), 'relecture ' + r.id + ' : le texte d’origine est celui de la recherche'));
+REL.retraits.forEach((r) => ok(X0.affirmations.some((a) => a.id === r.id) && r.pourquoi, 'retrait ' + r.id + ' : affirmation de la recherche, avec sa raison'));
 ok(C.VIDEOS.length === V0.videos.filter((v) => v.statut !== 'non_verifie').length && C.VIDEOS.length >= 40, 'vidéos : toutes les vérifiées, aucune autre');
 ok(!C.VIDEOS.some((v) => /Dessous des cartes|Scilabus/i.test(v.titre + v.chaine)), 'vidéos non vérifiées écartées (Le Dessous des cartes, Scilabus)');
 C.VIDEOS.forEach((v) => {
@@ -27,10 +34,10 @@ ok(new Set(C.VIDEOS.map((v) => v.id)).size === C.VIDEOS.length, 'vidéos : ident
 ['reseaux-deuil', 'chatgpt-dissertations', 'jeu-de-la-vie', 'blockchain-comment', 'reseaux-neurones'].forEach((k) => ok(C.VIDEOS.some((v) => v.id === k), 'correspondance acceptée par l’enseignant : ' + k));
 C.CHAINES.forEach((c) => ok(lien(c.url) && c.nom && c.phrase && V0.chaines.some((x) => x.url === c.url), 'chaîne ' + c.nom));
 ok(C.CHAINES.length === V0.chaines.length, 'toutes les chaînes');
-ok(C.INFOX.length === X0.affirmations.length && C.INFOX.length >= 60, 'toutes les affirmations');
+ok(C.INFOX.length === X0.affirmations.length - RETIREES.size && RETIREES.size === 3 && C.INFOX.length === 57 && !C.INFOX.some((a) => RETIREES.has(a.id)), 'toutes les affirmations, sauf les 3 que la relecture retire');
 C.INFOX.forEach((a) => {
   const o = X0.affirmations.find((x) => x.id === a.id);
-  ok(o && o.affirmation === a.affirmation && o.vrai === a.vrai && o.accroche === a.accroche && o.source.url === a.source.url, a.id + ' : texte ou source changé');
+  ok(o && ['affirmation', 'explication', 'accroche'].every((k) => a[k] === relu(REL.infox, a.id, k, o[k])) && o.vrai === a.vrai && o.source.url === a.source.url, a.id + ' : texte ou source changé hors de la relecture');
   ok(typeof a.vrai === 'boolean' && a.explication && a.accroche && a.source.titre && lien(a.source.url), a.id + ' : champs');
   ok(a.sujets.length && a.interets.every((t) => D.TAGS.i[t]) && a.notions.every((t) => D.TAGS.n[t]), a.id + ' : étiquettes');
   (a.autres || []).forEach((s) => ok(lien(s.url) && s.titre, a.id + ' : source complémentaire'));
@@ -39,7 +46,7 @@ ok(C.CONSEILS.length === C0.conseils.length && C.CONSEILS.length === 40, '40 con
 const SOLIDITES = ['bien établi', 'plusieurs études', 'une étude', 'repère de manuel', 'consignes aux jurys'];
 C.CONSEILS.forEach((c) => {
   const o = C0.conseils.find((x) => x.id === c.id);
-  ok(o && o.conseil === c.conseil && o.pourquoi === c.pourquoi && o.source.url === c.source.url && o.phase === c.phase, c.id + ' : texte ou source changé');
+  ok(o && ['titre', 'conseil', 'pourquoi'].every((k) => c[k] === relu(REL.conseils, c.id, k, o[k])) && o.source.url === c.source.url && o.phase === c.phase, c.id + ' : texte ou source changé hors de la relecture');
   ok(SOLIDITES.includes(c.solidite) && lien(c.source.url) && c.source.annee, c.id + ' : solidité ou source');
   if (/contrôler/.test(o.source.lu_par || '')) ok(!c.source.auteurs && !c.source.titre, c.id + ' : détail à contrôler affiché');
   else ok(c.source.auteurs === o.source.auteurs && c.source.titre === o.source.titre, c.id + ' : auteur·e·s ou titre changés');
@@ -129,13 +136,17 @@ ok(D.A_SAVOIR.length === 42, 'les « à savoir » existants sont gardés');
 { const d = neuf(); ok(/Découvrir/.test(A.prochaineAction(d).bouton), 'prochaine étape : découvrir d’abord');
   for (let i = 1; i <= 10; i++) d.decouverte.reactions[i] = 1; d.quiz.fait = true;
   ok(A.prochaineAction(d).vers === '#/explorer/infox', 'prochaine étape : Info ou infox ? au début du parcours');
-  A.noterInfox(d, 'bug-hopper', true); ok(A.prochaineAction(d).vers === '#/explorer/videos' && /«/.test(A.prochaineAction(d).texte), 'prochaine étape : une vidéo tant qu’il n’y a pas de piste');
+  A.noterInfox(d, 'arpanet-lo', true); ok(A.prochaineAction(d).vers === '#/explorer/videos' && /«/.test(A.prochaineAction(d).texte), 'prochaine étape : une vidéo tant qu’il n’y a pas de piste');
   d.culture.videos['craquer-wordle'] = { vue: '2026-11-18', retiens: '', intrigue: '' }; ok(A.prochaineAction(d).vers === '#/explorer/sujets', 'puis les sujets');
   ok(A.dossierValide(d), 'dossier avec la culture : valide');
   const mauvais = [{ videos: [] }, { videos: { 'a b': {} } }, { videos: { x: { vue: 3 } } }, { videos: { x: { avis: 2 } } }, { videos: { x: { piste: '<b>' } } }, { infox: { x: { v: -1 } } }, { infox: { x: { d: 2 } } }, { accroches: { x: { p: 'a"b' } } }, { salves: 1.5 }, { jour: 'x' }, 'culture'];
   mauvais.forEach((m) => { const x = JSON.parse(JSON.stringify(d)); x.culture = m; ok(!A.dossierValide(x), 'forme refusée : ' + JSON.stringify(m)); });
   const futur = JSON.parse(JSON.stringify(d)); futur.culture.videos['video-de-2027'] = { vue: '2027-01-01', retiens: 'x', intrigue: '', nouveau: 1 }; futur.culture.inconnu = { a: 1 };
   ok(A.dossierValide(futur) && A.chiffresCulture(futur).videos === 1, 'identifiants et clés d’une version plus récente : acceptés, ignorés');
+  // une affirmation retirée de la banque (relecture du Gardien) : gardée telle quelle dans le dossier, jamais comptée ni montrée
+  const retiree = JSON.parse(JSON.stringify(d)); A.noterInfox(retiree, 'bug-hopper', true, '2026-11-18'); retiree.culture.accroches['bug-hopper'] = { le: '2026-11-18' }; retiree.culture.jour = { j: '2026-11-18', id: 'bug-hopper' };
+  ok(A.dossierValide(retiree) && A.chiffresCulture(retiree).infox === A.chiffresCulture(d).infox && A.chiffresCulture(retiree).accroches === A.chiffresCulture(d).accroches, 'affirmation retirée : acceptée, non comptée');
+  ok(A.infoxDuJour(retiree, '2026-11-18').a.id !== 'bug-hopper' && !X.dossier(retiree).includes('Grace Hopper') && retiree.culture.infox['bug-hopper'], 'affirmation retirée : ni du jour, ni dans l’export, mais gardée');
   // fusion à trois : une vidéo de chaque côté
   const b = JSON.parse(JSON.stringify(d)), l2 = JSON.parse(JSON.stringify(d)), r2 = JSON.parse(JSON.stringify(d));
   l2.culture.videos['ia-langue'] = { vue: '2026-11-19', retiens: 'ici', intrigue: '' }; A.noterInfox(r2, 'arobase', false, '2026-11-19');

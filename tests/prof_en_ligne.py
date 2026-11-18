@@ -71,7 +71,7 @@ def essais(nav, Appareil, ok, base, prof, URL, CODE_PROF_A, classe_A, erreurs):
     ok('tableau : le score du quiz (résumé)', 'Quiz : Épreuve 8/10' in ligne, ligne)
     ok('tableau : les hauts faits, leur nombre et le dernier gagné', '2 hauts faits' in ligne and 'Dernier : Silence, ça tourne' in ligne, ligne.replace('\n', ' | '))
     ok('tableau : les jours actifs sur 30 jours', '1 jour actif sur 30' in ligne, ligne)
-    ok('tableau : la culture (vidéos, infox, accroches)', re.search(r'Culture : 1 vidéo · 7 infox vues \(\d réussies\) · 1 accroche', ligne), ligne.replace('\n', ' | '))
+    ok('tableau : la culture (vidéos, infox, accroches)', re.search(r'Culture : 1 vidéo · 7 affirmations vues \(\d réussies?\) · 1 accroche', ligne), ligne.replace('\n', ' | '))
     ok('tableau : personne à relancer', 'Tous les élèves sont venu·e·s dans les deux dernières semaines.' in p.inner_text('.bilan-visites') and p.locator('.tableau-classe .voyant').count() == 0)
     p.click('#derniers-hf summary')
     ok('derniers hauts faits de la classe : qui, quoi, quand', 'Inès B.' in p.inner_text('#derniers-hf') and 'Hello, world' in p.inner_text('#derniers-hf'), p.inner_text('#derniers-hf'))
@@ -107,7 +107,7 @@ def essais(nav, Appareil, ok, base, prof, URL, CODE_PROF_A, classe_A, erreurs):
     with p.expect_download() as dl:
         p.click('[data-pa=md-eleve]')
     md = open(dl.value.path(), encoding='utf-8').read()
-    ok('Markdown d’un·e élève : la culture, la note neutralisée', '## Ma culture' in md and video['url'] in md and '\\<img' in md)
+    ok('Markdown d’un·e élève : la culture, la note neutralisée', '## Ma culture' in md and video['url'] in md and '&lt;img' in md and '<img' not in md)
     ok('Markdown d’un·e élève : son dossier, sans code', dl.value.suggested_filename.endswith('.md') and '# Dossier de Grand oral · Inès B.' in md and 'Le cloud est-il écologique ?' in md and code_eleve not in md, md[:300])
     p.check('#md-eleve-code')
     with p.expect_download() as dl:

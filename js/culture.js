@@ -1,6 +1,7 @@
 // Hello GO : la culture (vidéos conseillées, chaînes à découvrir, « Info ou infox ? », conseils fondés sur des résultats
 // observés). Fichier fabriqué par outils/generer_culture.py à partir de outils/culture/*.json : ne pas le modifier à la main.
 // Vérifié le 2026-11-17 (oEmbed de YouTube pour les vidéos, pages ouvertes pour les faits et les conseils).
+// Relu le 2026-11-18 (outils/culture/relecture-gardien.json) : 3 affirmations retirées de la banque, 49 textes reformulés.
 // Textes CC BY-SA 4.0, Babash - NSI Tani Malandi, écrits avec l’aide de l’IA ; les titres des vidéos et des sources sont ceux de leurs auteur·e·s.
 (function (racine) {
   const api = {
@@ -929,42 +930,11 @@
  ],
  "INFOX": [
   {
-   "id": "bug-hopper",
-   "affirmation": "Grace Hopper a inventé le mot « bug » le jour où elle a trouvé un insecte dans un ordinateur.",
-   "vrai": false,
-   "explication": "En 1947, des ingénieur·e·s ont bien trouvé une mite dans l'ordinateur Mark II de Harvard, et l'ont collée dans le carnet de bord. Mais le Smithsonian, qui conserve ce carnet, rappelle que les ingénieur·e·s parlaient de « bugs » depuis plus d'un siècle : Thomas Edison employait déjà le mot dans les années 1870. L'idée reçue est si répandue que des encyclopédies la reprennent encore.",
-   "accroche": "« Le premier bug de l'histoire est une vraie mite, conservée dans un musée ; mais le mot, lui, existait déjà depuis un siècle. »",
-   "source": {
-    "titre": "Smithsonian, National Museum of American History, « Log Book With Computer Bug »",
-    "url": "https://americanhistory.si.edu/collections/object/nmah_334663"
-   },
-   "autres": [
-    {
-     "titre": "Encyclopædia Britannica, « Grace Hopper »",
-     "url": "https://www.britannica.com/biography/Grace-Hopper"
-    }
-   ],
-   "interets": [
-    "histoire",
-    "sciences"
-   ],
-   "notions": [
-    "hist",
-    "prog"
-   ],
-   "sujets": [
-    "bug",
-    "Grace Hopper",
-    "erreurs logicielles",
-    "histoire de l'informatique"
-   ]
-  },
-  {
    "id": "internet-web",
    "affirmation": "Internet et le Web, c'est la même chose.",
    "vrai": false,
    "explication": "Internet est le réseau : son ancêtre, ARPANET, transmet son premier message en 1969. Le Web est un service qui circule sur ce réseau : Tim Berners-Lee l'invente au CERN en 1989, vingt ans plus tard. Le courriel, par exemple, utilise Internet sans passer par le Web.",
-   "accroche": "« Internet avait déjà vingt ans quand le Web est né. »",
+   "accroche": "« L'ancêtre d'Internet avait déjà vingt ans quand le Web est né. »",
    "source": {
     "titre": "CERN, « A short history of the Web »",
     "url": "https://home.cern/science/computing/birth-web/short-history-web"
@@ -1022,7 +992,7 @@
    "affirmation": "En 1843, Ada Lovelace explique par écrit comment une machine pourrait calculer une suite de nombres, les nombres de Bernoulli.",
    "vrai": true,
    "explication": "En traduisant et en annotant un article sur la machine analytique de Charles Babbage, elle décrit comment la programmer pour ce calcul. C'est pourquoi on la présente souvent comme la première programmeuse.",
-   "accroche": "« Le premier programme publié date de 1843, et il est signé par une femme de 27 ans. »",
+   "accroche": "« Dès 1843, Ada Lovelace, 27 ans, décrit comment programmer une machine à calculer. »",
    "source": {
     "titre": "Encyclopædia Britannica, « Ada Lovelace »",
     "url": "https://www.britannica.com/biography/Ada-Lovelace"
@@ -1069,7 +1039,7 @@
   },
   {
    "id": "hedy-lamarr",
-   "affirmation": "Une actrice d'Hollywood a déposé en 1942 un brevet de communication radio par « saut de fréquence ».",
+   "affirmation": "Une actrice d'Hollywood a obtenu en 1942 un brevet de communication radio par « saut de fréquence ».",
    "vrai": true,
    "explication": "Hedy Lamarr l'a déposé avec le compositeur George Antheil (brevet américain n° 2 292 387). Le saut de fréquence est aujourd'hui considéré comme une étape importante des communications sans fil.",
    "accroche": "« Une star de cinéma des années 1940 figure au panthéon américain des inventeurs et inventrices. »",
@@ -1093,33 +1063,6 @@
     "communications sans fil",
     "femmes en informatique",
     "brevet"
-   ]
-  },
-  {
-   "id": "hamilton-genie-logiciel",
-   "affirmation": "L'expression « génie logiciel » (software engineering) vient de la responsable du logiciel de bord des missions Apollo.",
-   "vrai": true,
-   "explication": "Margaret Hamilton dirigeait au MIT le développement du logiciel embarqué de l'ordinateur de guidage d'Apollo. Elle a employé « software engineering » pour faire reconnaître le logiciel comme une ingénierie à part entière ; elle a reçu la médaille présidentielle de la Liberté en 2016.",
-   "accroche": "« C'est une femme qui a dirigé le logiciel qui a posé des humains sur la Lune, et qui a donné son nom à tout un métier. »",
-   "source": {
-    "titre": "Wikipedia (en), « Margaret Hamilton (software engineer) »",
-    "url": "https://en.wikipedia.org/wiki/Margaret_Hamilton_(software_engineer)"
-   },
-   "autres": [],
-   "interets": [
-    "histoire",
-    "sciences",
-    "transports"
-   ],
-   "notions": [
-    "hist",
-    "prog"
-   ],
-   "sujets": [
-    "Margaret Hamilton",
-    "Apollo",
-    "génie logiciel",
-    "femmes en informatique"
    ]
   },
   {
@@ -1154,7 +1097,7 @@
    "affirmation": "Grace Hopper, qui a conçu l'un des premiers compilateurs, a fini sa carrière avec le grade de contre-amirale.",
    "vrai": true,
    "explication": "Un compilateur traduit les instructions d'un·e programmeur·euse en code pour la machine. Grace Hopper en a conçu un des tout premiers, a défendu le langage COBOL, et a terminé sa carrière dans la marine américaine au grade de contre-amirale (rear admiral).",
-   "accroche": "« Sans compilateur, tu écrirais encore tes programmes en langage machine : merci à l'amirale Hopper. »",
+   "accroche": "« Une pionnière des compilateurs a fini sa carrière contre-amirale dans la marine américaine. »",
    "source": {
     "titre": "Encyclopædia Britannica, « Grace Hopper »",
     "url": "https://www.britannica.com/biography/Grace-Hopper"
@@ -1179,7 +1122,7 @@
    "id": "enigma-polonais",
    "affirmation": "Alan Turing a été le premier à casser le code de la machine Enigma.",
    "vrai": false,
-   "explication": "Enigma a d'abord été cassée par des Polonais au début des années 1930. En 1939, ils transmettent leurs résultats aux Britanniques, dont l'équipe travaille ensuite sous la direction du mathématicien Alan Turing.",
+   "explication": "Enigma a d'abord été cassée par des Polonais au début des années 1930. En 1939, ils transmettent leurs résultats aux Britanniques, dont l'équipe de cryptanalyse compte notamment le mathématicien Alan Turing.",
    "accroche": "« Avant Turing, il y a eu les mathématiciens polonais : la cryptanalyse d'Enigma est une course de relais. »",
    "source": {
     "titre": "Encyclopædia Britannica, « Enigma »",
@@ -1203,10 +1146,10 @@
   },
   {
    "id": "eniac-programmeuses",
-   "affirmation": "L'ENIAC, un des premiers ordinateurs électroniques, a été programmé par six femmes.",
+   "affirmation": "Les premières personnes chargées de programmer l'ENIAC, un des premiers ordinateurs électroniques, étaient six femmes.",
    "vrai": true,
    "explication": "Betty Holberton, Kay McNulty, Marlyn Wescoff, Ruth Lichterman, Betty Jean Jennings et Fran Bilas ont programmé l'ENIAC. Leur rôle a longtemps été oublié.",
-   "accroche": "« Les premières personnes à programmer un ordinateur électronique étaient six femmes. »",
+   "accroche": "« L'ENIAC, un des premiers ordinateurs électroniques, a eu six femmes pour premières programmeuses. »",
    "source": {
     "titre": "Wikipedia (en), « ENIAC »",
     "url": "https://en.wikipedia.org/wiki/ENIAC"
@@ -1228,7 +1171,7 @@
   },
   {
    "id": "eniac-bureau",
-   "affirmation": "L'ENIAC, terminé en 1946, tenait sur un bureau.",
+   "affirmation": "L'ENIAC, présenté au public en 1946, tenait sur un bureau.",
    "vrai": false,
    "explication": "Il pesait plus de 27 tonnes, comptait plus de 17 000 tubes à vide et consommait 150 kW. Il occupait une salle entière.",
    "accroche": "« Le grand-père de ton téléphone pesait 27 tonnes. »",
@@ -1283,7 +1226,7 @@
    "affirmation": "Le premier message envoyé sur l'ancêtre d'Internet a fait planter le système au bout de deux lettres.",
    "vrai": true,
    "explication": "En 1969, la première liaison d'ARPANET relie l'université UCLA au Stanford Research Institute. Seules les lettres « lo » arrivent avant la panne ; le message complet passe environ une heure plus tard.",
-   "accroche": "« Le premier mot d'Internet, c'est \"lo\" : un plantage. »",
+   "accroche": "« Le premier mot envoyé sur l'ancêtre d'Internet, c'est \"lo\" : un plantage. »",
    "source": {
     "titre": "Wikipedia (en), « ARPANET »",
     "url": "https://en.wikipedia.org/wiki/ARPANET"
@@ -1309,7 +1252,7 @@
    "affirmation": "L'arobase des adresses de courriel a été choisie en 1971 parce que ce signe n'apparaissait dans aucun nom.",
    "vrai": true,
    "explication": "Ray Tomlinson met au point en 1971 l'envoi de messages d'un ordinateur à un autre. Il sépare le nom de la personne et celui de la machine par @, un symbole absent des noms et du langage des ordinateurs de l'époque.",
-   "accroche": "« Le @ de ton adresse a plus de cinquante ans, et il a été choisi parce que personne ne s'en servait. »",
+   "accroche": "« Le @ de ton adresse a plus de cinquante ans, et il a été choisi parce qu'aucun nom ne l'utilisait. »",
    "source": {
     "titre": "Encyclopædia Britannica, « Ray Tomlinson »",
     "url": "https://www.britannica.com/biography/Ray-Tomlinson"
@@ -1362,7 +1305,7 @@
    "affirmation": "Un câble sous-marin d'Internet a, sur l'essentiel de son trajet, le diamètre d'un tuyau d'arrosage.",
    "vrai": true,
    "explication": "Les fibres de verre qui transportent la lumière y sont fines comme un cheveu. Début 2026, TeleGeography comptait plus de 1,5 million de kilomètres de câbles sous-marins en service.",
-   "accroche": "« Tes vidéos traversent l'océan dans un tuyau d'arrosage. »",
+   "accroche": "« Tes vidéos traversent l'océan dans un câble pas plus gros qu'un tuyau d'arrosage. »",
    "source": {
     "titre": "TeleGeography, « Submarine Cable FAQs »",
     "url": "https://www2.telegeography.com/submarine-cable-faqs-frequently-asked-questions"
@@ -1413,7 +1356,7 @@
    "affirmation": "Un câble sous-marin de 45 000 kilomètres fait le tour de l'Afrique.",
    "vrai": true,
    "explication": "Le câble 2Africa relie 33 pays ; il est financé par un consortium de huit entreprises, dont Meta, Orange et Vodafone. Le cœur du système a été achevé en 2025 ; il touche notamment le Kenya, le Mozambique et Madagascar.",
-   "accroche": "« Le plus grand chantier d'Internet de ces dernières années fait le tour de l'Afrique. »",
+   "accroche": "« Le plus long câble sous-marin du monde fait le tour de l'Afrique. »",
    "source": {
     "titre": "Wikipedia (en), « 2Africa »",
     "url": "https://en.wikipedia.org/wiki/2Africa"
@@ -1439,7 +1382,7 @@
    "affirmation": "Un service qui permet d'envoyer de l'argent avec un simple téléphone a été lancé au Kenya dès 2007.",
    "vrai": true,
    "explication": "M-Pesa, lancé par Vodafone et Safaricom, permet de transférer de l'argent et de payer par téléphone mobile. Fin 2011, il comptait déjà 17 millions d'abonné·e·s au Kenya.",
-   "accroche": "« Le paiement par téléphone s'est imposé au Kenya bien avant de se banaliser en Europe. »",
+   "accroche": "« Au Kenya, on envoie de l'argent avec un simple téléphone depuis 2007. »",
    "source": {
     "titre": "Wikipedia (en), « M-Pesa »",
     "url": "https://en.wikipedia.org/wiki/M-Pesa"
@@ -1464,8 +1407,8 @@
    "id": "apollo-memoire",
    "affirmation": "L'ordinateur de bord des missions Apollo avait environ 2 000 mots de mémoire vive.",
    "vrai": true,
-   "explication": "L'Apollo Guidance Computer disposait de 2 048 mots de mémoire vive et de 36 864 mots de mémoire morte, des mots de 15 bits, et il pesait 32 kg. C'est infiniment moins que le moindre téléphone actuel.",
-   "accroche": "« On est allé sur la Lune avec moins de mémoire qu'il n'en faut pour une seule photo. »",
+   "explication": "L'Apollo Guidance Computer disposait de 2 048 mots de mémoire vive et de 36 864 mots de mémoire morte, des mots de 16 bits (dont 15 de données), et il pesait 32 kg. C'est infiniment moins que le moindre téléphone actuel.",
+   "accroche": "« L'ordinateur de bord d'Apollo avait moins de mémoire qu'il n'en faut pour une seule photo d'aujourd'hui. »",
    "source": {
     "titre": "Wikipedia (en), « Apollo Guidance Computer »",
     "url": "https://en.wikipedia.org/wiki/Apollo_Guidance_Computer"
@@ -1519,7 +1462,7 @@
    "affirmation": "La loi de Moore est une loi de la physique.",
    "vrai": false,
    "explication": "C'est une prédiction faite en 1965 par l'ingénieur Gordon Moore sur le nombre de transistors par puce, révisée en 1975 (doublement tous les deux ans). Elle a longtemps été vérifiée, ce qui l'a fait prendre pour une loi inévitable, mais elle décrit un rythme industriel, pas la nature.",
-   "accroche": "« La loi de Moore n'est pas une loi : c'est un pari d'ingénieur qui a tenu cinquante ans. »",
+   "accroche": "« La loi de Moore n'est pas une loi de la nature : c'est une prédiction d'ingénieur, qui s'est longtemps vérifiée. »",
    "source": {
     "titre": "Encyclopædia Britannica, « Moore's law »",
     "url": "https://www.britannica.com/technology/Moores-law"
@@ -1546,7 +1489,7 @@
    "affirmation": "Le Bluetooth porte le surnom d'un roi viking du Xe siècle.",
    "vrai": true,
    "explication": "Le roi Harald « à la dent bleue » a uni le Danemark et la Norvège ; en 1996, un ingénieur d'Intel propose son surnom comme nom de code provisoire pour une technologie censée unir les appareils. Le logo assemble les deux runes de ses initiales.",
-   "accroche": "« Chaque fois que tu connectes tes écouteurs, tu invoques un roi viking. »",
+   "accroche": "« Chaque fois que tu connectes des écouteurs en Bluetooth, tu prononces le surnom d'un roi viking. »",
    "source": {
     "titre": "Bluetooth SIG, « Origin of the name »",
     "url": "https://www.bluetooth.com/about-us/bluetooth-origin/"
@@ -1597,7 +1540,7 @@
    "affirmation": "Pong est le premier jeu vidéo de l'histoire.",
    "vrai": false,
    "explication": "Dès le 18 octobre 1958, le physicien William Higinbotham présente « Tennis for Two » au laboratoire de Brookhaven : un jeu de tennis sur un écran d'oscilloscope, relié à un calculateur analogique. Pong n'arrive qu'après.",
-   "accroche": "« Le premier jeu de tennis sur écran a été bricolé par un physicien nucléaire pour une journée portes ouvertes. »",
+   "accroche": "« Dès 1958, un physicien a bricolé un jeu de tennis sur écran pour une journée portes ouvertes. »",
    "source": {
     "titre": "Brookhaven National Laboratory, « The First Video Game? »",
     "url": "https://www.bnl.gov/about/history/firstvideo.php"
@@ -1622,7 +1565,7 @@
    "affirmation": "Tetris a été créé au Japon par Nintendo.",
    "vrai": false,
    "explication": "Tetris a été créé au milieu des années 1980 par Alexey Pajitnov, un ingénieur soviétique du centre de calcul de l'Académie des sciences. Son nom mêle « tetra » (quatre) et le tennis, son sport préféré.",
-   "accroche": "« Le jeu vidéo le plus célèbre du monde vient d'un laboratoire soviétique. »",
+   "accroche": "« Tetris n'est pas né chez Nintendo, mais dans un centre de calcul soviétique. »",
    "source": {
     "titre": "Wikipedia (en), « Tetris »",
     "url": "https://en.wikipedia.org/wiki/Tetris"
@@ -1674,7 +1617,7 @@
    "affirmation": "Dans le premier Civilization, un bug de dépassement d'entier rendait Gandhi fou de bombes nucléaires.",
    "vrai": false,
    "explication": "C'est une légende : elle n'apparaît qu'en 2012, sur un wiki, 21 ans après la sortie du jeu, et le créateur du jeu, Sid Meier, a confirmé en 2020 que ce bug était inventé. L'histoire est belle parce que ce genre de bug existe vraiment ailleurs.",
-   "accroche": "« Le bug le plus célèbre du jeu vidéo n'a jamais existé. »",
+   "accroche": "« Le célèbre bug du Gandhi nucléaire n'a jamais existé. »",
    "source": {
     "titre": "Wikipedia (en), « Nuclear Gandhi »",
     "url": "https://en.wikipedia.org/wiki/Nuclear_Gandhi"
@@ -1700,7 +1643,7 @@
    "affirmation": "En 1997, un ordinateur a battu le champion du monde d'échecs en match.",
    "vrai": true,
    "explication": "Deep Blue, conçu par IBM, a battu Garry Kasparov 3,5 à 2,5 : deux victoires et trois nulles pour la machine.",
-   "accroche": "« En 1997, le meilleur joueur d'échecs du monde a perdu contre une machine. »",
+   "accroche": "« En 1997, le champion du monde d'échecs a perdu un match contre une machine. »",
    "source": {
     "titre": "Encyclopædia Britannica, « Deep Blue »",
     "url": "https://www.britannica.com/topic/Deep-Blue"
@@ -1753,8 +1696,8 @@
    "id": "ia-recent",
    "affirmation": "L'expression « intelligence artificielle » date des années 2010.",
    "vrai": false,
-   "explication": "Elle remonte à 1956 : cet été-là, un atelier de recherche organisé par John McCarthy à l'université de Dartmouth porte déjà ce nom.",
-   "accroche": "« L'intelligence artificielle a l'âge de nos grands-parents : son nom date de 1956. »",
+   "explication": "Elle remonte aux années 1950 : à l'été 1956, un atelier de recherche organisé par John McCarthy à l'université de Dartmouth porte déjà ce nom.",
+   "accroche": "« L'intelligence artificielle a l'âge de nos grands-parents : son nom date des années 1950. »",
    "source": {
     "titre": "Dartmouth College, « Artificial Intelligence (AI) Coined at Dartmouth »",
     "url": "https://home.dartmouth.edu/about/artificial-intelligence-ai-coined-dartmouth"
@@ -1909,7 +1852,7 @@
    "id": "an-2038",
    "affirmation": "Le 19 janvier 2038, certains ordinateurs risquent de se croire en 1901.",
    "vrai": true,
-   "explication": "Beaucoup de systèmes comptent le temps en secondes depuis le 1er janvier 1970 dans un entier signé de 32 bits. Ce compteur déborde le 19 janvier 2038 à 03 h 14 min 07 s (UTC), et la date repasse alors au 13 décembre 1901.",
+   "explication": "Beaucoup de systèmes comptent le temps en secondes depuis le 1er janvier 1970 dans un entier signé de 32 bits. Ce compteur atteint sa valeur maximale le 19 janvier 2038 à 03 h 14 min 07 s (UTC) : à la seconde suivante, il déborde, et la date repasse au 13 décembre 1901.",
    "accroche": "« Il existe un bug dont on connaît déjà la date à la seconde près : le 19 janvier 2038. »",
    "source": {
     "titre": "Wikipedia (en), « Year 2038 problem »",
@@ -2016,7 +1959,7 @@
    "affirmation": "On connaît l'identité de la personne qui a créé le Bitcoin.",
    "vrai": false,
    "explication": "Le texte fondateur a été publié en 2008 sous le pseudonyme de Satoshi Nakamoto, et l'identité de son auteur·e reste inconnue.",
-   "accroche": "« La monnaie numérique la plus célèbre a été inventée par quelqu'un dont personne ne connaît le nom. »",
+   "accroche": "« Le bitcoin a été inventé sous un pseudonyme, et l'on ne sait toujours pas par qui. »",
    "source": {
     "titre": "Wikipedia (en), « Bitcoin »",
     "url": "https://en.wikipedia.org/wiki/Bitcoin"
@@ -2042,7 +1985,7 @@
    "affirmation": "En 2010, un programmeur a payé deux pizzas 10 000 bitcoins.",
    "vrai": true,
    "explication": "Le 22 mai 2010, Laszlo Hanyecz achète deux pizzas pour 10 000 bitcoins.",
-   "accroche": "« Les deux pizzas les plus chères de l'histoire ont été payées en bitcoins. »",
+   "accroche": "« Le premier achat connu payé en bitcoins : deux pizzas, pour 10 000 bitcoins, en 2010. »",
    "source": {
     "titre": "Wikipedia (en), « Bitcoin »",
     "url": "https://en.wikipedia.org/wiki/Bitcoin"
@@ -2068,7 +2011,7 @@
    "affirmation": "YouTube a été créé par Google.",
    "vrai": false,
    "explication": "YouTube a été enregistré le 14 février 2005 par Steve Chen, Chad Hurley et Jawed Karim. Google l'a racheté en novembre 2006 pour 1,65 milliard de dollars en actions.",
-   "accroche": "« YouTube n'est pas né chez Google : Google l'a acheté à trois jeunes fondateurs, un an et demi après sa création. »",
+   "accroche": "« YouTube n'est pas né chez Google : Google l'a racheté en 2006, moins de deux ans après sa création. »",
    "source": {
     "titre": "Encyclopædia Britannica, « YouTube »",
     "url": "https://www.britannica.com/topic/YouTube"
@@ -2120,7 +2063,7 @@
    "affirmation": "Le premier appel public passé avec un téléphone portable date des années 1990.",
    "vrai": false,
    "explication": "Il date de 1973 : Martin Cooper, ingénieur chez Motorola, appelle le responsable du projet concurrent avec un prototype de 1,1 kg, présenté à New York le 3 avril 1973. Le premier modèle vendu sort en 1983, à 3 995 dollars.",
-   "accroche": "« Le premier téléphone portable pesait plus d'un kilo, et son premier appel a servi à narguer la concurrence. »",
+   "accroche": "« Le premier téléphone portable pesait plus d'un kilo, et son premier appel a été pour le responsable du projet concurrent. »",
    "source": {
     "titre": "Encyclopædia Britannica, « Martin Cooper »",
     "url": "https://www.britannica.com/biography/Martin-Cooper"
@@ -2145,7 +2088,7 @@
    "affirmation": "Pour te localiser, ton téléphone envoie un signal aux satellites GPS.",
    "vrai": false,
    "explication": "C'est l'inverse : les satellites émettent, le récepteur écoute et calcule sa position. Le GPS ne demande à l'utilisateur ou l'utilisatrice de transmettre aucune donnée, et fonctionne sans réseau téléphonique ni Internet ; il faut voir au moins quatre satellites.",
-   "accroche": "« Le GPS ne sait pas où tu es : c'est ton téléphone qui le calcule en écoutant quatre satellites. »",
+   "accroche": "« Le GPS ne sait pas où tu es : c'est ton téléphone qui le calcule en écoutant au moins quatre satellites. »",
    "source": {
     "titre": "Wikipedia (en), « Global Positioning System »",
     "url": "https://en.wikipedia.org/wiki/Global_Positioning_System"
@@ -2195,10 +2138,10 @@
   },
   {
    "id": "mp3-chanson",
-   "affirmation": "Le format MP3 a été mis au point en testant la compression sur une chanson de Suzanne Vega chantée sans instrument.",
+   "affirmation": "Le format MP3 a été mis au point en testant notamment la compression sur une chanson de Suzanne Vega chantée sans instrument.",
    "vrai": true,
    "explication": "Le MP3 a été développé en grande partie par la société Fraunhofer, en Allemagne, sous la direction de Karlheinz Brandenburg. Il se servait de « Tom's Diner », a cappella, pour vérifier que la voix humaine supportait la compression ; l'extension .mp3 est choisie le 14 juillet 1995.",
-   "accroche": "« Le MP3 a été réglé à l'oreille sur une seule chanson, chantée sans instrument. »",
+   "accroche": "« Le MP3 a été réglé à l'oreille, entre autres sur « Tom's Diner », une chanson chantée sans instrument. »",
    "source": {
     "titre": "Wikipedia (en), « MP3 »",
     "url": "https://en.wikipedia.org/wiki/MP3"
@@ -2225,7 +2168,7 @@
    "affirmation": "Le premier long métrage entièrement réalisé en images de synthèse est sorti en 1995.",
    "vrai": true,
    "explication": "C'est « Toy Story », du studio Pixar, distribué par Disney.",
-   "accroche": "« En 1995, pour la première fois, un film entier est sorti d'un ordinateur. »",
+   "accroche": "« En 1995, pour la première fois, un long métrage entier est sorti d'un ordinateur. »",
    "source": {
     "titre": "Encyclopædia Britannica, « Toy Story »",
     "url": "https://www.britannica.com/topic/Toy-Story"
@@ -2251,7 +2194,7 @@
    "affirmation": "Le premier grand ver informatique d'Internet, en 1988, a été écrit par un étudiant.",
    "vrai": true,
    "explication": "Robert Tappan Morris, étudiant à l'université Cornell, lance son ver le 2 novembre 1988. Il devient la première personne condamnée pour crime en vertu de la loi américaine de 1986 sur la fraude informatique.",
-   "accroche": "« La première grande attaque d'Internet est partie d'un étudiant, et elle lui a valu un procès. »",
+   "accroche": "« Le premier grand ver d'Internet a été écrit par un étudiant, et lui a valu une condamnation. »",
    "source": {
     "titre": "Wikipedia (en), « Morris worm »",
     "url": "https://en.wikipedia.org/wiki/Morris_worm"
@@ -2276,7 +2219,7 @@
    "affirmation": "En 2017, une attaque informatique a obligé des hôpitaux britanniques à refuser des urgences.",
    "vrai": true,
    "explication": "Le rançongiciel WannaCry se répand le 12 mai 2017 dans 150 pays. Une grande partie de sa diffusion vient d'organisations qui n'avaient pas installé les correctifs de sécurité disponibles.",
-   "accroche": "« Une mise à jour non faite, et des hôpitaux refusent des malades : c'est WannaCry, en 2017. »",
+   "accroche": "« Des correctifs de sécurité non installés, et des hôpitaux doivent refuser des urgences : c'est WannaCry, en 2017. »",
    "source": {
     "titre": "Wikipedia (en), « WannaCry ransomware attack »",
     "url": "https://en.wikipedia.org/wiki/WannaCry_ransomware_attack"
@@ -2301,7 +2244,7 @@
    "affirmation": "Pour la CNIL, une phrase de passe de sept mots vaut un mot de passe de douze caractères mêlant majuscules, minuscules, chiffres et symboles.",
    "vrai": true,
    "explication": "Dans sa recommandation du 14 octobre 2022, la CNIL raisonne en entropie (au moins 80 bits) et donne ces exemples comme équivalents, avec aussi 14 caractères sans symbole. Ce qui compte, c'est le nombre de combinaisons possibles, pas l'air compliqué.",
-   "accroche": "« Sept mots simples protègent aussi bien que douze caractères impossibles à retenir. »",
+   "accroche": "« Pour la CNIL, une phrase de passe de sept mots protège aussi bien qu'un mot de passe de douze caractères compliqués. »",
    "source": {
     "titre": "CNIL, « Mots de passe : recommandations pour maîtriser sa sécurité » (14 octobre 2022)",
     "url": "https://www.cnil.fr/fr/mots-de-passe-une-nouvelle-recommandation-pour-maitriser-sa-securite"
@@ -2353,8 +2296,8 @@
    "id": "google-premier",
    "affirmation": "Google a été le premier moteur de recherche d'Internet.",
    "vrai": false,
-   "explication": "Le premier, Archie, a été écrit en 1990 par Alan Emtage : il indexait des archives de fichiers (FTP) pour aider à retrouver un fichier précis.",
-   "accroche": "« Le premier moteur de recherche s'appelait Archie, et il cherchait des fichiers, pas des pages. »",
+   "explication": "Archie, écrit en 1990 par Alan Emtage, est considéré comme le premier moteur de recherche d'Internet : il indexait des archives de fichiers (FTP) pour aider à retrouver un fichier précis.",
+   "accroche": "« Dès 1990, bien avant Google, un moteur de recherche appelé Archie cherchait des fichiers, pas des pages. »",
    "source": {
     "titre": "Wikipedia (en), « Archie (search engine) »",
     "url": "https://en.wikipedia.org/wiki/Archie_(search_engine)"
@@ -2380,7 +2323,7 @@
    "affirmation": "L'inventeur du Web touche des droits sur chaque site créé.",
    "vrai": false,
    "explication": "Tim Berners-Lee invente le Web au CERN en 1989, et le 30 avril 1993 le CERN met le code source du logiciel à disposition sans redevance. C'est ce qui a permis à chacun·e de créer des sites librement.",
-   "accroche": "« Le Web est gratuit parce que le CERN a renoncé à le faire payer, en 1993. »",
+   "accroche": "« Personne ne paie de droits pour se servir du Web : en 1993, le CERN a mis son logiciel à disposition sans redevance. »",
    "source": {
     "titre": "CERN, « A short history of the Web »",
     "url": "https://home.cern/science/computing/birth-web/short-history-web"
@@ -2407,7 +2350,7 @@
    "affirmation": "Le système binaire a été inventé pour les ordinateurs.",
    "vrai": false,
    "explication": "Leibniz publie son « Explication de l'arithmétique binaire » en 1703, et des systèmes à deux symboles existaient bien avant, par exemple chez le savant indien Pingala (vers le IIe siècle avant notre ère). Les ordinateurs ont repris une idée vieille de plusieurs siècles.",
-   "accroche": "« Le binaire a trois siècles de plus que l'ordinateur. »",
+   "accroche": "« Le binaire est bien plus vieux que l'ordinateur : Leibniz l'expliquait dès 1703. »",
    "source": {
     "titre": "Wikipedia (en), « Binary number »",
     "url": "https://en.wikipedia.org/wiki/Binary_number"
@@ -2428,37 +2371,11 @@
    ]
   },
   {
-   "id": "algorithme-grec",
-   "affirmation": "Le mot « algorithme » vient du grec.",
-   "vrai": false,
-   "explication": "Il vient du nom du mathématicien al-Khwarizmi (vers 780 - vers 850), rendu en latin par « Algoritmi ». Le mot « algèbre » vient lui aussi du titre d'un de ses ouvrages.",
-   "accroche": "« Le mot algorithme est le nom d'un savant de Bagdad du IXe siècle. »",
-   "source": {
-    "titre": "Encyclopædia Britannica, « al-Khwārizmī »",
-    "url": "https://www.britannica.com/biography/al-Khwarizmi"
-   },
-   "autres": [],
-   "interets": [
-    "histoire",
-    "sciences"
-   ],
-   "notions": [
-    "prog",
-    "hist"
-   ],
-   "sujets": [
-    "algorithme",
-    "al-Khwarizmi",
-    "histoire des mathématiques",
-    "étymologie"
-   ]
-  },
-  {
    "id": "robot-theatre",
    "affirmation": "Le mot « robot » vient d'une pièce de théâtre.",
    "vrai": true,
    "explication": "Il vient du tchèque « robota », travail forcé, employé dans la pièce « R.U.R. » de Karel Čapek, en 1920.",
-   "accroche": "« Avant d'être une machine, le robot a été un personnage de théâtre. »",
+   "accroche": "« Avant de désigner des machines, le mot robot a désigné des personnages de théâtre. »",
    "source": {
     "titre": "Encyclopædia Britannica, « Robot »",
     "url": "https://www.britannica.com/technology/robot-technology"
@@ -2486,7 +2403,7 @@
    "affirmation": "Le mot « ordinateur » a été proposé en 1955 par un professeur de lettres.",
    "vrai": true,
    "explication": "IBM France cherchait un nom français pour ses machines : un responsable consulte son ancien professeur de lettres, Jacques Perret, qui propose un mot construit autour d'« ordonnateur ».",
-   "accroche": "« Le mot ordinateur a été inventé sur commande, par un professeur de lettres. »",
+   "accroche": "« Le mot ordinateur a été proposé sur commande, en 1955, par un professeur de lettres. »",
    "source": {
     "titre": "Wikipédia (fr), « Ordinateur »",
     "url": "https://fr.wikipedia.org/wiki/Ordinateur"
@@ -2540,7 +2457,7 @@
    "id": "commence-tot",
    "phase": 0,
    "titre": "Commence plus tôt que prévu",
-   "conseil": "Fixe ta date de fin, puis avance-la franchement : tu mettras plus de temps que tu ne le crois. Décide aujourd'hui de la première petite étape.",
+   "conseil": "Fixe ta date de fin, puis avance-la franchement : tu mettras sans doute plus de temps que tu ne le crois. Décide aujourd'hui de la première petite étape.",
    "pourquoi": "Dans une étude sur 37 étudiant·e·s, le mémoire devait prendre 33,9 jours en moyenne selon leurs prévisions ; il en a pris 55,5, et environ 30 % ont tenu leur délai.",
    "solidite": "une étude",
    "source": {
@@ -2931,7 +2848,7 @@
    "phase": 2,
    "titre": "Répète debout, comme le jour J",
    "conseil": "Entraîne-toi debout, sans écran, avec seulement ta feuille, et si possible dans une salle de classe. Chronomètre-toi.",
-   "pourquoi": "Dans une expérience célèbre, des plongeurs retenaient mieux sous l'eau les mots appris sous l'eau, et sur terre ceux appris sur terre ; et le jour de l'épreuve, tu seras debout pendant ton exposé.",
+   "pourquoi": "Le jour de l'épreuve, tu seras debout pendant ton exposé, avec ta seule feuille : t'entraîner dans ces conditions t'évite les surprises. Une expérience célèbre de 1975 va dans ce sens (des plongeurs retenaient mieux sous l'eau les mots appris sous l'eau, et sur terre ceux appris sur terre), mais une réplication de 2021 n'a pas retrouvé cet effet.",
    "solidite": "une étude",
    "source": {
     "annee": "1975",
@@ -2960,7 +2877,7 @@
    "id": "trac-invisible",
    "phase": 2,
    "titre": "Ton trac se voit peu",
-   "conseil": "Quand tu sens ton cœur battre, rappelle-toi que le jury ne le voit pas. Continue ta phrase.",
+   "conseil": "Quand tu sens ton cœur battre, rappelle-toi que le jury le voit bien moins que tu ne le crois. Continue ta phrase.",
    "pourquoi": "Dans plusieurs expériences, les personnes surestimaient à quel point les autres devinaient ce qu'elles ressentaient : nos états intérieurs « fuient » moins qu'on ne le croit.",
    "solidite": "plusieurs études",
    "source": {
@@ -3034,9 +2951,9 @@
   {
    "id": "trac-normal",
    "phase": 2,
-   "titre": "Le trac est la règle",
-   "conseil": "Ne lis pas ton trac comme le signe que tu n'es pas prêt·e : presque tout le monde l'a. Parle-en avec tes camarades.",
-   "pourquoi": "Dans une étude de 2017 sur des étudiant·e·s d'une université américaine, 64 % disaient avoir peur de parler en public.",
+   "titre": "Le trac est fréquent",
+   "conseil": "Ne lis pas ton trac comme le signe que tu n'es pas prêt·e : la plupart des gens l'ont. Parle-en avec tes camarades.",
+   "pourquoi": "Dans une étude de 2017 sur 1 135 étudiant·e·s, 64 % disaient avoir peur de parler en public.",
    "solidite": "une étude",
    "source": {
     "annee": "2017",
@@ -3081,7 +2998,7 @@
    "phase": 2,
    "titre": "Ne panique pas pour un « euh »",
    "conseil": "Ne cherche pas à supprimer tous tes « euh » : cherche à finir tes phrases. Si tu as besoin de réfléchir, dis-le (« je reformule… ») plutôt que de te taire longtemps.",
-   "pourquoi": "Les hésitations sont normales : elles peuvent représenter jusqu'à 20 % des « mots » d'une conversation, et peuvent même signaler à l'auditoire qu'une idée nouvelle ou complexe arrive.",
+   "pourquoi": "Les hésitations sont normales : elles représentent parfois plus de 20 % des « mots » d'une conversation, et peuvent même signaler à l'auditoire qu'une idée nouvelle ou complexe arrive.",
    "solidite": "plusieurs études",
    "source": {
     "annee": "consulté en 2026",
@@ -3109,7 +3026,7 @@
    "phase": 2,
    "titre": "L'échange n'est pas une interro",
    "conseil": "Écoute la question jusqu'au bout, prends deux secondes, puis réponds en partant de ce que tu as dit. Tu as le droit de préciser ou de nuancer ta pensée.",
-   "pourquoi": "La charte des jurys demande des questions brèves, ancrées dans ton propos, à un rythme qui te laisse « le temps de réfléchir » ; l'entretien évalue ta capacité à écouter et à préciser ta pensée, ce n'est pas un contrôle de connaissances.",
+   "pourquoi": "La charte des jurys demande des questions brèves, ancrées dans ton propos, à un rythme qui te laisse « le temps de réfléchir » ; l'entretien évalue ta capacité à écouter et à préciser ta pensée. Ce n'est pas un contrôle de connaissances, même si le jury peut s'appuyer sur le programme.",
    "solidite": "consignes aux jurys",
    "source": {
     "annee": "2023",

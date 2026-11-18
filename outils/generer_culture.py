@@ -1,11 +1,15 @@
 """Fabrique js/culture.js (vidéos conseillées, chaînes, « Info ou infox ? », conseils fondés sur des résultats observés)
-à partir des trois fichiers de la recherche du 17/11/2026, gardés dans outils/culture/ :
+à partir des trois fichiers de la recherche du 17/11/2026, gardés tels quels dans outils/culture/ :
   videos.json, info-ou-infox.json, conseils.json
+et de la relecture du Gardien (T80, 18/11/2026), outils/culture/relecture-gardien.json : les affirmations retirées de la
+banque (discutables, datées de façon ambiguë, ou dont la bonne réponse dépend de la source) et les textes reformulés (une
+accroche toujours vraie, un conseil qui n'exagère pas la portée d'une étude), chacun avec sa raison et son texte d'origine.
 Usage : python3 -I outils/generer_culture.py [dossier des trois fichiers]   (par défaut : outils/culture)
 
 Méthode de vérification (voir la note « La culture » du README) : chaque vidéo a été contrôlée le 17/11/2026 par l'oEmbed de
 YouTube (titre et chaîne) ; chaque affirmation et chaque conseil reposent sur une page ouverte ce jour-là. Ce script ne
-change aucun texte ni aucun lien : il choisit les champs affichés et applique les décisions de l'enseignant (17/11, 10:48) :
+change aucun lien, ni aucun texte en dehors de la relecture : il choisit les champs affichés, applique la relecture (il
+refuse une reformulation dont le texte d'origine a changé) et les décisions de l'enseignant (17/11, 10:48) :
 - une vidéo au statut « non_verifie » n'est pas reprise (Le Dessous des cartes ; Scilabus n'est pas dans la liste) ;
 - les correspondances incertaines (verifie_titre_different, verifie_chaine_differente, substitution) sont acceptées ;
 - Wikipédia est acceptée comme source affichée ;
@@ -19,6 +23,8 @@ SRC = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ICI, 'culture')
 SORTIE = os.path.join(os.path.dirname(ICI), 'js', 'culture.js')
 lire = lambda f: json.load(open(os.path.join(SRC, f), encoding='utf8'))
 V, X, C = lire('videos.json'), lire('info-ou-infox.json'), lire('conseils.json')
+REL = lire('relecture-gardien.json') if os.path.exists(os.path.join(SRC, 'relecture-gardien.json')) else {'retraits': [], 'infox': [], 'conseils': []}
+RETIREES = {r['id'] for r in REL['retraits']}
 
 # Les étiquettes de js/donnees.js (TAGS) : relues dans le fichier, pour ne jamais en inventer.
 donnees = open(os.path.join(os.path.dirname(ICI), 'js', 'donnees.js'), encoding='utf8').read()
@@ -29,6 +35,20 @@ N_TAGS = set(re.findall(r'(\w+): \'', re.search(r'n: \{(.*?)\}', bloc, re.S).gro
 problemes = []
 def verifier(cond, msg):
     if not cond: problemes.append(msg)
+# La relecture : chaque retrait et chaque reformulation vise un élément qui existe, et le texte d'origine n'a pas changé.
+def relire(liste, elements, quoi):
+    par_id = {x['id']: x for x in elements}
+    for r in liste:
+        x = par_id.get(r['id'])
+        verifier(x is not None and r['id'] not in RETIREES, quoi + ' ' + r['id'] + ' : reformulation d’un élément inconnu ou retiré')
+        if x is None: continue
+        verifier(x.get(r['champ']) == r['avant'], quoi + ' ' + r['id'] + ' : le texte d’origine de « ' + r['champ'] + ' » a changé, relecture à refaire')
+        verifier(isinstance(r['apres'], str) and r['apres'].strip() and r['pourquoi'].strip(), quoi + ' ' + r['id'] + ' : reformulation vide ou sans raison')
+        x[r['champ']] = r['apres']
+for r in REL['retraits']:
+    verifier(any(a['id'] == r['id'] for a in X['affirmations']) and r['pourquoi'].strip(), 'retrait ' + r['id'] + ' : affirmation inconnue ou sans raison')
+relire(REL['infox'], X['affirmations'], 'affirmation')
+relire(REL['conseils'], C['conseils'], 'conseil')
 ID = re.compile(r'^[a-z0-9-]{1,40}$')
 HTTPS = re.compile(r'^https://[^\s<>"\\]+$')
 
@@ -63,6 +83,7 @@ for c in V['chaines']:
 
 infox = []
 for a in X['affirmations']:
+    if a['id'] in RETIREES: continue
     verifier(ID.match(a['id']), a['id'] + ' : identifiant'); verifier(isinstance(a['vrai'], bool), a['id'] + ' : vrai')
     verifier(a['source'].get('titre') and HTTPS.match(a['source'].get('url', '')), a['id'] + ' : source')
     verifier(set(a['interets']) <= I_TAGS and set(a['notions']) <= N_TAGS, a['id'] + ' : étiquettes inconnues')
@@ -97,11 +118,14 @@ if problemes:
     print('\n'.join(problemes)); sys.exit(1)
 api = {'VERIFIE': {'videos': V['genere_le'], 'infox': X['genere_le'], 'conseils': C['genere_le']}, 'ENTREE': ENTREE,
        'VIDEOS': videos, 'CHAINES': chaines, 'INFOX': infox, 'CONSEILS': conseils}
+relu = ('// Relu le ' + REL['le'] + ' (outils/culture/relecture-gardien.json) : %d affirmations retirées de la banque, %d textes reformulés.\n'
+        % (len(RETIREES), len(REL['infox']) + len(REL['conseils']))) if REL.get('le') else ''
 js = ('// Hello GO : la culture (vidéos conseillées, chaînes à découvrir, « Info ou infox ? », conseils fondés sur des résultats\n'
       '// observés). Fichier fabriqué par outils/generer_culture.py à partir de outils/culture/*.json : ne pas le modifier à la main.\n'
-      '// Vérifié le ' + V['genere_le'] + ' (oEmbed de YouTube pour les vidéos, pages ouvertes pour les faits et les conseils).\n'
+      '// Vérifié le ' + V['genere_le'] + ' (oEmbed de YouTube pour les vidéos, pages ouvertes pour les faits et les conseils).\n' + relu +
       '// Textes CC BY-SA 4.0, Babash - NSI Tani Malandi, écrits avec l’aide de l’IA ; les titres des vidéos et des sources sont ceux de leurs auteur·e·s.\n'
       '(function (racine) {\n  const api = ' + json.dumps(api, ensure_ascii=False, indent=1) + ';\n'
       '  racine.HGCulture = api;\n  if (typeof module !== \'undefined\') module.exports = api;\n})(typeof window !== \'undefined\' ? window : globalThis);\n')
 open(SORTIE, 'w', encoding='utf8').write(js)
-print('%d vidéos (%d écartées), %d chaînes, %d affirmations (%d vraies), %d conseils' % (len(videos), len(V['videos']) - len(videos), len(chaines), len(infox), sum(a['vrai'] for a in infox), len(conseils)))
+print('%d vidéos (%d écartées), %d chaînes, %d affirmations (%d vraies, %d retirées à la relecture), %d conseils (%d reformulations en tout)' % (
+    len(videos), len(V['videos']) - len(videos), len(chaines), len(infox), sum(a['vrai'] for a in infox), len(RETIREES), len(conseils), len(REL['infox']) + len(REL['conseils'])))

@@ -19,7 +19,7 @@
   const TAGS = {
     i: { jeux: 'les jeux', musique: 'la musique', sport: 'le sport', cinema: 'le cinéma et les séries', reseaux: 'les réseaux sociaux', art: 'l’art et la création',
       sante: 'la santé', climat: 'l’environnement', societe: 'la société', argent: 'l’argent et l’économie', histoire: 'l’histoire', sciences: 'les sciences', transports: 'les transports et la ville' },
-    n: { prog: 'programmer', donnees: 'les données', web: 'Internet et les réseaux', secu: 'la sécurité et les codes secrets', ia: 'l’intelligence artificielle', hist: 'l’histoire de l’informatique', materiel: 'les machines et le matériel' },
+    n: { prog: 'la programmation', donnees: 'les données', web: 'Internet et les réseaux', secu: 'la sécurité et les codes secrets', ia: 'l’intelligence artificielle', hist: 'l’histoire de l’informatique', materiel: 'les machines et le matériel' },
   };
   // Une réponse : [identifiant, texte, { i: [...], n: [...], k: 'mots cherchés dans les titres des sujets' }]
   const c = (id, texte, i, n, k) => [id, texte, { i: i || [], n: n || [], k: k || '' }];
