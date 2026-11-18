@@ -247,6 +247,9 @@ dialog::backdrop { background: rgba(0, 0, 0, .55); } dialog h2 { margin-top: 0; 
 /* Six colonnes : un bouton ou une pastille du tableau ne se coupe jamais au milieu d'un mot (« Voi r »), malgré le
    overflow-wrap: anywhere de main ; le tableau défile dans son cadre s'il le faut. */
 .tableau-classe button, .tableau-classe .bouton, .tableau-classe .nouveau { white-space: nowrap; overflow-wrap: normal; } .tableau-classe .voyant { overflow-wrap: normal; }
+/* Les petits boutons de l'espace de l'enseignant·e (« Commenter », « Corriger »…) ne se coupent pas au milieu d'un mot à 320 et
+   390 px (« Comme / nter » dans l'échange, déjà en 1.6.0) : ils se coupent aux espaces, ou passent à la ligne entiers. */
+.espace-prof button.mini, .espace-prof .bouton.mini { overflow-wrap: normal; }
 @media print { .filtres { display: none; } }
 
 /* La culture (version 1.6.0) : vidéos conseillées, « Info ou infox ? », conseils et « Pourquoi ? » */
