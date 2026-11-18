@@ -204,6 +204,25 @@ def adresses_et_gestes(nav):
     ok('Découvrir : retour arrière pendant le glissement, aucun avis et le focus ne saute pas', reac() == 2 and not p.evaluate("document.activeElement.matches('.action .gros')"), reac())
     ctx.close()
 
+def debordements_passagers(nav):
+    """(Gardien, T81) Pendant les animations aussi, rien ne dépasse de la page : le compteur du bilan de Découvrir et « Bien vu ! »
+    de « Info ou infox ? » grossissent sans déborder (mesure à chaque image pendant 1,2 s), à 320, 390 et 768 px."""
+    SONDE = """() => { window.__deb = new Promise((ok) => { let max = 0; const t0 = performance.now();
+      (function f() { max = Math.max(max, document.documentElement.scrollWidth - innerWidth); if (performance.now() - t0 < 1200) requestAnimationFrame(f); else ok(max); })(); }); }"""
+    for L in (320, 390, 768):
+        ctx = nav.new_context(viewport={'width': L, 'height': 860}, service_workers='block'); p = ctx.new_page()
+        ctx.route(re.compile(r'^https?://(?!127\.0\.0\.1)'), lambda r: r.abort())
+        p.goto(URL); p.fill('#prenom', 'Essai'); p.click('[data-a=demarrer]'); p.wait_for_selector('#vue .action')
+        p.goto(URL + '#/explorer/decouvrir'); p.wait_for_selector('.decouverte')
+        for _ in range(9): p.locator('[data-a=reagir][data-v="1"]').click()
+        p.wait_for_timeout(400); p.evaluate(SONDE); p.locator('[data-a=reagir][data-v="1"]').click(); d1 = p.evaluate('window.__deb')
+        p.goto(URL + '#/explorer/infox'); p.click('[data-a=infox-commencer]'); d2 = 0
+        for _ in range(3):
+            p.wait_for_selector('.infox-carte'); x = p.get_attribute('.infox-carte', 'data-infox'); vrai = p.evaluate("(id) => HGCulture.INFOX.find((y) => y.id === id).vrai", x)
+            p.evaluate(SONDE); p.click('[data-a=infox-repondre][data-r="%d"]' % (1 if vrai else 0)); d2 = max(d2, p.evaluate('window.__deb')); p.click('[data-a=infox-suivante]')
+        ok('%d px : aucun débordement pendant les animations (bilan %d px, « Bien vu ! » %d px)' % (L, d1, d2), d1 <= 1 and d2 <= 1, (d1, d2))
+        ctx.close()
+
 def deja_commence(nav):
     """Un·e élève qui revient : aucun écran d'introduction, ses réponses à leur place, « Mes goûts » s'ouvre sur la première question."""
     ctx = nav.new_context(viewport={'width': 390, 'height': 860}, service_workers='block'); p = ctx.new_page(); p.goto(URL)
@@ -221,7 +240,7 @@ with sync_playwright() as pw:
     nav = pw.chromium.launch()
     for l in (320, 390, 768, 1440):
         for s in (False, True): essai(nav, l, s); print('design %d px %s : fait' % (l, 'obscur' if s else 'clair'))
-    mouvement(nav); deja_commence(nav); adresses_et_gestes(nav)
+    mouvement(nav); deja_commence(nav); adresses_et_gestes(nav); debordements_passagers(nav)
     nav.close()
 print('design : %d contrôles, %s' % (n[0], 'aucun problème' if not erreurs else '%d problème(s)' % len(erreurs)))
 for x in erreurs: print(' -', x)

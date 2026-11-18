@@ -353,6 +353,9 @@ button, .bouton, input[type=text], input[type=search], input[type=url], input[ty
 .decouverte, .infox-carte { position: relative; z-index: 1; overflow: hidden; margin: 0; box-shadow: var(--ombre-forte); transition: transform .25s ease; --glisse: 0; }
 .decouverte { border: 0; border-top: 6px solid var(--teinte, var(--accent)); }
 .decouverte.glisse, .infox-carte.glisse { transition: none; }
+/* Une carte à glisser : le navigateur ne fait défiler la page que de haut en bas (et garde le zoom à deux doigts) ;
+   le mouvement de côté est celui de la carte, jamais celui de la page. */
+.a-glisser { touch-action: pan-y pinch-zoom; }
 .decouverte.entree { animation: entree .35s cubic-bezier(.2, .8, .3, 1.2) both; }
 @keyframes entree { from { opacity: 0; transform: translateY(18px) scale(.96) rotate(-1deg); } to { opacity: 1; transform: none; } }
 .carte-tete { display: flex; align-items: center; gap: 10px; }
@@ -376,7 +379,8 @@ button, .bouton, input[type=text], input[type=search], input[type=url], input[ty
 .collection summary .picto { color: var(--vif); }
 .bilan { text-align: center; border-width: 0; box-shadow: var(--ombre-forte); }
 .bilan .boutons { justify-content: center; }
-.compteur { margin: 4px 0 12px; } .compteur b { display: block; font: 700 2.6rem/1 var(--titre); color: var(--vif); animation: pop .5s ease both .15s; }
+/* Le nombre ne prend que sa largeur : agrandi par « pop », il ne fait pas déborder la page (768 px). */
+.compteur { margin: 4px 0 12px; } .compteur b { display: block; width: fit-content; margin: 0 auto; font: 700 2.6rem/1 var(--titre); color: var(--vif); animation: pop .5s ease both .15s; }
 @keyframes pop { from { transform: scale(.3); opacity: 0; } 70% { transform: scale(1.15); } to { transform: none; opacity: 1; } }
 
 /* La révélation des sujets, cartes et vidéos proposés : un par un, avec « parce que tu as choisi… » en évidence. */
@@ -417,7 +421,10 @@ button, .bouton, input[type=text], input[type=search], input[type=url], input[ty
 
 /* Info ou infox ? : la carte suit le doigt ; « Bien vu ! » s'allume. */
 .infox-carte { border-radius: var(--rayon); }
-.retour-quiz.juste { animation: pop .35s ease both; }
+/* « Bien vu ! » (et le quiz « Vérifie que tu as compris ») : une carte entière ne grossit qu'à 1,02 au plus, sinon elle
+   dépasse de la page pendant l'animation (37 px à 768 px avec « pop »). */
+.retour-quiz.juste { animation: pop-carte .35s ease both; }
+@keyframes pop-carte { from { transform: scale(.3); opacity: 0; } 70% { transform: scale(1.02); } to { transform: none; opacity: 1; } }
 
 /* Les hauts faits : le message s'ouvre avec un petit éclat. */
 .toast-hf { position: relative; background: linear-gradient(90deg, var(--fort), color-mix(in srgb, var(--fort) 70%, var(--vif))); }
