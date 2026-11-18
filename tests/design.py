@@ -189,19 +189,28 @@ def adresses_et_gestes(nav):
     b = p.locator('.decouverte [data-a=reagir][data-v="1"]').bounding_box(); x, y = b['x'] + b['width'] / 2, b['y'] + b['height'] / 2
     p.mouse.click(x, y); p.wait_for_timeout(120); p.mouse.click(x, y); p.wait_for_timeout(400)
     ok('Découvrir : un double clic ne donne qu’un avis (pas d’avis à la carte apparue sous le doigt)', reac() == 2, reac())
+    # Des appuis répétés au même endroit, toutes les 100 ms pendant une seconde : un avis toutes les 300 ms environ, jamais
+    # tous bloqués (seul un appui accepté sert de repère au double appui).
+    n0 = reac()
+    for _ in range(10):
+        p.evaluate("() => { const b = document.querySelector('.decouverte [data-a=reagir][data-v=\\'1\\']'); if (b) b.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1, clientX: 100, clientY: 100 })); }")
+        p.wait_for_timeout(100)
+    ok('Découvrir : des appuis répétés au même endroit ne se bloquent pas les uns les autres (3 ou 4 avis en une seconde)', 3 <= reac() - n0 <= 4, reac() - n0)
+    p.wait_for_timeout(400)
     h = p.locator('.decouverte h2').bounding_box(); x, y = h['x'] + 40, h['y'] + 10
     t = lambda dx: [{'identifier': 1, 'clientX': x + dx, 'clientY': y}]
     p.locator('.decouverte h2').dispatch_event('touchstart', {'touches': t(0), 'changedTouches': t(0)})
     p.locator('.decouverte h2').dispatch_event('touchmove', {'touches': t(70), 'changedTouches': t(70)})
     p.locator('.decouverte h2').dispatch_event('touchcancel', {'touches': [], 'changedTouches': t(70)})
-    ok('Découvrir : un geste interrompu remet la carte en place, sans avis', p.evaluate("document.querySelector('.decouverte').style.transform") == '' and reac() == 2)
+    n1 = reac()
+    ok('Découvrir : un geste interrompu remet la carte en place, sans avis', p.evaluate("document.querySelector('.decouverte').style.transform") == '' and reac() == n1)
     p.goto(URL + '#/'); p.goto(URL + '#/explorer/decouvrir'); p.wait_for_selector('.decouverte'); p.wait_for_timeout(350)
     h = p.locator('.decouverte h2').bounding_box(); x, y = h['x'] + 40, h['y'] + 10
     p.locator('.decouverte h2').dispatch_event('touchstart', {'touches': t(0), 'changedTouches': t(0)})
     p.evaluate('history.back()'); p.wait_for_function("document.querySelector('#vue').dataset.vue === 'accueil'")
     p.evaluate("(t) => document.dispatchEvent(new TouchEvent('touchend', { changedTouches: [new Touch({ identifier: 1, target: document.body, clientX: t[0], clientY: t[1] })], bubbles: true }))", [x + 120, y])
     p.wait_for_timeout(200)
-    ok('Découvrir : retour arrière pendant le glissement, aucun avis et le focus ne saute pas', reac() == 2 and not p.evaluate("document.activeElement.matches('.action .gros')"), reac())
+    ok('Découvrir : retour arrière pendant le glissement, aucun avis et le focus ne saute pas', reac() == n1 and not p.evaluate("document.activeElement.matches('.action .gros')"), reac())
     ctx.close()
 
 def debordements_passagers(nav):

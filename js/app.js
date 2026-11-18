@@ -1265,13 +1265,15 @@
     if (!A.CARTES.some((x) => String(x.num) === String(num))) return;
     d.decouverte.reactions[num] = v; delete d.vus.suite; dernierAvis = v; enregistrer(true); rendre(false); dernierAvis = 0; focusCarte();
   }
-  // Un double appui ne donne pas d'avis à la carte qui vient d'apparaître sous le doigt : un deuxième appui au même endroit
-  // (à 40 px près) moins de 300 ms après le premier est ignoré. Le clavier (detail = 0) et le glissement ne sont pas concernés.
+  // Un double appui ne donne pas d'avis à la carte qui vient d'apparaître sous le doigt : un appui au même endroit (à 40 px
+  // près) moins de 300 ms après l'appui qui a donné le dernier avis est ignoré ; seul un appui accepté sert de repère, pour que
+  // des appuis répétés ne se bloquent jamais les uns les autres. Le clavier (detail = 0) et le glissement ne sont pas concernés.
   let appuiAvis = null;
   function doubleAppui(ev) {
     if (!ev || !ev.detail) return false;
-    const a = appuiAvis, t = Date.now(); appuiAvis = { t: t, x: ev.clientX, y: ev.clientY };
-    return !!a && t - a.t < 300 && Math.abs(ev.clientX - a.x) < 40 && Math.abs(ev.clientY - a.y) < 40;
+    const a = appuiAvis, t = Date.now();
+    if (a && t - a.t < 300 && Math.abs(ev.clientX - a.x) < 40 && Math.abs(ev.clientY - a.y) < 40) return true;
+    appuiAvis = { t: t, x: ev.clientX, y: ev.clientY }; return false;
   }
   function focusCarte() { const t = $('.decouverte h2, .action .gros'); if (t) { t.tabIndex = -1; t.focus({ preventScroll: true }); t.scrollIntoView({ block: 'center' }); } }
   const SUITE = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a']; let rang = 0;
