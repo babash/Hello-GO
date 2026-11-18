@@ -109,7 +109,7 @@ node tests/retours.test.js     # retours, résumé, fusion à trois, format pour
 node tests/suivi.test.js       # jours de visite, voyant à 13, 14 et 15 jours, hauts faits datés, résumé, tirage des salves de quiz
 node tests/export.test.js      # l'export en Markdown : contenu, ordre, textes neutralisés, liens http(s) seulement, retours et codes sur demande, classe
 node tests/culture.test.js     # la culture : données (liens, étiquettes, sources, champs, fichier fabriqué à jour), vidéos conseillées et « pourquoi », salves, accroches, conseils, dossier, résumé, export
-python3 tests/design.py        # les écrans de la 1.7.0, à 4 largeurs, en clair et en obscur : débordement, contrastes du texte et des contours, pictogrammes cachés aux lecteurs d’écran, mouvement réduit, clavier, glissement, élève qui revient
+python3 tests/design.py        # les écrans de la 1.7.0, à 4 largeurs, en clair et en obscur : débordement, contrastes du texte et des contours, pictogrammes cachés aux lecteurs d’écran, mouvement réduit, clavier, glissement, élève qui revient ; les adresses de la 1.6.0 (aucune ne mène à la « 404 ») ; flèche maintenue, double appui, geste interrompu, retour arrière pendant un glissement
 python3 tests/culture.py       # la culture dans un navigateur, à 4 largeurs : vidéo → note → piste et source, salve au clavier et en glissant → accroche → introduction, conseils
 node tests/compatibilite.test.js # non-régression : un dossier de chaque version publiée, utilisé par la version actuelle, reste accepté par chacune (historique Git)
 python3 tests/en_ligne.py      # élève et enseignant·e en ligne, contre une reproduction locale de la base (PostgreSQL 16)

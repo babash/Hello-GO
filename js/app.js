@@ -1107,7 +1107,7 @@
       case 'ton-code': return ['ton-code', '#/', vues.tonCode()];
       case 'retours': return ['retours', '#/plus', vues.retours()];
       case 'a-part': return ['a-part', '#/', vues.aPart()];
-      default: return ['introuvable', '#/', vues.introuvable()];
+      default: return ['introuvable', '', vues.introuvable()]; // aucune entrée de la navigation n'est la page courante
     }
   }
   // Le lien de classe : le nom de la classe et de l'enseignant·e, demandés une fois par code.
@@ -1230,25 +1230,30 @@
     if (salveInfox && !salveInfox.fini && (ev.key === 'ArrowLeft' || ev.key === 'ArrowRight') && $('#vue').dataset.vue === 'infox' && !/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) && !$('#dialogue').open && !ev.altKey && !ev.ctrlKey && !ev.metaKey) {
       if (salveInfox.reponses[salveInfox.i] === undefined) { ev.preventDefault(); repondreInfox(ev.key === 'ArrowRight'); }
     }
-    // Découvrir : flèche gauche « Pas pour moi », flèche droite « Ça m'intrigue » (hors des champs et des liens).
+    // Découvrir : flèche gauche « Pas pour moi », flèche droite « Ça m'intrigue » (hors des champs). Une flèche maintenue
+    // (répétition automatique) ne donne qu'un avis : les cartes suivantes ne défilent pas sans être lues.
     if ((ev.key === 'ArrowLeft' || ev.key === 'ArrowRight') && $('#vue').dataset.vue === 'decouvrir' && $('.decouverte') && !/^(INPUT|TEXTAREA|SELECT|SUMMARY)$/.test(t.tagName) && !$('#dialogue').open && !ev.altKey && !ev.ctrlKey && !ev.metaKey && !ev.shiftKey) {
-      const c = $('.decouverte [data-a=reagir]'); if (c) { ev.preventDefault(); reagirCarte(c.dataset.n, ev.key === 'ArrowRight' ? 1 : -1); }
+      const c = $('.decouverte [data-a=reagir]'); if (c) { ev.preventDefault(); if (!ev.repeat) reagirCarte(c.dataset.n, ev.key === 'ArrowRight' ? 1 : -1); }
     }
     if (typeof ev.key === 'string') konami(ev.key); // la saisie automatique envoie des touches sans nom
   });
   // Sur téléphone, « Info ou infox ? » et « Découvrir » se jouent aussi en glissant la carte (à droite : info ou « Ça m'intrigue »,
   // à gauche : infox ou « Pas pour moi ») ; jamais obligatoire : les boutons et les flèches du clavier font la même chose.
   // Pendant le geste, la carte suit le doigt et le tampon de la réponse apparaît (rien ne bouge si le mouvement est réduit).
+  // Un geste interrompu (le système le reprend, un deuxième doigt se pose) remet la carte en place, sans rien enregistrer.
   let glisse = null;
   const bougeReduit = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  document.addEventListener('touchstart', (ev) => { const c = ev.target.closest && ev.target.closest('.a-glisser');
+  const lacher = (c) => { c.style.transform = ''; c.style.removeProperty('--glisse'); c.classList.remove('glisse'); };
+  document.addEventListener('touchstart', (ev) => { if (glisse) lacher(glisse.c); const c = ev.target.closest && ev.target.closest('.a-glisser');
     glisse = c && ev.touches.length === 1 && !ev.target.closest('button, a, summary') ? { x: ev.touches[0].clientX, y: ev.touches[0].clientY, c } : null; }, { passive: true });
+  document.addEventListener('touchcancel', () => { if (glisse) { lacher(glisse.c); glisse = null; } }, { passive: true });
   document.addEventListener('touchmove', (ev) => { if (!glisse || bougeReduit()) return; const dx = ev.touches[0].clientX - glisse.x, dy = ev.touches[0].clientY - glisse.y;
     if (Math.abs(dy) > Math.abs(dx) * 1.5) return;
     glisse.c.style.transform = 'translateX(' + dx + 'px) rotate(' + (dx / 30) + 'deg)'; glisse.c.style.setProperty('--glisse', Math.max(-1, Math.min(1, dx / 100))); glisse.c.classList.add('glisse'); }, { passive: true });
   document.addEventListener('touchend', (ev) => { if (!glisse) return; const t = ev.changedTouches[0], dx = t.clientX - glisse.x, dy = t.clientY - glisse.y, c = glisse.c; glisse = null;
-    c.style.transform = ''; c.style.removeProperty('--glisse'); c.classList.remove('glisse');
-    if (!(Math.abs(dx) > 80 && Math.abs(dy) < 60)) return;
+    lacher(c);
+    // La carte n'est plus à l'écran (retour arrière ou autre page pendant le geste) : rien n'est enregistré.
+    if (!c.isConnected || !(Math.abs(dx) > 80 && Math.abs(dy) < 60)) return;
     if (c.classList.contains('infox-carte')) repondreInfox(dx > 0);
     else if (c.classList.contains('decouverte')) { const b = $('[data-a=reagir]', c); if (b) reagirCarte(b.dataset.n, dx > 0 ? 1 : -1); } }, { passive: true });
   function focusPoint(id) { const t = $('[data-id="' + id + '"] textarea'); if (t) t.focus(); }
@@ -1260,6 +1265,14 @@
     if (!A.CARTES.some((x) => String(x.num) === String(num))) return;
     d.decouverte.reactions[num] = v; delete d.vus.suite; dernierAvis = v; enregistrer(true); rendre(false); dernierAvis = 0; focusCarte();
   }
+  // Un double appui ne donne pas d'avis à la carte qui vient d'apparaître sous le doigt : un deuxième appui au même endroit
+  // (à 40 px près) moins de 300 ms après le premier est ignoré. Le clavier (detail = 0) et le glissement ne sont pas concernés.
+  let appuiAvis = null;
+  function doubleAppui(ev) {
+    if (!ev || !ev.detail) return false;
+    const a = appuiAvis, t = Date.now(); appuiAvis = { t: t, x: ev.clientX, y: ev.clientY };
+    return !!a && t - a.t < 300 && Math.abs(ev.clientX - a.x) < 40 && Math.abs(ev.clientY - a.y) < 40;
+  }
   function focusCarte() { const t = $('.decouverte h2, .action .gros'); if (t) { t.tabIndex = -1; t.focus({ preventScroll: true }); t.scrollIntoView({ block: 'center' }); } }
   const SUITE = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a']; let rang = 0;
   function konami(k) { rang = (k === SUITE[rang] || k.toLowerCase() === SUITE[rang]) ? rang + 1 : (k === SUITE[0] ? 1 : 0); if (rang === SUITE.length) { rang = 0; secret(); } }
@@ -1270,7 +1283,7 @@
   const actions = {
     demarrer() { d.profil.prenom = ($('#prenom').value || '').trim().slice(0, 24); d.profil.vu = true; noterVisite(); enregistrer(true); location.hash = '#/'; rendre(false); },
     'autre-savoir'() { d.vus.decalage = (d.vus.decalage || 0) + 1; enregistrer(); rendre(); },
-    reagir(b) { reagirCarte(b.dataset.n, +b.dataset.v); },
+    reagir(b, ev) { if (!doubleAppui(ev)) reagirCarte(b.dataset.n, +b.dataset.v); },
     'suite-cartes'() { d.vus.suite = 1; enregistrer(); rendre(false); focusCarte(); },
     'recommencer-cartes'() { avecAnnulation('Tes avis sur les cartes sont effacés.', () => { d.decouverte.reactions = {}; delete d.vus.suite; }); },
     'gouts-aller'(b) { etapeGouts = +b.dataset.e; rendre(false); const t = $('#gouts-etape'); if (t) { t.focus({ preventScroll: true }); t.scrollIntoView({ block: 'nearest' }); } },
@@ -1440,7 +1453,7 @@
     // Le lien d'évitement mène au contenu de la page affichée, sans changer d'adresse (« #vue » n'est pas une page).
     if (ev.target.closest('.evitement')) { ev.preventDefault(); $('#vue').focus(); return; }
     const b = ev.target.closest('[data-a]'); if (!b || b.disabled) return;
-    const f = actions[b.dataset.a]; if (f) f(b);
+    const f = actions[b.dataset.a]; if (f) f(b, ev);
   });
   document.addEventListener('toggle', (ev) => { if (ev.target.dataset && ev.target.dataset.fiche === 'canard' && ev.target.open) { d.compteurs.canard = 1; enregistrer(true); } }, true);
 

@@ -149,6 +149,61 @@ def mouvement(nav):
     p.goto(URL + '#/prof'); p.wait_for_timeout(300); ok('espace de l’enseignant·e : sobre (ni motif ni pictogramme de jeu)', p.locator('#vue .motif, #vue .tampon, #vue .dose').count() == 0)
     ctx.close()
 
+def adresses_et_gestes(nav):
+    """(Gardien, T81) Chaque adresse de la 1.6.0 mène à sa page, jamais à la « 404 » ; la « 404 » ne marque aucune entrée de la
+    navigation comme courante ; les états vides gardent leurs liens dans le texte ; Découvrir : une flèche maintenue, un
+    double appui, un geste interrompu ou un retour arrière pendant le glissement ne donnent aucun avis de trop."""
+    import json
+    ctx = nav.new_context(viewport={'width': 390, 'height': 860}, service_workers='block', has_touch=True); p = ctx.new_page()
+    ctx.route(re.compile(r'^https?://(?!127\.0\.0\.1)'), lambda r: r.abort())  # jamais la base en ligne (#/classe/ABCD la cherche)
+    p.on('pageerror', lambda x: erreurs.append('adresses erreur JS : ' + str(x)))
+    p.goto(URL); type160 = open(os.path.join(RACINE, 'tests/dossiers/1.6.0.json'), encoding='utf-8').read()
+    p.evaluate("(t) => localStorage.setItem('hellogo:dossier:v1', t)", type160); p.reload(); p.wait_for_selector('#vue h1')
+    ids = p.evaluate("""() => ({ q: JSON.parse(localStorage.getItem('hellogo:dossier:v1')).questions.map((x) => x.id), fiches: HGDonnees.FICHES.map((x) => x.id),
+      quiz: HGDonnees.COMPRENDRE.map((x) => x.id), conseils: HGCulture.CONSEILS.map((x) => x.id) })""")
+    adresses = ['', '#', '#/', '#//', '#/explorer', '#/explorer/', '#/explorer/inconnu', '#/questions', '#/mots', '#/mots/', '#/sources', '#/oraux', '#/hauts-faits',
+                '#/aide', '#/aide/exemple', '#/aide/inconnu', '#/comprendre', '#/comprendre/inconnu', '#/conseils', '#/conseils/inconnu', '#/reglages', '#/plus',
+                '#/ton-code', '#/retours', '#/a-part', '#/entrer', '#/rejoindre', '#/classe/ABCD', '#/classe/abcd', '#/prof', '#/prof/classe/inconnue', '#/question/inconnue']
+    adresses += ['#/explorer/' + x for x in ('decouvrir', 'quiz', 'sujets', 'pistes', 'videos', 'infox')]
+    adresses += ['#/question/' + q for q in ids['q']] + ['#/question/%s/echange' % q for q in ids['q']]
+    adresses += ['#/aide/' + x for x in ids['fiches']] + ['#/comprendre/' + x for x in ids['quiz']] + ['#/conseils/' + x for x in ids['conseils']]
+    perdues = []
+    for a in adresses:
+        p.goto(URL + a); p.wait_for_function("() => document.querySelector('#vue').dataset.vue && document.querySelector('#vue').innerText.trim().length > 20", timeout=5000)
+        if p.evaluate("document.querySelector('#vue').dataset.vue") == 'introuvable': perdues.append(a)
+    ok('les %d adresses de la 1.6.0 mènent à leur page, aucune à la « 404 »' % len(adresses), not perdues, perdues)
+    p.goto(URL + '#/nulle-part'); p.wait_for_selector('.page-404')
+    ok('« 404 » : aucune entrée de la navigation n’est marquée comme la page courante', p.locator('#nav [aria-current]').count() == 0)
+    ok('« 404 » : l’adresse demandée n’est pas recopiée dans la page', 'nulle-part' not in p.inner_text('#vue'))
+    # Les états vides : un paragraphe, pas une boîte flexible (« Découvr / e des cartes » à 320 px)
+    vide = {'v': 1, 'profil': {'prenom': 'Lou', 'vu': True}, 'quiz': {'reponses': {}, 'fait': False}, 'interets': ['', '', ''], 'ponts': [''], 'pistes': [], 'questions': [],
+            'decouverte': {'reactions': {}}, 'comprendre': {}, 'mots': [], 'sources': [], 'oraux': [], 'hf': {}, 'compteurs': {}, 'vus': {}}
+    p.evaluate("(t) => localStorage.setItem('hellogo:dossier:v1', t)", json.dumps(vide)); p.goto(URL + '#/explorer/pistes'); p.reload(); p.wait_for_selector('.vide a')
+    ok('état vide avec des liens : un paragraphe, où le texte et les liens coulent ensemble', p.evaluate("getComputedStyle(document.querySelector('.vide')).display") == 'block',
+       p.evaluate("getComputedStyle(document.querySelector('.vide')).display"))
+    reac = lambda: len(json.loads(p.evaluate("localStorage.getItem('hellogo:dossier:v1')"))['decouverte']['reactions'])
+    p.goto(URL + '#/explorer/decouvrir'); p.wait_for_selector('.decouverte'); p.locator('.decouverte h2').click()
+    for _ in range(6): p.keyboard.down('ArrowRight')
+    p.keyboard.up('ArrowRight'); p.wait_for_timeout(200)
+    ok('Découvrir : une flèche maintenue ne donne qu’un avis', reac() == 1, reac())
+    b = p.locator('.decouverte [data-a=reagir][data-v="1"]').bounding_box(); x, y = b['x'] + b['width'] / 2, b['y'] + b['height'] / 2
+    p.mouse.click(x, y); p.wait_for_timeout(120); p.mouse.click(x, y); p.wait_for_timeout(400)
+    ok('Découvrir : un double clic ne donne qu’un avis (pas d’avis à la carte apparue sous le doigt)', reac() == 2, reac())
+    h = p.locator('.decouverte h2').bounding_box(); x, y = h['x'] + 40, h['y'] + 10
+    t = lambda dx: [{'identifier': 1, 'clientX': x + dx, 'clientY': y}]
+    p.locator('.decouverte h2').dispatch_event('touchstart', {'touches': t(0), 'changedTouches': t(0)})
+    p.locator('.decouverte h2').dispatch_event('touchmove', {'touches': t(70), 'changedTouches': t(70)})
+    p.locator('.decouverte h2').dispatch_event('touchcancel', {'touches': [], 'changedTouches': t(70)})
+    ok('Découvrir : un geste interrompu remet la carte en place, sans avis', p.evaluate("document.querySelector('.decouverte').style.transform") == '' and reac() == 2)
+    p.goto(URL + '#/'); p.goto(URL + '#/explorer/decouvrir'); p.wait_for_selector('.decouverte'); p.wait_for_timeout(350)
+    h = p.locator('.decouverte h2').bounding_box(); x, y = h['x'] + 40, h['y'] + 10
+    p.locator('.decouverte h2').dispatch_event('touchstart', {'touches': t(0), 'changedTouches': t(0)})
+    p.evaluate('history.back()'); p.wait_for_function("document.querySelector('#vue').dataset.vue === 'accueil'")
+    p.evaluate("(t) => document.dispatchEvent(new TouchEvent('touchend', { changedTouches: [new Touch({ identifier: 1, target: document.body, clientX: t[0], clientY: t[1] })], bubbles: true }))", [x + 120, y])
+    p.wait_for_timeout(200)
+    ok('Découvrir : retour arrière pendant le glissement, aucun avis et le focus ne saute pas', reac() == 2 and not p.evaluate("document.activeElement.matches('.action .gros')"), reac())
+    ctx.close()
+
 def deja_commence(nav):
     """Un·e élève qui revient : aucun écran d'introduction, ses réponses à leur place, « Mes goûts » s'ouvre sur la première question."""
     ctx = nav.new_context(viewport={'width': 390, 'height': 860}, service_workers='block'); p = ctx.new_page(); p.goto(URL)
@@ -166,7 +221,7 @@ with sync_playwright() as pw:
     nav = pw.chromium.launch()
     for l in (320, 390, 768, 1440):
         for s in (False, True): essai(nav, l, s); print('design %d px %s : fait' % (l, 'obscur' if s else 'clair'))
-    mouvement(nav); deja_commence(nav)
+    mouvement(nav); deja_commence(nav); adresses_et_gestes(nav)
     nav.close()
 print('design : %d contrôles, %s' % (n[0], 'aucun problème' if not erreurs else '%d problème(s)' % len(erreurs)))
 for x in erreurs: print(' -', x)

@@ -124,7 +124,10 @@ def essai(nav, largeur, sombre):
     p.goto(URL + '#/aide/plan'); ok(nom + ' : la fiche renvoie aux conseils', p.locator('#fiche-plan a[href^="#/conseils/"]').count() >= 4)
     # --- L'export Markdown de l'élève contient la culture ---
     md = p.evaluate("HGExport.dossier(JSON.parse(localStorage.getItem('hellogo:dossier:v1')))")
-    ok(nom + ' : export Markdown', 'Ma culture' in md and q['url'] in md and acc[:30] in md)
+    # L'export neutralise les caractères qui ont un sens en Markdown (« @ » devient « \@ », « < » devient « &lt; ») : l'accroche
+    # se cherche donc dans le texte débarrassé de ces marques (sinon l'essai échoue quand la salve commence par « arobase »).
+    brut = md.replace('\\', '').replace('&lt;', '<')
+    ok(nom + ' : export Markdown', 'Ma culture' in md and q['url'] in md and acc[:30] in brut, acc[:30])
     p.goto(URL + '#/hauts-faits'); ok(nom + ' : groupe « La culture » des hauts faits', 'La culture' in p.inner_text('#vue'))
     ctx.close()
 

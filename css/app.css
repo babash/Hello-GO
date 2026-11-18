@@ -290,7 +290,8 @@ button:active:not(:disabled), .bouton:active { transform: translateY(1px) scale(
 @media (max-width: 899px) { .nav a[aria-current]::before { content: ""; position: absolute; top: 6px; width: 48px; height: 30px; border-radius: 999px; background: var(--accent-fond); z-index: -1; } .nav a { isolation: isolate; } }
 .onglets a { transition: background-color .15s ease, color .15s ease; } .onglets a:hover { border-color: var(--accent); color: var(--encre); }
 .avance span { transition: width .35s ease; background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 55%, var(--vif))); }
-.vide { display: flex; gap: 8px; align-items: flex-start; background: var(--carte2); border: 1px dashed var(--trait); border-radius: 14px; padding: 12px 14px; }
+/* Un état vide reste un paragraphe (pas une boîte flexible) : ses liens et son texte coulent ensemble, sans mot coupé. */
+.vide { background: var(--carte2); border: 1px dashed var(--trait); border-radius: 14px; padding: 12px 14px; }
 .vide .picto { color: var(--vif); margin-top: 2px; }
 
 /* Les contours des commandes (champs, boutons, tuiles) : au moins 3:1 sur leur fond. */
@@ -459,7 +460,7 @@ body:not(.espace-prof)::before { content: ""; position: fixed; inset: 0; z-index
 .avance span { background-image: repeating-linear-gradient(90deg, transparent 0 7px, color-mix(in srgb, var(--carte) 35%, transparent) 7px 9px), linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 55%, var(--vif))); }
 .chargement { display: flex; align-items: center; gap: 8px; } .chargement .avance { flex: 1; height: 10px; margin: 0; } .pc { font-size: .78rem; color: var(--doux); min-width: 3.4em; text-align: right; }
 /* Les états vides, comme une sortie de console amicale ; les aides, comme un commentaire. */
-.vide { font-size: .95rem; } .vide::before { content: ">" / ""; font-family: var(--mono); font-weight: 700; color: var(--accent); }
+.vide { font-size: .95rem; } .vide::before { content: ">" / ""; font-family: var(--mono); font-weight: 700; color: var(--accent); margin-right: .5em; }
 .aide p::before { content: "# " / ""; font-family: var(--mono); color: var(--doux); }
 /* Un nombre en binaire et en hexadécimal, au survol ou au focus (décoratif). */
 .nombre-geek { position: relative; display: inline-block; }
