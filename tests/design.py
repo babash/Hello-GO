@@ -1,4 +1,4 @@
-"""Le rendu des écrans refaits en 1.7.0 : python3 tests/design.py (depuis la racine du dépôt).
+"""Le rendu des écrans refaits en 1.7.0 (et les hauts faits en collection, la page « 404 ») : python3 tests/design.py (depuis la racine du dépôt).
 
 À 320, 390, 768 et 1440 px, en clair et en obscur : bienvenue, accueil (« Par où commencer », « Ta dose du jour »),
 Découvrir (la carte, puis le bilan et la révélation), « Mes goûts » (une question par écran), les sujets proposés.
@@ -48,13 +48,13 @@ TRAITS = '(sel) => {' + OUTILS + r"""
     const r = rapport(c, fond(el.parentElement)); if (r < pire) { pire = r; ou = el.tagName + '.' + el.className; } });
   return [pire, ou]; }"""
 ANIMATIONS = r"""() => { let pire = 0, ou = '';
-  document.querySelectorAll('#vue *, #vue *::before').forEach((el) => { const s = getComputedStyle(el);
+  document.querySelectorAll('#vue *, #toasts *').forEach((el) => { const s = getComputedStyle(el);
     const t = (v) => Math.max(...v.split(',').map((x) => parseFloat(x) * (x.trim().endsWith('ms') ? 1 : 1000)));
     const d = Math.max(s.animationName !== 'none' ? t(s.animationDuration) + t(s.animationDelay) : 0, t(s.transitionDuration));
     if (d > pire) { pire = d; ou = el.tagName + '.' + el.className; } });
   return [pire, ou]; }"""
-PICTOS = "() => [...document.querySelectorAll('#vue svg.picto, #vue svg.motif, #vue .coche-anim')].filter((s) => s.getAttribute('aria-hidden') !== 'true' && !s.closest('[aria-hidden=true]')).length"
-COMMANDES = '.tuiles .puce span, .point-etape, .dose-onglets button, .deux button, input[type=text], .serie li'
+PICTOS = "() => [...document.querySelectorAll('#vue svg.picto, #vue svg.motif, #vue .coche-anim, #vue svg.insigne, #toasts svg, #vue .bin, #vue .hf-id, #vue .curseur')].filter((s) => s.getAttribute('aria-hidden') !== 'true' && !s.closest('[aria-hidden=true]')).length"
+COMMANDES = '.tuiles .puce span, .point-etape, .dose-onglets button, .deux button, input[type=text], .serie li, .fil-etape, .hf li.a-gagner, .hf li.cache'
 
 def controler(p, nom, etape):
     p.wait_for_timeout(350)  # la fin des transitions
@@ -98,6 +98,7 @@ def essai(nav, largeur, sombre):
         p.locator('.decouverte h2').dispatch_event('touchend', {'touches': [], 'changedTouches': t(120)}); p.wait_for_timeout(100)
         ok(nom + ' : glisser à droite = « Ça m’intrigue »', 'Carte 5 sur' in p.inner_text('.decouverte'))
     while p.locator('.decouverte').count(): p.locator('[data-a=reagir][data-v="1"]').click()
+    ok(nom + ' : le haut fait s’ouvre avec son insigne et « pourquoi c’est utile »', p.locator('#toasts .toast-hf .insigne').count() >= 1 and 'On ne peut pas aimer' in p.inner_text('#toasts'))
     ok(nom + ' : au bilan, le compteur et la révélation', p.locator('.bilan .compteur b').count() == 1 and p.locator('.revelation .sujet').count() >= 5)
     ok(nom + ' : « parce que tu as choisi… » en pastilles', p.locator('.revelation .raison').count() >= 1)
     controler(p, nom, '3-bilan')
@@ -114,17 +115,37 @@ def essai(nav, largeur, sombre):
     p.click('.point-etape[data-q=angle]'); controler(p, nom, '5-gouts-angle')
     p.click('.point-etape[data-q=apres]'); p.click('.gouts-nav .principal'); ok(nom + ' : « Suivante » mène à la dernière étape', p.locator('.etape-gouts[data-etape]:visible #piste-libre').count() == 1)
     p.click('[data-a=quiz-fini]'); p.wait_for_selector('#resultats .sujet'); controler(p, nom, '6-propositions')
+    # Les hauts faits : la collection, le fil du parcours, les états, sans dévoiler un haut fait caché.
+    p.goto(URL + '#/'); p.wait_for_selector('.hf-rappel')
+    ok(nom + ' : accueil, le dernier haut fait et le prochain à ta portée', 'Ton dernier haut fait' in p.inner_text('.hf-rappel') and 'Le prochain à ta portée' in p.inner_text('.hf-rappel'))
+    ok(nom + ' : le compteur en binaire et en hexadécimal, décoratif', p.locator('.chiffres .bin[aria-hidden=true]').count() == 1 and p.text_content('.chiffres .bin').startswith('0b'))
+    p.goto(URL + '#/hauts-faits'); p.wait_for_selector('.hf-bilan')
+    info = p.evaluate("(() => { const H = window.HGAnalyse.HAUTS_FAITS, d = JSON.parse(localStorage.getItem('hellogo:dossier:v1')); return { n: H.length, g: new Set(H.map((h) => h.g)).size, gagnes: H.filter((h) => d.hf[h.id]).length, secrets: H.filter((h) => h.cache && !d.hf[h.id]).map((h) => [h.id, h.titre]) }; })()")
+    ok(nom + ' : un insigne par haut fait', p.locator('.hf li .insigne').count() == info['n'] == p.locator('.hf li').count())
+    ok(nom + ' : gagnés, à gagner, cachés, dits en texte', p.locator('.hf li.gagne').count() == info['gagnes'] and p.locator('.hf li .lecteur').count() == info['n'])
+    ok(nom + ' : la progression globale', p.inner_text('.hf-total b') == str(info['gagnes']) and ('sur %d' % info['n']) in p.inner_text('.hf-total'))
+    texte = p.inner_text('#vue')
+    ok(nom + ' : un haut fait caché ne se dévoile pas (ni titre ni identifiant)', all(('hf_' + i) not in texte and t not in texte for i, t in info['secrets']) and p.locator('.hf li.cache').count() == len(info['secrets']))
+    ok(nom + ' : le fil du parcours, une étape par famille', p.locator('.fil-hf .fil-etape').count() == info['g'])
+    p.locator('.fil-etape[data-i="2"]').click(); p.wait_for_timeout(500); ok(nom + ' : une étape du fil mène à sa famille (focus)', p.evaluate("document.activeElement.id") == 'hf-famille-2')
+    controler(p, nom, '7-hauts-faits')
+    # Une adresse inconnue : la page « 404 », et le chemin du retour ; le lien d'évitement n'y mène pas.
+    p.goto(URL + '#/nulle-part'); p.wait_for_selector('.page-404')
+    ok(nom + ' : page « 404 » avec un lien vers l’accueil', p.locator('.page-404 a[href="#/"]').count() == 1 and 'n’existe pas' in p.inner_text('.page-404 h1')); controler(p, nom, '8-404')
+    p.goto(URL + '#/'); p.wait_for_selector('.heros-etape'); p.focus('.evitement'); p.keyboard.press('Enter'); p.wait_for_timeout(200)
+    ok(nom + ' : le lien « Aller au contenu » reste sur la page', p.locator('.page-404').count() == 0 and p.locator('.heros-etape').count() == 1)
     ctx.close()
 
 def mouvement(nav):
     """Mouvement réduit : aucune animation ni transition qui dure, sur les écrans refaits ; et rien n'est caché pour autant."""
     ctx = nav.new_context(viewport={'width': 390, 'height': 860}, reduced_motion='reduce', service_workers='block'); p = ctx.new_page()
-    p.goto(URL); a = p.evaluate(ANIMATIONS); ok('mouvement réduit : bienvenue, %.0f ms' % a[0], a[0] <= 1, a)
+    p.goto(URL); a = p.evaluate(ANIMATIONS); ok('mouvement réduit : bienvenue (curseur immobile), %.0f ms' % a[0], a[0] <= 1, a)
     p.fill('#prenom', 'Essai'); p.click('[data-a=demarrer]'); p.wait_for_selector('.heros-etape'); a = p.evaluate(ANIMATIONS); ok('mouvement réduit : accueil, %.0f ms' % a[0], a[0] <= 1, a)
     p.goto(URL + '#/explorer/decouvrir'); p.wait_for_selector('.decouverte'); p.click('[data-a=reagir][data-v="1"]'); a = p.evaluate(ANIMATIONS); ok('mouvement réduit : Découvrir, %.0f ms' % a[0], a[0] <= 1, a)
     while p.locator('.decouverte').count(): p.locator('[data-a=reagir][data-v="1"]').click()
     ok('mouvement réduit : les propositions sont toutes visibles', p.evaluate("[...document.querySelectorAll('.revelation .sujet')].every((x) => getComputedStyle(x).opacity === '1')"))
     p.goto(URL + '#/explorer/quiz'); p.wait_for_selector('.etape-gouts'); p.locator('label.puce').first.click(); a = p.evaluate(ANIMATIONS); ok('mouvement réduit : Mes goûts, %.0f ms' % a[0], a[0] <= 1, a)
+    p.goto(URL + '#/hauts-faits'); p.wait_for_selector('.hf-bilan'); a = p.evaluate(ANIMATIONS); ok('mouvement réduit : hauts faits et leurs messages, %.0f ms' % a[0], a[0] <= 1, a)
     p.goto(URL + '#/prof'); p.wait_for_timeout(300); ok('espace de l’enseignant·e : sobre (ni motif ni pictogramme de jeu)', p.locator('#vue .motif, #vue .tampon, #vue .dose').count() == 0)
     ctx.close()
 

@@ -437,3 +437,66 @@ button, .bouton, input[type=text], input[type=search], input[type=url], input[ty
   body:not(.espace-prof) { background: #fff; } .carte, .chiffres a { box-shadow: none; } .motif, .dose-onglets, .tampon, .pile-cartes::before, .pile-cartes::after { display: none; }
   .dose-piste { display: block; overflow: visible; } .logo b, .logo-grand b { color: #000; background: none; }
 }
+
+/* ========== Version 1.7.0 (suite) : les hauts faits en collection, et un parfum de NSI ========== */
+:root { --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; }
+/* Les petits repères en chasse fixe ; les phrases restent en Atkinson Hyperlegible. */
+.sur-titre, .fil-compte, .pc, .hf-id, .chemin-titre .note, .code-404, .console, .nombre-geek .bin { font-family: var(--mono); letter-spacing: -.01em; }
+.sur-titre { font-size: .76rem; }
+/* L'invite de commande devant les titres des pages de l'élève (décorative : rien n'est lu). */
+body:not(.espace-prof) main > h1::before { content: ">" / ""; font-family: var(--mono); color: var(--vif); margin-right: .4em; font-weight: 400; }
+.curseur { display: inline-block; width: .5em; height: .95em; margin-left: .15em; vertical-align: -.1em; background: var(--vif); animation: clignote 1.1s steps(1) infinite; }
+@keyframes clignote { 50% { opacity: 0; } }
+/* Un fond de carte électronique : une grille de points, qui s'efface vers le bas. */
+body:not(.espace-prof)::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background-image: radial-gradient(circle, color-mix(in srgb, var(--accent) 22%, transparent) 1px, transparent 1.5px); background-size: 22px 22px;
+  -webkit-mask-image: linear-gradient(#000, transparent 55%); mask-image: linear-gradient(#000, transparent 55%); }
+@media print { body::before { display: none; } }
+/* Les barres façon chargement. */
+.avance span { background-image: repeating-linear-gradient(90deg, transparent 0 7px, color-mix(in srgb, var(--carte) 35%, transparent) 7px 9px), linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 55%, var(--vif))); }
+.chargement { display: flex; align-items: center; gap: 8px; } .chargement .avance { flex: 1; height: 10px; margin: 0; } .pc { font-size: .78rem; color: var(--doux); min-width: 3.4em; text-align: right; }
+/* Les états vides, comme une sortie de console amicale ; les aides, comme un commentaire. */
+.vide { font-size: .95rem; } .vide::before { content: ">" / ""; font-family: var(--mono); font-weight: 700; color: var(--accent); }
+.aide p::before { content: "# " / ""; font-family: var(--mono); color: var(--doux); }
+/* Un nombre en binaire et en hexadécimal, au survol ou au focus (décoratif). */
+.nombre-geek { position: relative; display: inline-block; }
+.nombre-geek .bin { position: absolute; left: 50%; bottom: 100%; transform: translate(-50%, -4px); white-space: nowrap; font-size: .72rem; font-weight: 400; padding: 2px 6px; border-radius: 6px; background: var(--fort); color: var(--sur-fort); display: none; pointer-events: none; }
+a:hover .nombre-geek .bin, a:focus-visible .nombre-geek .bin, .hf-total:hover .bin { display: block; }
+.chiffres a:last-child .nombre-geek .bin { left: auto; right: -1.6rem; transform: translateY(-4px); }
+
+/* Les insignes */
+.insigne { width: 48px; height: 48px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.insigne.gagne { color: var(--c); } .insigne.gagne .insigne-fond { fill: var(--cf); stroke: var(--c); stroke-width: 2.5; }
+.insigne.a-gagner, .insigne.cache { color: var(--doux); } .insigne.a-gagner .insigne-fond, .insigne.cache .insigne-fond { stroke: var(--trait-fort); stroke-dasharray: 4 3; }
+.insigne-q { font: 700 20px var(--mono); fill: var(--doux); stroke: none; }
+/* La page des hauts faits : le total, le fil du parcours, les familles. */
+.hf-bilan { text-align: center; }
+.hf-total { font: 700 1.1rem var(--titre); margin: 6px 0; } .hf-total .nombre-geek b { font-size: 2.6rem; color: var(--vif); }
+.fil-hf { list-style: none; padding: 0; margin: 8px 0 18px; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 8.5rem), 1fr)); gap: 8px; }
+.fil-etape { width: 100%; height: 100%; flex-direction: column; gap: 2px; padding: 10px 6px; background: var(--carte); border-color: var(--trait-fort); border-radius: 14px; }
+.fil-etape .insigne { width: 40px; height: 40px; } .fil-nom { font-weight: 700; font-size: .9rem; } .fil-compte { font-size: .76rem; color: var(--doux); font-weight: 400; }
+.fil-etape.complet { border-color: var(--c); border-width: 2px; }
+.hf-famille { margin: 22px 0 8px; scroll-margin-top: 12px; }
+.hf-famille h2 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; } .hf-famille h2 .fil-compte { margin-left: auto; }
+.picto-famille { width: 30px; height: 30px; padding: 5px; border-radius: 9px; background: var(--cf); color: var(--c); }
+.hf { display: grid; gap: 8px; } @media (min-width: 760px) { .hf { grid-template-columns: 1fr 1fr; } }
+.hf li { margin: 0; align-items: flex-start; border-color: color-mix(in srgb, var(--trait) 70%, transparent); }
+.hf li.gagne { border-color: var(--c); border-width: 2px; background: linear-gradient(135deg, var(--carte) 60%, color-mix(in srgb, var(--cf) 70%, var(--carte))); }
+.hf li.a-gagner, .hf li.cache { background: var(--carte2); border-style: dashed; border-color: var(--trait-fort); }
+.hf-id { font-size: .7rem; color: var(--doux); margin: 0; } .hf-titre { margin: 0; color: var(--encre); }
+.hf-pourquoi { color: var(--encre); }
+/* Le rappel sur l'accueil */
+.hf-rappel { display: grid; gap: 10px; } @media (min-width: 700px) { .hf-rappel { grid-template-columns: 1fr 1fr; } }
+.hf-rappel-ligne { display: flex; gap: 10px; align-items: flex-start; } .hf-rappel-ligne p { margin: 0; } .hf-rappel .insigne { width: 40px; height: 40px; }
+/* L'ouverture d'un haut fait : l'insigne se dévoile, et pourquoi c'est utile se lit. */
+.toast-hf { align-items: center; max-width: 520px; }
+.toast-hf .insigne { width: 44px; height: 44px; color: var(--sur-fort); } .toast-hf .insigne .insigne-fond { fill: color-mix(in srgb, var(--sur-fort) 18%, transparent); stroke: var(--sur-fort); }
+.toast-hf .devoile { animation: devoile .7s cubic-bezier(.2, .8, .3, 1.3) both; }
+@keyframes devoile { from { transform: rotateY(90deg) scale(.4); } 60% { transform: rotateY(0) scale(1.15); } to { transform: none; } }
+.toast-hf-texte p { margin: 0; } .toast-hf-texte p + p { font-size: .88rem; margin-top: 2px; }
+.toast-hf::after { left: 32px; }
+/* La page « 404 » */
+.page-404 { text-align: center; } .code-404 { font-size: 3.6rem; font-weight: 700; line-height: 1; margin: 8px 0; color: var(--vif); letter-spacing: .08em; }
+.page-404 h1::before { display: none; } .console { display: inline-block; background: var(--carte2); border-radius: 8px; padding: 4px 10px; color: var(--doux); }
+@media (prefers-reduced-motion: reduce) { .curseur { animation: none !important; } }
+@media (max-width: 759px) { .hf li { padding: 8px 10px; gap: 10px; } .hf .insigne { width: 40px; height: 40px; } .hf-famille { margin-top: 18px; } }

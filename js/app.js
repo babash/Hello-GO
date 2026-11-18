@@ -115,7 +115,7 @@
     clearTimeout(minuterie);
     if (tout_de_suite) ecrire(); else { enAttente = true; minuterie = setTimeout(ecrire, 400); }
     const nouveaux = A.majHautsFaits(d);
-    if (nouveaux.length) { ecrire(); nouveaux.forEach((h) => toast('Haut fait débloqué : ' + h.titre, '#/hauts-faits', 'Voir')); }
+    if (nouveaux.length) { ecrire(); nouveaux.forEach(toastHautFait); }
   }
   // En quittant, on n'écrit que ce qui attend encore : un vieil onglet n'écrase jamais le travail fait dans un autre.
   window.addEventListener('pagehide', () => { if (enAttente) ecrire(); envoiFermeture(); });
@@ -271,11 +271,19 @@
   let pile = null;
   function toast(texte, vers, bouton, action) {
     pile = pile || $('#toasts');
-    const t = document.createElement('div'), hf = /^Haut fait débloqué/.test(texte); t.className = 'toast' + (hf ? ' toast-hf' : ''); t.setAttribute('role', 'status');
-    t.innerHTML = (hf ? picto('etoile') : '') + '<span>' + e(texte) + '</span>' + (bouton ? (vers ? '<a href="' + vers + '">' + e(bouton) + '</a>' : '<button type="button">' + e(bouton) + '</button>') : '');
+    const t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status');
+    t.innerHTML = '<span>' + e(texte) + '</span>' + (bouton ? (vers ? '<a href="' + vers + '">' + e(bouton) + '</a>' : '<button type="button">' + e(bouton) + '</button>') : '');
     if (action) $('button', t).addEventListener('click', () => { action(); t.remove(); });
     while (pile.children.length >= 3) pile.firstChild.remove();
     pile.appendChild(t); setTimeout(() => t.remove(), 7000);
+  }
+  // Un haut fait gagné : l'insigne se dévoile, avec son titre et pourquoi c'est utile (annoncé poliment, une fois).
+  function toastHautFait(h) {
+    pile = pile || $('#toasts');
+    const t = document.createElement('div'); t.className = 'toast toast-hf'; t.setAttribute('role', 'status');
+    t.innerHTML = insigne(h.g, 'gagne', 'devoile') + '<div class="toast-hf-texte"><p><b>Haut fait débloqué : ' + e(h.titre) + '</b></p><p>' + e(h.pourquoi) + '</p></div><a href="#/hauts-faits">Voir</a>';
+    while (pile.children.length >= 3) pile.firstChild.remove();
+    pile.appendChild(t); setTimeout(() => t.remove(), 9000);
   }
   function avecAnnulation(texte, changer) {
     const avant = JSON.stringify(d); changer(); enregistrer(true); rendre();
@@ -350,13 +358,45 @@
     <path class="motif-bulle" d="M20 18h76a12 12 0 0 1 12 12v40a12 12 0 0 1-12 12H52l-20 18v-18H20A12 12 0 0 1 8 70V30a12 12 0 0 1 12-12z"/>
     <text class="motif-texte" x="58" y="62" text-anchor="middle">GO</text></svg>`;
 
+  // ---------- Les insignes des hauts faits (version 1.7.0) : un par famille, dessinés pour Hello GO ----------
+  // Un hexagone et le pictogramme de la famille ; gagné : en couleur ; à gagner : en pointillés ; caché : « ? ».
+  // Le texte voisin dit toujours l'état (les insignes sont décoratifs). Rien de nouveau n'est enregistré.
+  const FAMILLES = { 'Explorer': ['explorer', 'accent'], 'Comprendre': ['idee', 'ok'], 'Le plan': ['points', 'src'], 'Les mots': ['mots', 'mot'], 'Les sources': ['sources', 'alerte'],
+    'L’échange': ['debat', 'vif'], 'Les oraux': ['preparer', 'accent'], 'La culture': ['monde', 'mot'], 'Cachés': ['cle', 'vif'] };
+  const famille = (g) => FAMILLES[g] || ['etoile', 'accent'];
+  const styleFamille = (g) => `--c:var(--${famille(g)[1]});--cf:var(--${famille(g)[1]}-fond)`;
+  const HEXAGONE = 'M24 3l18 10.5v21L24 45 6 34.5v-21z';
+  function insigne(g, etat, classe) {
+    const dedans = etat === 'cache' ? '<text x="24" y="31" text-anchor="middle" class="insigne-q">?</text>' : `<path transform="translate(12 12)" d="${PICTOS[famille(g)[0]]}"/>`;
+    return `<svg class="insigne ${etat}${classe ? ' ' + classe : ''}" style="${styleFamille(g)}" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path class="insigne-fond" d="${HEXAGONE}"/>${dedans}</svg>`;
+  }
+  // Un nombre, et (décoratif, au survol ou au focus) son écriture en binaire et en hexadécimal.
+  const enBinaire = (n) => `<span class="nombre-geek"><b>${n}</b><span class="bin" aria-hidden="true">0b${n.toString(2)} · 0x${n.toString(16).toUpperCase().padStart(2, '0')}</span></span>`;
+  // Une barre façon chargement, et son pourcentage (le texte voisin dit « k sur n »).
+  const barre = (k, n) => { const pc = n ? Math.round(100 * k / n) : 0; return `<span class="chargement" aria-hidden="true"><span class="avance"><span style="width:${pc}%"></span></span><span class="pc">${pc} %</span></span>`; };
+  const ROUTE_FAMILLE = [[/decouvrir|sujets|pistes|quiz$/, 'Explorer'], [/comprendre/, 'Comprendre'], [/echange/, 'L’échange'], [/question/, 'Le plan'], [/mots/, 'Les mots'], [/sources/, 'Les sources'], [/oraux/, 'Les oraux'], [/infox|videos/, 'La culture']];
+  // Le prochain haut fait à ta portée : le premier pas encore gagné (et pas caché) de la famille de ta prochaine étape,
+  // sinon le premier pas encore gagné. Seules les conditions existantes (cond) sont montrées : rien n'est inventé.
+  function prochainHautFait() {
+    const vers = A.prochaineAction(d).vers, f = (ROUTE_FAMILLE.find((x) => x[0].test(vers)) || [])[1];
+    const libres = A.HAUTS_FAITS.filter((h) => !d.hf[h.id] && !h.cache);
+    return libres.find((h) => h.g === f) || libres[0] || null;
+  }
+  function rappelHautsFaits() {
+    const l = A.hautsFaitsDates(d), dernier = l.length ? A.HAUTS_FAITS.find((h) => h.id === l[l.length - 1].id) : null, suivant = prochainHautFait();
+    if (!dernier && !suivant) return '';
+    return `<a class="carte lien-carte hf-rappel" href="#/hauts-faits">
+      ${dernier ? `<div class="hf-rappel-ligne">${insigne(dernier.g, 'gagne')}<div><p class="sur-titre">Ton dernier haut fait</p><p><b>${e(dernier.titre)}</b>${l[l.length - 1].le ? ' <span class="note">· ' + e(dateLongue(l[l.length - 1].le)) + '</span>' : ''}</p></div></div>` : ''}
+      ${suivant ? `<div class="hf-rappel-ligne">${insigne(suivant.g, 'a-gagner')}<div><p class="sur-titre">Le prochain à ta portée</p><p><b>${e(suivant.titre)}</b> : ${e(suivant.cond)}</p></div></div>` : ''}</a>`;
+  }
+
   // ---------- Les vues ----------
   const vues = {};
 
   vues.bienvenue = () => `
     <section class="bienvenue">
       <div class="heros">${MOTIF}<div><p class="logo-grand">Hello <b>GO</b></p>
-      <h1>Prépare ton Grand oral de NSI, pas à pas</h1></div></div>
+      <h1>Prépare ton Grand oral de NSI, pas à pas<span class="curseur" aria-hidden="true"></span></h1></div></div>
       <ol class="etapes tuiles-etapes">
         <li style="--i:0">${picto('explorer')}<span><b>Explore</b> : découvre des histoires de l’informatique, trouve un sujet qui te plaît, puis ta question.</span></li>
         <li style="--i:1">${picto('construire')}<span><b>Construis</b> ton plan point par point, avec tes mots et tes sources.</span></li>
@@ -430,8 +470,9 @@
       <a href="#/questions">${picto('points')}<b>${nPoints}</b> ${nPoints > 1 ? 'points' : 'point'}</a>
       <a href="#/mots">${picto('mots')}<b>${d.mots.length}</b> ${d.mots.length > 1 ? 'mots' : 'mot'}</a>
       <a href="#/sources">${picto('sources')}<b>${d.sources.length}</b> ${d.sources.length > 1 ? 'sources' : 'source'}</a>
-      <a href="#/hauts-faits">${picto('etoile')}<b>${nHf}</b> ${nHf > 1 ? 'hauts faits' : 'haut fait'}</a>
+      <a href="#/hauts-faits">${picto('etoile')}${enBinaire(nHf)} ${nHf > 1 ? 'hauts faits' : 'haut fait'}</a>
     </section>
+    ${rappelHautsFaits()}
     ${blocComprendre()}
     ${s ? (retoursProf.items.length ? '<p class="bas"><a href="#/retours">Tous les retours de ton enseignant·e</a></p>' : '') : `<section class="carte invitation"><h2>Retrouve ton dossier partout</h2><p>Pour le moment, ton dossier reste sur cet appareil. Rejoins ta classe avec le lien ou le code de ton enseignant·e : ton dossier te suit, et ton enseignant·e peut te faire des retours.</p><p><a class="bouton" href="#/rejoindre">Rejoindre ma classe</a></p></section>`}`;
   };
@@ -472,7 +513,7 @@
     // Pendant les cartes, ce qui intrigue reste replié (« Ta collection ») ; au bilan, tout se révèle, une carte après l'autre.
     const listeAimees = aimees.length ? `<ul class="liste">${aimees.map((x, i) => { const deja = d.pistes.some((p) => p.titre === x.q);
         return `<li class="carte sujet" style="--i:${i}"><p class="sur-titre">${picto(PICTO_CATEGORIE[x.cat] || 'etoile')} ${e(x.titre)} · ${e(x.date)}</p><p class="gros">${e(x.q)}</p>${deja ? '<p class="fait-texte">Dans tes pistes</p>' : `<button data-a="garder" data-t="${e(x.q)}">Garder comme piste</button>`}</li>`; }).join('')}</ul>`
-      : `<p class="vide">${picto('oui')} ${c ? 'Aucune carte pour le moment : continue, il y en a pour tous les goûts.' : 'Aucune carte ne t’a intrigué·e : dis ce que tu aimes dans « Mes goûts », ou parcours les sujets.'}</p>`;
+      : `<p class="vide">${c ? 'Aucune carte pour le moment : continue, il y en a pour tous les goûts.' : 'Aucune carte ne t’a intrigué·e : dis ce que tu aimes dans « Mes goûts », ou parcours les sujets.'}</p>`;
     const enCartes = c && !bilan;
     const surprise = surp.length ? `<section class="carte savoir surprise"><p class="sur-titre">${picto('oui')} Ta surprise</p><p class="gros">Tu ne l’avais pas coché dans tes goûts, mais ça t’intrigue : ${e(surp.join(', '))}.</p></section>` : '';
     const resultats = !n ? '' : enCartes ? (aimees.length ? `<details class="carte collection"><summary>${picto('oui')} Ta collection : ${pluriel(aimees.length, 'carte')} qui t’intrigue${aimees.length > 1 ? 'nt' : ''}</summary>${listeAimees}</details>` : '') + surprise
@@ -673,13 +714,28 @@
       <label>Mes deux objectifs pour la prochaine fois ${zoneTexte('oral.' + o.id + '.objectifs', o.objectifs)}</label>${retoursSur('oral', o.id)}</section>`; }).join('')}
     <button class="ajouter" data-a="plus-oral">+ Ajouter une vidéo ou un entraînement</button>`;
 
+  // « Mes hauts faits » (version 1.7.0) : une collection d'insignes, la progression globale et par famille (le fil du
+  // Grand oral : explorer, comprendre, le plan, les mots, les sources, l'échange, les oraux…). Ni points, ni niveaux, ni
+  // classement : on ne perd jamais un haut fait, et rien n'est comparé entre élèves.
   vues.hf = () => {
-    const groupes = [...new Set(A.HAUTS_FAITS.map((h) => h.g))], n = A.hautsFaitsDates(d).length; // seulement les hauts faits que connaît cette version
-    return `<h1>Mes hauts faits</h1><p class="chapo">${n} sur ${A.HAUTS_FAITS.length}. Ils récompensent les bonnes habitudes, pas la quantité.</p>
-    ${groupes.map((g) => `<h2>${e(g)}</h2><ul class="hf">${A.HAUTS_FAITS.filter((h) => h.g === g).map((h) => { const ok = d.hf[h.id];
-      return `<li class="${ok ? 'gagne' : ''}"><span class="medaille" aria-hidden="true">${ok ? '★' : h.cache ? '?' : '☆'}</span><div><b>${ok || !h.cache ? e(h.titre) : '???'}</b>
-        <p>${ok ? e(h.pourquoi) : e(h.cache ? h.indice : h.cond)}</p>${ok ? `<p class="note">${/^[0-9]{4}-[0-9]{2}-[0-9]{2}/.test(ok) ? 'Gagné le ' + e(dateLongue(ok)) : 'Date inconnue'}</p>` : ''}</div></li>`; }).join('')}</ul>`).join('')}`;
+    const groupes = [...new Set(A.HAUTS_FAITS.map((h) => h.g))], n = A.hautsFaitsDates(d).length, N = A.HAUTS_FAITS.length; // seulement les hauts faits que connaît cette version
+    const dans = (g) => A.HAUTS_FAITS.filter((h) => h.g === g), gagnes = (g) => dans(g).filter((h) => d.hf[h.id]).length;
+    return `<h1>Mes hauts faits</h1>
+    <section class="carte hf-bilan"><p class="hf-total">${enBinaire(n)} <span>sur ${N} gagnés</span></p>${barre(n, N)}
+      <p class="chapo">Ils récompensent les bonnes habitudes, pas la quantité. Un haut fait gagné l’est pour de bon.</p></section>
+    <h2 id="fil-hf">Ton parcours</h2>
+    <ol class="fil-hf" aria-labelledby="fil-hf">${groupes.map((g, i) => { const k = gagnes(g), t = dans(g).length;
+      return `<li style="${styleFamille(g)}"><button type="button" class="fil-etape${k === t ? ' complet' : ''}" data-a="hf-famille" data-i="${i}">${insigne(g, k ? 'gagne' : 'a-gagner')}<span class="fil-nom">${e(g)}</span><span class="fil-compte">${k} sur ${t}</span></button></li>`; }).join('')}</ol>
+    ${groupes.map((g, i) => { const k = gagnes(g), t = dans(g).length;
+      return `<section class="hf-famille" style="${styleFamille(g)}"><h2 id="hf-famille-${i}" tabindex="-1">${picto(famille(g)[0], 'picto-famille')}${e(g)} <span class="fil-compte">${k} sur ${t}</span></h2>${barre(k, t)}
+      <ul class="hf">${dans(g).map((h) => { const ok = d.hf[h.id], etat = ok ? 'gagne' : h.cache ? 'cache' : 'a-gagner';
+        return `<li class="${ok ? 'gagne' : etat}">${insigne(g, etat)}<div><p class="hf-id" aria-hidden="true">hf_${ok || !h.cache ? e(h.id) : '???'}</p><p class="hf-titre"><b>${ok || !h.cache ? e(h.titre) : '???'}</b> <span class="lecteur">${ok ? '(gagné)' : h.cache ? '(caché)' : '(à gagner)'}</span></p>
+        <p>${ok ? `<span class="hf-pourquoi">${e(h.pourquoi)}</span>` : h.cache ? '<span class="note">Indice :</span> ' + e(h.indice) : e(h.cond)}</p>${ok ? `<p class="note">${/^[0-9]{4}-[0-9]{2}-[0-9]{2}/.test(ok) ? 'Gagné le ' + e(dateLongue(ok)) : 'Date inconnue'}</p>` : ''}</div></li>`; }).join('')}</ul></section>`; }).join('')}`;
   };
+  // Une adresse inconnue : une page « 404 », drôle mais claire, et le chemin du retour.
+  vues.introuvable = () => `<section class="carte page-404"><p class="code-404" aria-hidden="true">404</p><h1>Cette page n’existe pas</h1>
+    <p>L’adresse ne mène nulle part : comme un lien mort dans une bibliographie. Ton dossier, lui, est bien là.</p>
+    <p class="console" aria-hidden="true">&gt; cd ~/accueil</p><p><a class="bouton principal" href="#/">Revenir à l’accueil ${picto('suite')}</a></p></section>`;
   // « 2026-11-17 » devient « 17 novembre 2026 ».
   function dateLongue(j) { const p = String(j).slice(0, 10).split('-'); return new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
   };
@@ -1051,7 +1107,7 @@
       case 'ton-code': return ['ton-code', '#/', vues.tonCode()];
       case 'retours': return ['retours', '#/plus', vues.retours()];
       case 'a-part': return ['a-part', '#/', vues.aPart()];
-      default: return ['accueil', '#/', vues.accueil()];
+      default: return ['introuvable', '#/', vues.introuvable()];
     }
   }
   // Le lien de classe : le nom de la classe et de l'enseignant·e, demandés une fois par code.
@@ -1219,6 +1275,7 @@
     'recommencer-cartes'() { avecAnnulation('Tes avis sur les cartes sont effacés.', () => { d.decouverte.reactions = {}; delete d.vus.suite; }); },
     'gouts-aller'(b) { etapeGouts = +b.dataset.e; rendre(false); const t = $('#gouts-etape'); if (t) { t.focus({ preventScroll: true }); t.scrollIntoView({ block: 'nearest' }); } },
     'gouts-liste'() { goutsListe = !goutsListe; rendre(); const t = $('[data-a=gouts-liste]'); if (t) t.focus(); },
+    'hf-famille'(b) { const t = $('#hf-famille-' + b.dataset.i); if (t) { t.scrollIntoView({ block: 'start', behavior: bougeReduit() ? 'auto' : 'smooth' }); t.focus({ preventScroll: true }); } },
     'dose'(b) { doseActive = +b.dataset.i; montrerDose(true); },
     'quiz-fini'() { d.quiz.fait = true; enregistrer(true); rendre(); const r = $('#resultats'); if (r) r.scrollIntoView({ behavior: bougeReduit() ? 'auto' : 'smooth' }); },
     garder(b) { d.pistes.push({ id: uid(), titre: b.dataset.t, pourquoi: '', idees: [''], candidates: [''] }); enregistrer(true); rendre(); toast('Ajouté à tes pistes.', '#/explorer/pistes', 'Ouvrir'); },
@@ -1468,7 +1525,7 @@
     const gagnes = A.majHautsFaits(d); rendre(false);
     window.HG_DEMARRE = true; try { sessionStorage.removeItem(CLE_REPARATION); } catch (x) { /* rien */ }
     if (d.profil.vu && (nouveauJour || visite || gagnes.length)) ecrire();
-    if (d.profil.vu) gagnes.forEach((h) => toast('Haut fait débloqué : ' + h.titre, '#/hauts-faits', 'Voir'));
+    if (d.profil.vu) gagnes.forEach(toastHautFait);
     if (EL.session()) { if (EL.session().attente) montrerEtat('attente'); reprendre().then(interroger); }
     if (!memoireOk) toast('Ce navigateur ne garde pas ton dossier.');
   } catch (x) {
