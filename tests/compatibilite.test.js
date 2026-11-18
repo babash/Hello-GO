@@ -28,7 +28,7 @@ const anciens = VERSIONS.map((ver) => {
   assert.strictEqual(typeof M.dossierValide, 'function', ver.v + ' : dossierValide absent');
   return { v: ver.v, valide: M.dossierValide };
 });
-ok(anciens.length === 10, 'neuf versions publiées (1.0.0 à 1.6.0), et la 1.4.0 avant sa pré-validation');
+ok(anciens.length === 11, 'dix versions publiées (1.0.0 à 1.7.0), et la 1.4.0 avant sa pré-validation');
 
 // Ce que fait la version actuelle à l'ouverture (app.js : Object.assign(dossierNeuf(), dossier)), puis à l'usage.
 const neuf = () => ({ v: 1, profil: { prenom: '', vu: false }, quiz: { reponses: {}, fait: false }, interets: ['', '', ''], ponts: [''], pistes: [], questions: [],

@@ -25,7 +25,7 @@ TYPES = os.path.join(RACINE, 'tests', 'dossiers')
 # de la base (un onglet resté ouvert le reprend), donc doit accepter celui des versions suivantes.
 PUBLIEES = [('1.0.0', 'da25fa5', False), ('1.1.0', '6b45cf1', False), ('1.2.0', 'd654f95', False),
             ('1.3.0', 'ffdbd76', True), ('1.3.1', 'df87f84', True), ('1.3.2', 'ef8b049', True), ('1.4.0', '5c92a5d', True),
-            ('1.5.0', '4af835c', True), ('1.6.0', 'd32c149', True)]
+            ('1.5.0', '4af835c', True), ('1.6.0', 'd32c149', True), ('1.7.0', '284701d', True)]
 PAGES = ['#/', '#/explorer/decouvrir', '#/explorer/quiz', '#/explorer/sujets', '#/explorer/pistes', '#/questions', '#/question/{q}',
          '#/question/{q}/echange', '#/mots', '#/sources', '#/oraux', '#/hauts-faits', '#/plus', '#/aide', '#/aide/exemple',
          '#/comprendre', '#/comprendre/epreuve', '#/reglages', '#/a-part',
